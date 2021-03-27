@@ -1,0 +1,57 @@
+<%= content_for :page_title, @area.name %>
+
+<div class="flex-1">
+  <header class="bg-gray-100">
+    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
+      <div class="flex-1">
+        <%= link_to image_tag("logo.png", class: "w-96", alt: "SweepAround.Us logo"), root_path %>
+      </div>
+      <div class="hidden lg:block">
+        <%= render "search/form" %>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="lg:flex items-center my-6">
+        <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
+          <%= @area.name %>
+        </h1>
+
+        <div class="mt-4 text-sm lg:mt-0 lg:bg-gray-100 lg:py-2 lg:px-4 ">
+          <div class="text-xs font-medium uppercase">
+            Next Sweeps
+          </div>
+          <%= @area.next_sweep %>
+        </div>
+      </div>
+
+      <div class="lg:grid grid-cols-2 gap-8">
+        <div>
+          <%= @area.map_image %>
+        </div>
+
+        <aside class="flex-1 my-6 lg:my-0 max-w-xl">
+          <!-- Subscribe -->
+          <%= render "subscribe" %>
+          <%= render "schedule" %>
+
+          <div class="mt-8 text-sm text-gray-500">
+            <p class="mb-2">1. Email and text message alerts will be sent one day prior to the beginning of street sweeping in this area.</p>
+            <p>2. Standard message and data rates may apply. To unsubscribe from alerts for this area, text <strong>STOP <%= @area.shortcode %></strong>.</p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="my-8 rounded-md bg-yellow-50 p-4 text-sm">
+        <div class="text-yellow-700">
+          <p>
+            Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis.
+            Please consult the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping_2021.html" class="underline" target="_blank">Department of Streets and Sanitation website</a>
+            and street signage for parking information.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

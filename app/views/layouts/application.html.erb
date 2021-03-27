@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "inter-font" %>
+    <%= stylesheet_link_tag "tailwind" %>
+    <%= stylesheet_link_tag "application", media: "all" %>
+    <%= stimulus_include_tags %>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_API_KEY"] %>&libraries=places"></script>
+    <%= javascript_include_tag "turbo", type: "module-shim" %>
+    <%= yield :head %>
+  </head>
+
+  <body class="flex-col text-gray-700 lg:flex">
+    <%= yield %>
+
+    <footer>
+      <div class="p-4 max-w-6xl mx-auto text-sm text-center lg:flex border-t">
+        <div class="mb-4 underline text-gray-600 hover:text-black lg:mb-0">
+          <%= link_to "Home", root_path %>
+        </div>
+
+        <div class="flex-1 lg:text-right">
+          &copy; <%= Time.current.year %> Robbin & Co. LLC.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

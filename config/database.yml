@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgis
+  encoding: unicode
+  host: db
+  username: postgres
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: sweeparoundus_development
+
+test:
+  <<: *default
+  database: sweeparoundus_test
+
+production:
+  <<: *default
+  database: sweeparoundus_production
+  url: <%= ENV.fetch("DATABASE_URL", "").sub(/^postgres/, "postgis") %>

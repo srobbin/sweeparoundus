@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date_1: 2021-03-28
+  date_2: 2021-03-28
+  date_3: 2021-03-28
+  date_4: 2021-03-28
+  area: one
+
+two:
+  date_1: 2021-03-28
+  date_2: 2021-03-28
+  date_3: 2021-03-28
+  date_4: 2021-03-28
+  area: two

@@ -1,0 +1,7 @@
+---
+queues:
+  - default
+  - mailers
+  - sms
+  - active_storage_analysis
+  - active_storage_purge

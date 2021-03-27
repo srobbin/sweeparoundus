@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  number: 1
+  ward: 1
+  shape: 
+
+two:
+  number: 1
+  ward: 1
+  shape: 

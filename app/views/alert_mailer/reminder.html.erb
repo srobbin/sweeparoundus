@@ -1,0 +1,16 @@
+<p>Hello,</p>
+
+<p>This is a reminder that street sweeping for <%= link_to @area.name, @area %> will begin tomorrow.</p>
+
+<p><%= @dates.join("<br />").html_safe %></p>
+
+<p>
+Cheers,<br />
+SweepAround.Us
+</p>
+
+<p>Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. Please consult the Department of Streets and Sanitation website and street signage for parking information.</p>
+
+<p>
+  <%= link_to "Unsubscribe", @unsubscribe_url %>
+</p>

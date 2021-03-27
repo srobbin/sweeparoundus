@@ -1,0 +1,30 @@
+<h2 class="flex items-center mb-4 text-xl font-bold">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+  </svg>
+  <span class="ml-2">Subscribe to be notified</span>
+</h2>
+<div class="text-sm">
+  <p>SweepAround.Us has several options for being notified of street sweeping in this area: we can send you an email, a text message or you may subscribe to a calendar feed. <sup>1</sup></p>
+  
+  <ul>
+    <li class="py-6 border-b">
+      <h5 class="mb-2">Enter your email address, and we'll send alerts directly to your inbox:</h5>
+      <div id="subscribe">
+        <%= render "alerts/form", area: @area %>
+      </div>
+    </li>
+
+    <li class="py-6 border-b">
+      <h5 class="mb-1">Receive text message alerts on your phone:</h5>
+      <p>
+        To subscribe, text <strong><%= @area.shortcode %></strong> to <strong><%= number_to_phone(ENV["PHONE_NUMBER"], area_code: true) %></strong>. <sup>2</sup>
+      </p>
+    </li>
+
+    <li class="py-6">
+      <h5 class="mb-2">Calendar feed (for iCal, Google Calendar, or Outlook):</h5>
+      <%= link_to "Download or right-click to copy", area_url(@area, format: :ics), class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    </li>
+  </ul>
+</div>

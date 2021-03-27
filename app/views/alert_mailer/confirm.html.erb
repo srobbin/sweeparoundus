@@ -1,0 +1,22 @@
+<p>Hello,</p>
+
+<p>
+  You are receiving this email because we have received a request to subscribe
+  <strong><%= @email %></strong> to Chicago street sweeping alerts for <strong><%= @area.name %></strong>.
+  Alerts will be sent out one day prior to a scheduled street sweeping.
+</p>
+
+<p>
+  <%= link_to "Click here to confirm your subscription", @confirmation_url %>
+</p>
+
+<p>
+Cheers,<br />
+SweepAround.Us
+</p>
+
+---
+
+<p>
+  <%= link_to "Unsubscribe", @unsubscribe_url %>
+</p>

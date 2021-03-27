@@ -1,0 +1,11 @@
+<div class="flex-1 w-full items-center justify-center lg:flex">
+  <div class="max-w-3xl p-8 text-center">
+    <%= image_tag "logo.png", class: "inline-block", alt: "SweepAround.Us logo" %>
+    <div class="my-8">
+      <%= render "shared/flash" %>
+      <%= render "search/form" %>
+    </div>
+    <p>Search for your Chicago street address, and find out when your street will be swept next. Then, register for email and text message alerts, or subscribe to your calendar feed.</p>
+    <%= render "important_note" %>
+  </div>
+</div>

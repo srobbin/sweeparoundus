@@ -1,0 +1,3 @@
+send_alerts:
+  cron: "0 16 * * *"
+  class: "SendAlertsJob"

@@ -1,0 +1,8 @@
+<%= turbo_stream.replace "subscribe" do %>
+  <div id="subscribe">
+    <div class="mt-5">
+      <%= render "shared/flash" %>
+    </div>
+    <%= render "alerts/form", area: @area %>
+  </div>
+<% end %>

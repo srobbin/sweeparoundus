@@ -1,0 +1,26 @@
+<h2 class="flex items-center mt-6 mb-4 text-xl font-bold">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+  <span class="ml-2">Sweep Schedule</span>
+</h2>
+<div class="flex flex-col">
+  <div class="-my-2 sm:-mx-6 lg:-mx-8">
+    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+      <div class="shadow border-b border-gray-200 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <tbody>
+            <% @area.sweeps.each do |sweep| %>
+              <tr class="<%= cycle("bg-white", "bg-gray-50") %>">
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= sweep.date_1 %></td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= sweep.date_2 %></td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= sweep.date_3 %></td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= sweep.date_4 %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

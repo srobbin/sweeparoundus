@@ -1,0 +1,35 @@
+class AlertMailer < ApplicationMailer
+  def reminder
+    @sweep = params[:sweep]
+    @alert = params[:alert]
+    @area = @alert.area
+    @dates = [
+      @sweep.date_1,
+      @sweep.date_2,
+      @sweep.date_3,
+      @sweep.date_4,
+    ].compact.map { |d| d.strftime("%B %-d") }
+    @unsubscribe_url = unsubscribe_area_alerts_url(@area, t: encode_jwt(@alert.email))
+
+    mail(
+      to: @alert.email,
+      subject: "Street sweeping alert for #{@area.name}",
+    )
+  end
+
+  def confirm
+    
+    @alert = params[:alert]
+    @area = @alert.area
+    @email = @alert.email
+
+    token = encode_jwt(@email)
+    @confirmation_url = confirm_area_alerts_url(@area, t: token)
+    @unsubscribe_url = unsubscribe_area_alerts_url(@area, t: token)
+
+    mail(
+      to: @alert.email,
+      subject: "Please confirm your subscription to #{@area.name}",
+    )
+  end
+end
