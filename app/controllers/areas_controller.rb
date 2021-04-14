@@ -14,16 +14,25 @@ class AreasController < ApplicationController
 
   def calendar
     cal = Icalendar::Calendar.new
+  
+    cal.x_wr_calname = "SweepAround.Us: #{@area.name}"
+    cal.x_wr_timezone = "America/Chicago"
+    cal.prodid = "-//SweepAround.Us: #{@area.name}//EN"
+    cal.calscale = "GREGORIAN"
     
     @area.sweeps.each do |sweep|
       1.upto(4).each do |n|
-        date = sweep.send("date_#{n}")
+        date = sweep.object.send("date_#{n}")
         next unless date.present?
 
         event = Icalendar::Event.new
         event.summary = "Street Sweeping for #{@area.name}"
         event.uid = "#{date}@sweeparound.us"
         event.url = area_url(@area)
+        event.dtstamp = date.beginning_of_day
+        event.dtstart = Icalendar::Values::Date.new(date)
+        event.dtend = Icalendar::Values::Date.new(date + 1.day)
+
         cal.add_event(event)
       end
     end
