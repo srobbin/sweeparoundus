@@ -12,6 +12,7 @@
     <%= stimulus_include_tags %>
     <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_API_KEY"] %>&libraries=places"></script>
     <%= javascript_include_tag "turbo", type: "module-shim" %>
+    <%= render "shared/analytics" if Rails.env.production? && ENV["GOOGLE_ANALYTICS_ID"].present? %>
     <%= yield :head %>
   </head>
 
