@@ -5,7 +5,7 @@
   <span class="ml-2">Subscribe to be notified</span>
 </h2>
 <div class="text-sm">
-  <p>SweepAround.Us has several options for being notified of street sweeping in this area: we can send you an email, a text message or you may subscribe to a calendar feed. <sup>1</sup></p>
+  <p>SweepAround.Us has two options for being notified of street sweeping in this area: we can send you an email or you may subscribe to a calendar feed.</p>
   
   <ul>
     <li class="py-6 border-b">
@@ -13,13 +13,6 @@
       <div id="subscribe">
         <%= render "alerts/form", area: @area %>
       </div>
-    </li>
-
-    <li class="py-6 border-b">
-      <h5 class="mb-1">Receive text message alerts on your phone:</h5>
-      <p>
-        To subscribe, text <strong><%= @area.shortcode %></strong> to <strong><%= number_to_phone(ENV["PHONE_NUMBER"], area_code: true) %></strong>. <sup>2</sup>
-      </p>
     </li>
 
     <li class="py-6">
