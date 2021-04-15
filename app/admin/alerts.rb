@@ -13,6 +13,6 @@ ActiveAdmin.register Alert do
     actions
   end
 
-  scope :email
-  scope :phone
+  scope :confirmed
+  scope :unconfirmed
 end
