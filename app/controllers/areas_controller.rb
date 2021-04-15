@@ -27,7 +27,7 @@ class AreasController < ApplicationController
 
         event = Icalendar::Event.new
         event.summary = "Street Sweeping for #{@area.name}"
-        event.uid = "#{date}@sweeparound.us"
+        event.uid = "#{date}_#{@area.shortcode}-#{}@sweeparound.us"
         event.url = area_url(@area)
         event.dtstamp = date.beginning_of_day
         event.dtstart = Icalendar::Values::Date.new(date)
