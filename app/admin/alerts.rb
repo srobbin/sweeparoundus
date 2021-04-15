@@ -1,6 +1,7 @@
 ActiveAdmin.register Alert do
   permit_params :area_id, :email, :phone, :confirmed
   actions :all, except: [:show]
+  config.sort_order = "created_at_desc"
 
   index do
     column :email
