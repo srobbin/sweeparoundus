@@ -8,7 +8,7 @@ class Alert < ApplicationRecord
   validate :email_or_phone
 
   scope :confirmed, -> { where(confirmed: true) }
-  scope :unconfirmed, -> { where(confirmed: false ) }
+  scope :unconfirmed, -> { where(confirmed: false) }
 
   private
 
