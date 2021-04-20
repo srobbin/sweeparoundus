@@ -113,8 +113,6 @@ GEM
       activemodel-serializers-xml (>= 1.0)
       activesupport (>= 5.0)
       request_store (>= 1.0)
-    email_validator (2.2.3)
-      activemodel
     erubi (1.10.0)
     et-orbi (1.2.4)
       tzinfo
@@ -340,7 +338,6 @@ DEPENDENCIES
   capybara (>= 3.26)
   devise (~> 4.7)
   draper (~> 4.0)
-  email_validator (~> 2.2)
   friendly_id (~> 5.4)
   hotwire-rails (~> 0.1)
   icalendar (~> 2.7)

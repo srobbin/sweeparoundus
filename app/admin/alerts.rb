@@ -10,7 +10,7 @@ ActiveAdmin.register Alert do
       link_to alert.area.name, area_url(alert.area), target: "_blank"
     end
     column :confirmed
-    column :created_at
+    column :updated_at
     actions
   end
 

@@ -9,7 +9,8 @@ class AlertsController < ApplicationController
   end
 
   def create
-    @alert = @area.alerts.find_or_initialize_by(alert_params)
+    email = params[:email].strip
+    @alert = @area.alerts.where("LOWER(email) = ?", email.downcase).first_or_initialize(email: email)
 
     if @alert.save
       flash.now[:notice] = "Please check your inbox to confirm the subscription."
@@ -41,9 +42,5 @@ class AlertsController < ApplicationController
   def find_alert
     email = decode_jwt(params[:t])["sub"]
     @alert = Alert.find_by(area: @area, email: email)
-  end
-
-  def alert_params
-    params.permit(:email)
   end
 end

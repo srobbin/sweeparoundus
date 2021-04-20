@@ -1,10 +1,12 @@
 class Alert < ApplicationRecord
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+
   belongs_to :area
 
   scope :email, -> { where.not(email: nil) }
   scope :phone, -> { where.not(phone: nil) }
 
-  validates :email, email: { mode: :strict, require_fqdn: true }, unless: -> { self.phone.present? }
+  validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, unless: -> { self.phone.present? }
   validate :email_or_phone
 
   scope :confirmed, -> { where(confirmed: true) }

@@ -18,6 +18,7 @@ gem "friendly_id", "~> 5.4"
 gem "hotwire-rails", "~> 0.1"
 gem "icalendar", "~> 2.7"
 gem "jwt", "~> 2.2"
+gem "mailgun-ruby", "~> 1.2"
 gem "pundit", "~> 2.1"
 gem "rgeo-geojson", "2.0.0"
 gem "sidekiq", "~> 6.1"
@@ -44,7 +45,3 @@ group :test do
 end
 
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-gem "email_validator", "~> 2.2"
-
-gem "mailgun-ruby", "~> 1.2"
