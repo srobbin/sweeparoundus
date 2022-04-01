@@ -15,8 +15,8 @@ from the terminal:
 cp .env.example .env
 
 # Install gems and initialize the database
-docker-compose run web bundle install
-docker-compose run web rails db:setup
+docker-compose run app bundle install
+docker-compose run app rails db:setup
 ```
 
 ### Running the app

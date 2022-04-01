@@ -18,10 +18,6 @@ Rails.application.routes.draw do
   end
   resources :search, only: [:index]
 
-  # Twilio
-  post "webhooks/twilio/sms", to: "webhooks#twilio_sms"
-  post "webhooks/twilio/voice", to: "webhooks#twilio_voice"
-
   # Root
   root to: "home#index"
 end
