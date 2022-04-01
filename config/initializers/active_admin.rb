@@ -232,9 +232,9 @@ ActiveAdmin.setup do |config|
   # To change the default utility navigation to show a link to your website & a logout btn
   #
 
-  config.namespace :admin do |admin|
+  config.namespace ENV.fetch("ADMIN_PATH", "admin") do |admin|
     admin.build_menu :utility_navigation do |menu|
-      menu.add label: "Sidekiq", url: "/admin/sidekiq", html_options: { target: :blank }
+      menu.add label: "Sidekiq", url: "/#{ENV.fetch("ADMIN_PATH", "admin")}/sidekiq", html_options: { target: :blank }
       admin.add_logout_button_to_menu menu
     end
   end

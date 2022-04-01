@@ -2,10 +2,12 @@ require "sidekiq/web"
 require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
-  # Control panel (/admin)
+  # Control panel
   devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-  mount Sidekiq::Web => "/admin/sidekiq"
+  authenticate :admin_user do
+    ActiveAdmin.routes(self)
+    mount Sidekiq::Web => "/#{ENV.fetch("ADMIN_PATH", "admin")}/sidekiq"
+  end
 
   # Resources
   resources :areas, only: [:show] do
