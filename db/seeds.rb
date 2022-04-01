@@ -14,7 +14,7 @@ Sweep.delete_all
 Area.delete_all
 
 puts "Importing GeoJSON"
-File.open("db/data/Street Sweeping Zones - 2021.geojson", "r") do |f|
+File.open("db/data/Street Sweeping Zones - 2022.geojson", "r") do |f|
   RGeo::GeoJSON.decode(f, geo_factory: RGeo::Cartesian.simple_factory).each do |object|
     ward_number = object.properties["ward"]
     area_number = object.properties["section"]
@@ -29,7 +29,7 @@ File.open("db/data/Street Sweeping Zones - 2021.geojson", "r") do |f|
 end
 
 puts "Importing Schedule"
-CSV.foreach("db/data/Street_Sweeping_Schedule_-_2021.csv", headers: true).each do |row|
+CSV.foreach("db/data/Street_Sweeping_Schedule_-_2022.csv", headers: true).each do |row|
   puts row.to_s
   area = Area.find_by(number: row["SECTION"], ward: row["WARD"])
   month = row["MONTH NUMBER"].strip

@@ -1,3 +1,3 @@
-web: bundle exec puma -C config/puma.rb
-sidekiq: RAILS_MAX_THREADS=${SIDEKIQ_RAILS_MAX_THREADS:-5} bundle exec sidekiq -C config/sidekiq.yml
-release: bin/rails db:migrate
+web: bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}
+sidekiq: bundle exec sidekiq
+release: rails db:migrate

@@ -1,4 +1,11 @@
 class AlertMailer < ApplicationMailer
+  def yearly
+    mail(
+      to: params[:email],
+      subject: "2022 street sweeping schedule is now live",
+    )
+  end
+
   def reminder
     @sweep = params[:sweep]
     @alert = params[:alert]
