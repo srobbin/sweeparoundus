@@ -20,6 +20,9 @@ Rails.application.routes.draw do
   end
   resources :search, only: [:index]
 
+  # Unsubscribe all
+  post "unsubscribe", to: "alerts#unsubscribe_all", as: :unsubscribe_all
+
   # Root
   root to: "home#index"
 end

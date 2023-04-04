@@ -1,7 +1,7 @@
 class AlertsController < ApplicationController
   include JwtHelper
 
-  before_action :find_area
+  before_action :find_area, except: [:unsubscribe_all]
   before_action :find_alert, only: [:unsubscribe, :confirm]
 
   def new
@@ -27,6 +27,13 @@ class AlertsController < ApplicationController
 
   def unsubscribe
     @alert.try(:destroy)
+  end
+
+  def unsubscribe_all
+    email = decode_jwt(params[:token])["sub"]
+    Alert.where(email: email).destroy_all
+
+    head :ok
   end
 
   def confirm
