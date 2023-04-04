@@ -13,12 +13,12 @@ services:
       - db
       - redis
   db:
-    image: postgis/postgis
+    image: postgis/postgis:13-3.3
     env_file: ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
   redis:
-    image: redis
+    image: redis:6.2
     volumes:
       - redis_data:/data
 volumes:
