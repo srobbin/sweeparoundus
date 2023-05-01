@@ -14,11 +14,11 @@ FileUtils.chdir APP_ROOT do
     abort("\n== Sorry, this script is for development only. ==\n\n")
   end
 
-  puts "\n== Installing gems ==\n\n"
+  puts "\n== Update gems ==\n\n"
   system! "bundle install"
 
-  puts "\n== Preparing database ==\n\n"
-  system! "bin/rails db:setup"
+  puts "\n== Migrate database ==\n\n"
+  system! "bin/rails db:migrate"
 
-  puts "\n== Setup complete =="
+  puts "\n== Update complete =="
 end
