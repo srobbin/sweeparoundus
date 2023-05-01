@@ -1,21 +1,30 @@
-# Base image
-FROM ruby:2.7.5-slim
+########
+# BASE #
+########
+
+FROM ruby:3.1-slim as base
 
 # Install dependencies
 RUN apt-get update -qq \
   && apt-get install -y build-essential libpq-dev postgresql-client libgeos-dev vim
 
-# Set the working directory
+# Set the working directory and copy files
 WORKDIR /app
+COPY . ./
 
-# Install the gems
-COPY Gemfile* .
-ENV BUNDLE_PATH=/bundle \
-    BUNDLE_BIN=/bundle/bin \
-    GEM_HOME=/bundle
-ENV PATH="${BUNDLE_BIN}:${PATH}"
-RUN gem install bundler:2.3.9
+########
+# DEV #
+########
+
+FROM base as dev
+ENV BUNDLE_PATH=/bundle
+RUN bundle config set path ${BUNDLE_PATH}
+RUN gem install bundler -v 2.3.25
+
+########
+# PROD #
+########
+
+FROM base as prod
 RUN bundle install
-
-# Copy files
-COPY . .
+RUN RAILS_ENV=production SECRET_KEY_BASE=DUMMY bin/rails assets:precompile

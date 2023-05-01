@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+# path to your application root.
+APP_ROOT = File.expand_path("..", __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+FileUtils.chdir APP_ROOT do
+  # Make sure this is only run in development
+  if ENV["RAILS_ENV"] != "development"
+    abort("\n== Sorry, this script is for development only. ==\n\n")
+  end
+
+  puts "\n== Update gems ==\n\n"
+  system! "bundle install"
+
+  puts "\n== Migrate database ==\n\n"
+  system! "bin/rails db:migrate"
+
+  puts "\n== Update complete =="
+end

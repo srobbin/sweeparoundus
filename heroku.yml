@@ -1,0 +1,16 @@
+build:
+  docker:
+    web:
+      dockerfile: Dockerfile
+      target: prod
+release:
+  command:
+    - bin/rails db:migrate
+  image: web
+run:
+  web: bundle exec puma -C config/puma.rb
+  sidekiq:
+    image: web
+    command:
+      - RAILS_MAX_THREADS=${SIDEKIQ_RAILS_MAX_THREADS:-5} bundle exec sidekiq -C config/sidekiq.yml
+
