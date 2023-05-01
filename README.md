@@ -12,11 +12,15 @@ from the terminal:
 
 ```sh
 # Make a copy of the environment variables file
+# NOTE: You'll need a Google API key for maps/address autocomplete,
+# and a Mailgun API key for sending transactional emails
 cp .env.example .env
 
-# Install gems and initialize the database
-docker-compose run app bundle install
-docker-compose run app rails db:setup
+# Run the setup script
+docker-compose run app bin/setup
+
+# After the setup is completed, run the app
+docker-compose up
 ```
 
 ### Running the app
@@ -24,6 +28,9 @@ docker-compose run app rails db:setup
 From a terminal session:
 
 ```sh
+# Update to make sure your database and dependencies are in sync
+docker-compose run app bin/update
+
 # Launch the stack
 docker-compose up
 ```
@@ -36,14 +43,17 @@ the website prompt._
 ### Gems and console
 
 From time to time, you'll need to install new gems and access the console. In order to do so,
-please use the `docker-compose run web` command. For example:
+please use the `docker-compose run app` command. For example:
 
 ```sh
 # Installing gems
-docker-compose run web bundle install
+docker-compose run app bundle add foo
 
 # Accessing the console
-docker-compose run web rails c
+docker-compose run app bin/rails console
+
+# Start a bash shell
+docker-compose run app /bin/bash
 ```
 
 ### Emails
