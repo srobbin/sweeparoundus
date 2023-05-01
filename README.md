@@ -12,6 +12,8 @@ from the terminal:
 
 ```sh
 # Make a copy of the environment variables file
+# NOTE: You'll need a Google API key for maps/address autocomplete,
+# and a Mailgun API key for sending transactional emails
 cp .env.example .env
 
 # Run the setup script
