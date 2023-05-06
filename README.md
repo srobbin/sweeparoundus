@@ -16,6 +16,9 @@ from the terminal:
 # and a Mailgun API key for sending transactional emails
 cp .env.example .env
 
+# Build the Docker image
+docker-compose build --no-cache
+
 # Run the setup script
 docker-compose run app bin/setup
 
