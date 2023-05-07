@@ -9,7 +9,7 @@
   
   <ul>
     <li class="py-6 border-b">
-      <h5 class="mb-2">Enter your email address, and we'll send alerts directly to your inbox:</h5>
+      <h5 class="mb-2">Enter your email, and we'll send alerts directly to your inbox:</h5>
       <div id="subscribe">
         <%= render "alerts/form", area: @area %>
       </div>
@@ -17,7 +17,7 @@
 
     <li class="py-6">
       <h5 class="mb-2">Calendar feed (for iCal, Google Calendar, or Outlook):</h5>
-      <%= link_to "Download or right-click to copy", area_url(@area, format: :ics), class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      <%= link_to "Download or right-click to copy", area_url(@area, format: :ics), class: "inline-flex items-center px-3 py-2.5 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" %>
     </li>
   </ul>
 </div>
