@@ -1,6 +1,6 @@
 <div class="flex-1 w-full items-center justify-center lg:flex">
   <div class="max-w-3xl p-8 text-center">
-    <%= image_tag "logo.png", class: "inline-block", alt: "SweepAround.Us logo" %>
+    <%= image_tag "logo.png", class: "inline-block", alt: "#{ENV["SITE_NAME"]} logo" %>
     <div class="my-8">
       <%= render "shared/flash" %>
       <%= render "search/form" %>
