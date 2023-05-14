@@ -40,8 +40,10 @@ class AlertsController < ApplicationController
   end
 
   def find_alert
-    email = decode_jwt(params[:t])["sub"]
-    @alert = Alert.find_by(area: @area, email: email)
+    decoded_params = decode_jwt(params[:t])
+    email = decoded_params["sub"]
+    street_address = decoded_params["street_address"]
+    @alert = Alert.find_by(area: @area, email: email, street_address: street_address)
   end
 
   def street_address
