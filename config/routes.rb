@@ -20,6 +20,9 @@ Rails.application.routes.draw do
   end
   resources :search, only: [:index]
 
+  # Static pages
+  get "about", to: 'about#show'
+
   # Root
   root to: "home#index"
 end
