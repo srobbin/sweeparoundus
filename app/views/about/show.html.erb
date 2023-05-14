@@ -1,0 +1,50 @@
+<div class="flex-1">
+  <header class="bg-gray-100">
+    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
+      <div class="flex-1">
+        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
+      </div>
+      <div class="hidden lg:block">
+        <%= render "search/form" %>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="lg:flex items-center my-6">
+        <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
+          <%= "About #{ENV["SITE_NAME"]}" %>
+        </h1>
+      </div>
+
+      <div class="flex flex-col gap-5 text-sm">
+        <p>Orange <em>should</em> be a hard color to miss.</p>
+        <p>
+          Just ask Nickelodeon, Home Depot, or the Sun.
+          But when neon orange <strong>TH</strong> flyers are tied to every tree on your block, they have a way of blending in with nature.
+          And as every long-time Chicagoan with a car knows, there'll come a time when you don't notice those <strong>TH</strong> flyers until it's too late, and the City has kindly left a $60 neon orange "reminder" under your windshield wiper.
+        </p>
+        <p>
+          <%= link_to 'However you feel', 'https://chicagoreader.com/news-politics/why-sweep-the-streets/', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %> about street sweeping, <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> is here to help you avoid getting ticketed.
+          Just enter your street address, and we'll use the sanitation schedule from the City of Chicago's <%= link_to "open data portal", 'https://data.cityofchicago.org/browse?category=Sanitation', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %> to let you know when your street is due for cleaning.
+          And, if you want reminders down the road, sign up for email notifications or download the schedule as an ".ics" (calendar) file. 
+        </p>
+        <p>
+          <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> (formerly SweepAround.Us) was created in 2011 by Scott Robbin and is currently maintained by Kat Evans and Carl Hauck.
+          None of them work for the City.
+          All three have received their fair share of street sweeping tickets.
+          Please direct your appeals elsewhere.
+        </p>
+        <p>
+          If you find this site helpful and want to help with the cost of running it, <%= link_to 'send Kat and Carl a few bucks', 'https://www.buymeacoffee.com/wethesweeple', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %>.
+          (Full technical disclosure: Heroku + Postgres + Redis + dyno + domain name + Google Maps + Mailgun costs all add up to an annual sum of roughly 6-7 street sweeping tickets).
+          As soon as we receive enough donations to cover the site's annual costs, we'll donate the rest to <%= link_to 'We All Code', 'https://www.weallcode.org/', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %>, a Chicago based non-profit that helps young people from 7-18 envision a future in STEM and gain the coding skills to make it real through free coding classes.
+        </p>
+      </div>
+      <div class="flex justify-center mt-8 mb-6">
+        <a href="https://www.buymeacoffee.com/wethesweeple"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=☕&slug=wethesweeple&button_colour=b3ddf2&font_colour=000000&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" /></a>
+      </div>
+    </div>
+  </main>
+</div>
