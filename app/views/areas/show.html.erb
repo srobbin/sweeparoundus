@@ -4,7 +4,7 @@
   <header class="bg-gray-100">
     <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
       <div class="flex-1">
-        <%= link_to image_tag("logo.png", class: "w-96", alt: "SweepAround.Us logo"), root_path %>
+        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
       </div>
       <div class="hidden lg:block">
         <%= render "search/form" %>
@@ -43,7 +43,7 @@
         <div class="text-yellow-700">
           <p>
             Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis.
-            Please consult the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping.html" class="underline" target="_blank">Department of Streets and Sanitation website</a>
+            Please consult the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping2023.html" class="underline" target="_blank">Department of Streets and Sanitation website</a>
             and street signage for parking information.</p>
         </div>
       </div>
