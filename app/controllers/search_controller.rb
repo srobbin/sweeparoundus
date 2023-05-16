@@ -6,6 +6,8 @@ class SearchController < ApplicationController
 
     session[:search_lat] = params[:lat]
     session[:search_lng] = params[:lng]
+    session[:street_address] = params[:address]
+    session[:is_save_street_address_checked] = true
 
     if @area
       redirect_to @area
