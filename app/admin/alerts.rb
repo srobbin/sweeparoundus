@@ -10,7 +10,7 @@ ActiveAdmin.register Alert do
       link_to alert.area.name, area_url(alert.area), target: "_blank"
     end
     column :street_address do |alert|
-      alert.street_address[0..-19]
+      alert.street_address && alert.street_address[0..-19]
     end
     column :confirmed
     column :updated_at
