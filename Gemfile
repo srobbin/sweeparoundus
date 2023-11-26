@@ -20,6 +20,7 @@ gem "icalendar", "~> 2.7"
 gem "jwt", "~> 2.2"
 gem "mailgun-ruby", "~> 1.2"
 gem "pundit", "~> 2.1"
+gem 'redis', '~> 5.0', '>= 5.0.8'
 gem "rgeo-geojson", "2.0.0"
 gem 'sidekiq', '~> 7.1', '>= 7.1.2'
 gem "sidekiq-cron", "~> 1.11"
