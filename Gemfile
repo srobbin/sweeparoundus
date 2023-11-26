@@ -21,8 +21,8 @@ gem "jwt", "~> 2.2"
 gem "mailgun-ruby", "~> 1.2"
 gem "pundit", "~> 2.1"
 gem "rgeo-geojson", "2.0.0"
-gem "sidekiq", "~> 6.1"
-gem "sidekiq-cron", "~> 1.2"
+gem 'sidekiq', '~> 7.1', '>= 7.1.2'
+gem "sidekiq-cron", "~> 1.11"
 gem "tailwindcss-rails", "~> 0.3"
 
 # Avoid breaking changes
