@@ -2,7 +2,6 @@
 
 FactoryBot.define do
   factory :area do
-    id { SecureRandom.uuid }
     number { 7 }
     ward { 28 }
     slug { "ward-28-sweep-area-7" }
