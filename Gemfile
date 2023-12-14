@@ -6,7 +6,6 @@ ruby "3.2.2"
 gem "rails", "~> 7.1.2"
 gem "pg", "~> 1.1"
 gem "puma", "~> 6.4"
-gem "sass-rails", ">= 6"
 gem "jbuilder", "~> 2.7"
 gem "bootsnap", ">= 1.4.4", require: false
 
@@ -53,3 +52,7 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+
+gem "dartsass-rails", "~> 0.5.0"
+
+gem "sprockets-rails", "~> 3.4"
