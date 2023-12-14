@@ -3,20 +3,21 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.2.2"
 
-gem "rails", "~> 6.1.7.5"
+gem "rails", "~> 7.1.2"
 gem "pg", "~> 1.1"
-gem "puma", "~> 5.6.7"
+gem "puma", "~> 6.4"
 gem "sass-rails", ">= 6"
 gem "jbuilder", "~> 2.7"
 gem "bootsnap", ">= 1.4.4", require: false
 
-gem "activeadmin", "~> 2.9"
-gem "activerecord-postgis-adapter", "~> 7.0"
-gem "devise", "~> 4.7"
+gem "activeadmin", "~> 3.2"
+gem "activerecord-postgis-adapter", "~> 9.0.1"
+gem 'devise', '~> 4.9', '>= 4.9.3'
 gem "draper", "~> 4.0"
+gem "ffi", "~> 1.16"
 gem "friendly_id", "~> 5.4"
 gem "hotwire-rails", "~> 0.1.3"
-gem "icalendar", "~> 2.7"
+gem "icalendar", "~> 2.10"
 gem "jwt", "~> 2.2"
 gem "mailgun-ruby", "~> 1.2"
 gem "pundit", "~> 2.1"
@@ -25,6 +26,7 @@ gem "rgeo-geojson", "2.0.0"
 gem 'sidekiq', '~> 7.1', '>= 7.1.2'
 gem "sidekiq-cron", "~> 1.11"
 gem "tailwindcss-rails", "~> 0.3"
+gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Avoid breaking changes
 gem "stimulus-rails", "0.2.4"
@@ -51,5 +53,3 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
-
-gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]

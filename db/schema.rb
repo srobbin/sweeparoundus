@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_06_174112) do
-
+ActiveRecord::Schema[7.1].define(version: 2023_12_14_012803) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
@@ -20,13 +19,13 @@ ActiveRecord::Schema.define(version: 2023_05_06_174112) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
-    t.datetime "locked_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "locked_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -36,8 +35,8 @@ ActiveRecord::Schema.define(version: 2023_05_06_174112) do
     t.string "phone"
     t.boolean "confirmed", default: false
     t.uuid "area_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "street_address"
     t.index ["area_id"], name: "index_alerts_on_area_id"
   end
@@ -46,8 +45,8 @@ ActiveRecord::Schema.define(version: 2023_05_06_174112) do
     t.integer "number"
     t.integer "ward"
     t.geometry "shape", limit: {:srid=>0, :type=>"geometry"}
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "slug"
     t.string "shortcode"
     t.index ["shortcode"], name: "index_areas_on_shortcode", unique: true
@@ -60,8 +59,8 @@ ActiveRecord::Schema.define(version: 2023_05_06_174112) do
     t.date "date_3"
     t.date "date_4"
     t.uuid "area_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["area_id"], name: "index_sweeps_on_area_id"
   end
 
