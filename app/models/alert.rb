@@ -12,6 +12,14 @@ class Alert < ApplicationRecord
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[area_id confirmed email phone street_address updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[area]
+  end
+
   private
 
   def email_or_phone
