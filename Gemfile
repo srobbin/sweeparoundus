@@ -56,3 +56,5 @@ end
 gem "dartsass-rails", "~> 0.5.0"
 
 gem "sprockets-rails", "~> 3.4"
+
+gem "sassc", "~> 2.4"
