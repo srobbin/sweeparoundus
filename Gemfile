@@ -42,7 +42,7 @@ end
 
 group :development do
   gem "foreman", "~> 0.87.2"
-  gem "letter_opener", "~> 1.7"
+  gem "letter_opener", "~> 1.8"
   gem "listen", "~> 3.3"
   gem "web-console", ">= 4.1.0"
   # gem "rack-mini-profiler", "~> 2.0"
@@ -53,10 +53,3 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
-
-
-
-
-
-
-

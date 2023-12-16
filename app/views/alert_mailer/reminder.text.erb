@@ -1,6 +1,10 @@
 Hello,
 
-This is a reminder that street sweeping <%= @area.name %> will begin tomorrow.
+<% if @street_address %>
+  This is a reminder that street sweeping for <%= @street_address %> (<%= @area.name %>) will begin tomorrow.
+<% else %>
+  This is a reminder that street sweeping for <%= @area.name %> will begin tomorrow.
+<% end %>
 
 <%= @dates.join(" / ") %>
 

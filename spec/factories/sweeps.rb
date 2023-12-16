@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :sweep do
-    area_id { SecureRandom.uuid }
+    area { create :area }
     date_1 { Date.tomorrow }
   end
 end

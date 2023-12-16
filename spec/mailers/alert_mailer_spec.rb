@@ -10,7 +10,7 @@ RSpec.describe AlertMailer, type: :mailer do
   end 
   
   describe '#confirm email' do
-    let!(:alert) { create :alert, :unconfirmed, area: area }
+    let!(:alert) { create :alert, :unconfirmed, :with_address, area: area }
     let(:mail) do
       described_class
         .with(alert: alert, sweep: sweep)
@@ -25,6 +25,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Hello,')
       expect(html_body).to include('You are receiving this email because we have received a request to subscribe')
       expect(html_body).to include(alert.email)
+      expect(html_body).to include("to Chicago street sweeping alerts for <strong>#{alert.street_address} (#{area.name})</strong>.")
       expect(html_body).to include('Alerts will be sent out one day prior to a scheduled street sweeping.')
       expect(html_body).to include(confirm_area_alerts_url(area))
       expect(html_body).to include('Cheers,')
@@ -33,10 +34,18 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('https://www.wethesweeple.com')
       expect(html_body).to include('Copyright 2023 We The Sweeple')
     end
+
+    context 'when alert has no street address' do
+      let!(:alert) { create :alert, :unconfirmed, area: area }
+
+      it 'has the right attributes' do
+        expect(html_body).to include("to Chicago street sweeping alerts for <strong>#{area.name}</strong>.")
+      end
+    end
   end
 
   describe '#reminder email' do
-    let!(:alert) { create :alert, :confirmed, area: area }
+    let!(:alert) { create :alert, :confirmed, :with_address, area: area }
     let(:mail) do
       described_class
         .with(alert: alert, sweep: sweep)\
@@ -49,7 +58,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(mail.subject).to eq('Street sweeping alert for Ward 28, Sweep Area 7')
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
-      expect(html_body).to include('This is a reminder that street sweeping for')
+      expect(html_body).to include("This is a reminder that street sweeping for #{alert.street_address}")
       expect(html_body).to include(area_url(area))
       expect(html_body).to include('will begin tomorrow.')
       expect(html_body).to include(Date.tomorrow.strftime('%B %-d'))
@@ -59,6 +68,14 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
       expect(html_body).to include('https://www.wethesweeple.com')
       expect(html_body).to include('Copyright 2023 We The Sweeple')
+    end
+
+    context 'when alert has no street address' do
+      let!(:alert) { create :alert, :unconfirmed, area: area }
+
+      it 'has the right attributes' do
+        expect(html_body).to include("This is a reminder that street sweeping for <a href=")
+      end
     end
   end
 end
