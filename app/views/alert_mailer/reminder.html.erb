@@ -1,6 +1,10 @@
 <p>Hello,</p>
 
-<p>This is a reminder that street sweeping for <%= link_to @area.name, @area %> will begin tomorrow.</p>
+<% if @street_address %>
+  <p>This is a reminder that street sweeping for <%= @street_address %> (<%= link_to @area.name, @area %>) will begin tomorrow.</p>
+<% else %>
+  <p>This is a reminder that street sweeping for <%= link_to @area.name, @area %> will begin tomorrow.</p>
+<% end %>
 
 <p><%= @dates.join("<br />").html_safe %></p>
 

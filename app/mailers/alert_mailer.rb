@@ -9,8 +9,8 @@ class AlertMailer < ApplicationMailer
   def reminder
     @sweep = params[:sweep]
     @alert = params[:alert]
-    @street_address = @alert.street_address
     @area = @alert.area
+    @street_address = @alert.street_address
     @dates = [
       @sweep.date_1,
       @sweep.date_2,
@@ -29,7 +29,7 @@ class AlertMailer < ApplicationMailer
     @alert = params[:alert]
     @area = @alert.area
     @email = @alert.email
-    @street_address = @alert.street_address
+    @formatted_address_area = formatted_address_area(@alert.street_address, @area)
 
     token = encode_jwt(@email, @street_address)
     @confirmation_url = confirm_area_alerts_url(@area, t: token)
@@ -39,5 +39,15 @@ class AlertMailer < ApplicationMailer
       to: @alert.email,
       subject: "Please confirm your subscription to #{@area.name}",
     )
+  end
+
+  private
+
+  def formatted_address_area(street_address, area)
+    if street_address
+      "#{street_address} (#{area.name})"
+    else
+      area.name
+    end
   end
 end
