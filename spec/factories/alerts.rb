@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :alert do
     email { Faker::Internet.email }
     area_id { SecureRandom.uuid }
+    area { create :area }
 
     trait :confirmed do
       confirmed { true }
