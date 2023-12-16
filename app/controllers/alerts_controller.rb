@@ -13,7 +13,7 @@ class AlertsController < ApplicationController
     @alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
 
     if @alert.save
-      flash.now[:notice] = "Please check your inbox to confirm the subscription."
+      flash.now[:notice] = "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
       AlertMailer.with(alert: @alert).confirm.deliver_later
     else
       flash.now[:alert] = "Invalid email"
