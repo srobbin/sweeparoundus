@@ -1,0 +1,8 @@
+Hello,
+
+We've just updated the Chicago street sweeping schedules for the <%= Time.current.year %> season, and wanted to let you know that your subscription for <%= @area.name %> has been canceled. (This is because your subscription did not have a specific street address, and because the City's sweeping areas often change from year to year.)
+
+If you'd like to continue receiving alerts for this (or another) area, <%= link_to "please visit our website and re-subscribe", @home_url %>.
+
+Cheers,
+<%= ENV["SITE_NAME"] %>
