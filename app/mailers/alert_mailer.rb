@@ -41,6 +41,17 @@ class AlertMailer < ApplicationMailer
     )
   end
 
+  def deleted_notification
+    @alert = params[:alert]
+    @area = @alert.area
+    @home_url = root_url
+
+    mail(
+      to: @alert.email,
+      subject: "Your street sweeping alert subscription has been canceled",
+    )
+  end
+
   private
 
   def formatted_address_area(street_address, area)
