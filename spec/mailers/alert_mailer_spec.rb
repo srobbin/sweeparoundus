@@ -78,4 +78,27 @@ RSpec.describe AlertMailer, type: :mailer do
       end
     end
   end
+
+  describe '#deleted_notification email' do
+    let!(:alert) { create :alert, :confirmed, area: area }
+    let(:mail) do
+      described_class
+        .with(alert: alert)
+        .deleted_notification
+        .deliver_now
+    end
+
+    it 'has the right attributes' do
+      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.subject).to eq('Your street sweeping alert subscription has been canceled')
+      expect(mail.to).to include(alert.email)
+      expect(html_body).to include('Hello,')
+      expect(html_body).to include("We've just updated the Chicago street sweeping schedules for the 2023 season, and wanted to let you know that your subscription for <strong>#{area.name}</strong> has been canceled. (This is because your subscription did not have a specific street address, and because the City's sweeping areas often change from year to year.)")
+      expect(html_body).to include("If you'd like to continue receiving alerts for this (or another) area,")
+      expect(html_body).to include(root_url)
+      expect(html_body).to include('Cheers,')
+      expect(html_body).to include(ENV["SITE_NAME"])
+      expect(html_body).to include('https://www.wethesweeple.com')
+    end
+  end
 end
