@@ -29,7 +29,8 @@ class AlertMailer < ApplicationMailer
     @alert = params[:alert]
     @area = @alert.area
     @email = @alert.email
-    @formatted_address_area = formatted_address_area(@alert.street_address, @area)
+    @street_address = @alert.street_address
+    @formatted_address_area = formatted_address_area(@street_address, @area)
 
     token = encode_jwt(@email, @street_address)
     @confirmation_url = confirm_area_alerts_url(@area, t: token)
