@@ -32,7 +32,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
       expect(html_body).to include('https://www.wethesweeple.com')
-      expect(html_body).to include('Copyright 2023 We The Sweeple')
+      expect(html_body).to include("Copyright #{Time.current.year} We The Sweeple")
     end
 
     context 'when alert has no street address' do
@@ -67,7 +67,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. Please consult the Department of Streets and Sanitation website and street signage for parking information.')
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
       expect(html_body).to include('https://www.wethesweeple.com')
-      expect(html_body).to include('Copyright 2023 We The Sweeple')
+      expect(html_body).to include("Copyright #{Time.current.year} We The Sweeple")
     end
 
     context 'when alert has no street address' do
@@ -93,7 +93,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(mail.subject).to eq('Your street sweeping alert subscription has been canceled')
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
-      expect(html_body).to include("We've just updated the Chicago street sweeping schedules for the 2023 season, and wanted to let you know that your subscription for <strong>#{area.name}</strong> has been canceled. (This is because your subscription did not have a specific street address, and because the City's sweeping areas often change from year to year.)")
+      expect(html_body).to include("We've just updated the Chicago street sweeping schedules for the #{Time.current.year} season, and wanted to let you know that your subscription for <strong>#{area.name}</strong> has been canceled. (This is because your subscription either was unconfirmed or did not have a specific street address, and because the City's sweeping areas often change from year to year.)")
       expect(html_body).to include("If you'd like to continue receiving alerts for this (or another) area,")
       expect(html_body).to include(root_url)
       expect(html_body).to include('Cheers,')
