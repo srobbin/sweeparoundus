@@ -8,6 +8,9 @@ class CarryOverExistingAlerts
   end
 
   def call
+    total_alert_count = Alert.confirmed.with_street_address.count
+    updated_count = 0
+
     Alert.confirmed.with_street_address.each do |alert|
       lat, lng = get_address_coords(alert)
 
@@ -20,8 +23,11 @@ class CarryOverExistingAlerts
 
       if area
         alert.update(area: area, lat: lat, lng: lng) if write
+        updated_count += 1
+        puts "#{updated_count}/#{total_alert_count} alerts updated"
       else
         add_to_failures(alert)
+        puts "failure"
       end
     end
 
