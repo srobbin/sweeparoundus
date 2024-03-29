@@ -45,8 +45,8 @@ class SeedYearlyData
     puts "Importing GeoJSON"
     File.open("db/data/Street Sweeping Zones - #{year}.geojson", "r") do |f|
       RGeo::GeoJSON.decode(f, geo_factory: RGeo::Cartesian.simple_factory).each do |object|
-        ward_number = object.properties["ward"]
-        area_number = object.properties["section"]
+        ward_number = object.properties["ward"].to_i
+        area_number = object.properties["section"].to_i
         area_shape = object.geometry
     
         next unless [write, ward_number, area_number, area_shape].all?

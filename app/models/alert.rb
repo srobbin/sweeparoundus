@@ -11,6 +11,7 @@ class Alert < ApplicationRecord
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
+  scope :with_street_address, -> { where.not(street_address: nil) }
   scope :without_street_address, -> { where(street_address: nil) }
 
   def self.ransackable_attributes(auth_object = nil)
