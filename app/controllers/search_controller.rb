@@ -12,7 +12,7 @@ class SearchController < ApplicationController
     if @area
       redirect_to @area
     else
-      flash[:error] = "Sorry, we would not find the sweep area associated with your address."
+      flash[:error] = "Sorry, we could not find the sweep area associated with your address."
       redirect_to root_path
     end
   end
