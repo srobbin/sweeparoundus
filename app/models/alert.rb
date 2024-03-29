@@ -13,6 +13,8 @@ class Alert < ApplicationRecord
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :with_street_address, -> { where.not(street_address: nil) }
   scope :without_street_address, -> { where(street_address: nil) }
+  scope :with_coords, -> { where.not(lat: nil, lng: nil) }
+  scope :without_coords, -> { where(lat: nil, lng: nil) }
 
   def self.ransackable_attributes(auth_object = nil)
     %w[area_id confirmed email phone street_address updated_at]
