@@ -1,7 +1,7 @@
 class SeedYearlyData
   attr_reader :write, :year
 
-  # SeedYearlyData.new(write: false, year: Time.current.year.to_s)
+  # SeedYearlyData.new(write: false, year: Time.current.year.to_s).call
   def initialize(write: false, year:)
     @write = write
     @year = year
