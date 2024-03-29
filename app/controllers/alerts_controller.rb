@@ -10,7 +10,12 @@ class AlertsController < ApplicationController
 
   def create
     email = params[:email].strip.downcase
-    @alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
+    @alert = @area.alerts.find_or_initialize_by(
+      email: email,
+      street_address: street_address,
+      lat: street_address ? session[:search_lat] : nil,
+      lng: street_address ? session[:search_lng] : nil
+    )
 
     if @alert.save
       flash.now[:notice] = "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
@@ -42,8 +47,8 @@ class AlertsController < ApplicationController
   def find_alert
     decoded_params = decode_jwt(params[:t])
     email = decoded_params["sub"]
-    street_address = decoded_params["street_address"]
-    @alert = Alert.find_by(area: @area, email: email, street_address: street_address)
+    address = decoded_params["street_address"]
+    @alert = Alert.find_by(area: @area, email: email, street_address: address)
   end
 
   def street_address
