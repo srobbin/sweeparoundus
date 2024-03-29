@@ -19,7 +19,7 @@ class CarryOverExistingAlerts
       area = find_area(lat, lng)
 
       if area
-        alert.update(area: area) if write
+        alert.update(area: area, lat: lat, lng: lng) if write
       else
         add_to_failures(alert)
       end
