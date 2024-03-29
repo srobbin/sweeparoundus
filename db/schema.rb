@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_29_220223) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_29_224622) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
@@ -34,7 +34,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_29_220223) do
     t.string "email"
     t.string "phone"
     t.boolean "confirmed", default: false
-    t.uuid "area_id", null: false
+    t.uuid "area_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "street_address"

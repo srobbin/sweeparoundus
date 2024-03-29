@@ -4,7 +4,8 @@ class Area < ApplicationRecord
 
   # Future proof, for when the season ends
   has_many :sweeps, -> { where("EXTRACT(YEAR FROM date_1) = ?", Time.current.year).order(:date_1) }
-  has_many :alerts
+  # nullifies foreign key in alerts table when associated area is deleted
+  has_many :alerts, dependent: :nullify
 
   validates :number, presence: true, uniqueness: { scope: :ward }
   validates :ward, presence: true
