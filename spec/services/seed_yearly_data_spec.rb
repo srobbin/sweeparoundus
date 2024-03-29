@@ -76,7 +76,7 @@ RSpec.describe SeedYearlyData, type: :model do
         end
 
         describe 'when files exist for arg year' do
-          let(:year) { '2023' }
+          let(:year) { '2024' }
 
           it 'returns a success message' do
             expect(subject).to include('SUCCESS')
