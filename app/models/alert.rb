@@ -1,7 +1,7 @@
 class Alert < ApplicationRecord
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
-  belongs_to :area
+  belongs_to :area, optional: true
 
   scope :email, -> { where.not(email: nil) }
   scope :phone, -> { where.not(phone: nil) }
