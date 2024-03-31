@@ -7,7 +7,11 @@ ActiveAdmin.register Alert do
     column :email
     column :phone
     column :area do |alert|
-      link_to alert.area?.name, area_url(alert.area), target: "_blank" if alert.area
+      if alert.area_id
+        link_to alert.area.name, area_url(alert.area), target: "_blank"
+      else
+        nil
+      end
     end
     column :street_address do |alert|
       alert.street_address && alert.street_address[0..-19]
