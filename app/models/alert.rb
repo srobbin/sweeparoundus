@@ -17,7 +17,7 @@ class Alert < ApplicationRecord
   scope :without_coords, -> { where(lat: nil, lng: nil) }
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[area_id confirmed email phone street_address updated_at]
+    %w[area_id confirmed email phone street_address updated_at lat lng]
   end
 
   def self.ransackable_associations(auth_object = nil)
