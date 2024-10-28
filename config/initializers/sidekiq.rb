@@ -1,5 +1,5 @@
 Sidekiq.configure_server do |config|
-  config.redis = { url: ENV["REDIS_URL"], db: 1 }
+  config.redis = { url: ENV["REDIS_URL"], db: 1, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 
   # Cron
   schedule_file = "config/cron.yml"
@@ -10,5 +10,5 @@ Sidekiq.configure_server do |config|
 end
 
 Sidekiq.configure_client do |config|
-  config.redis = { url: ENV["REDIS_URL"], db: 1 }
+  config.redis = { url: ENV["REDIS_URL"], db: 1, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 end
