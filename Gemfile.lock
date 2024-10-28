@@ -142,7 +142,7 @@ GEM
       ruby2_keywords
     drb (2.2.1)
     erubi (1.13.0)
-    et-orbi (1.2.7)
+    et-orbi (1.2.11)
       tzinfo
     factory_bot (6.4.2)
       activesupport (>= 5.0.0)
@@ -158,8 +158,8 @@ GEM
     formtastic_i18n (0.7.0)
     friendly_id (5.5.1)
       activerecord (>= 4.0.0)
-    fugit (1.9.0)
-      et-orbi (~> 1, >= 1.2.7)
+    fugit (1.11.1)
+      et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
