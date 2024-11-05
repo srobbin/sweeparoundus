@@ -6,3 +6,12 @@ body {
 body {
   min-height: 100%;
 }
+
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+li:not(:last-child) { 
+  margin-bottom: 5px;  
+}
