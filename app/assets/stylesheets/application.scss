@@ -10,8 +10,9 @@ body {
 ul {
   list-style-type: disc;
   padding-left: 20px;
+  padding-bottom: 8px;
 }
 
 li:not(:last-child) { 
-  margin-bottom: 5px;  
+  margin-bottom: 8px;  
 }
