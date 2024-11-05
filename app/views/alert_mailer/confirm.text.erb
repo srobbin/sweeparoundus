@@ -1,12 +1,12 @@
 Hello,
 
-You are receiving this email because we have received a request to subscribe <%= @email %> to Chicago street sweeping alerts for <%= @area.name %>. Alerts will be sent out one day prior to a scheduled street sweeping.
+You are receiving this email because we have received a request to subscribe <%= @email %> to Chicago street sweeping alerts for <%= @formatted_address_area %>. Alerts will be sent out one day prior to a scheduled street sweeping.
 
 Click here to confirm your subscription:
-<%= @confirmation_url  %>
+<%= @confirmation_url %>
 
 Cheers,
 <%= ENV["SITE_NAME"] %>
 
 ---
-@unsubscribe_url 
+Unsubscribe: <%= @unsubscribe_url %>

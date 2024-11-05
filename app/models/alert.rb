@@ -1,7 +1,7 @@
 class Alert < ApplicationRecord
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
-  belongs_to :area
+  belongs_to :area, optional: true
 
   scope :email, -> { where.not(email: nil) }
   scope :phone, -> { where.not(phone: nil) }
@@ -11,6 +11,18 @@ class Alert < ApplicationRecord
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
+  scope :with_street_address, -> { where.not(street_address: nil) }
+  scope :without_street_address, -> { where(street_address: nil) }
+  scope :with_coords, -> { where.not(lat: nil, lng: nil) }
+  scope :without_coords, -> { where(lat: nil, lng: nil) }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[area_id confirmed email phone street_address updated_at lat lng]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[area]
+  end
 
   private
 

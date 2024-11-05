@@ -1,0 +1,20 @@
+{"results": 
+  [{"address_components": 
+     [{"long_name": "2741", "short_name": "2741", "types": ["street_number"]},
+      {"long_name": "North Central Park Avenue", "short_name": "N Central Park Ave", "types": ["route"]},
+      {"long_name": "Logan Square", "short_name": "Logan Square", "types": ["neighborhood", "political"]},
+      {"long_name": "Chicago", "short_name": "Chicago", "types": ["locality", "political"]},
+      {"long_name": "Cook County", "short_name": "Cook County", "types": ["administrative_area_level_2", "political"]},
+      {"long_name": "Illinois", "short_name": "IL", "types": ["administrative_area_level_1", "political"]},
+      {"long_name": "United States", "short_name": "US", "types": ["country", "political"]},
+      {"long_name": "60647", "short_name": "60647", "types": ["postal_code"]},
+      {"long_name": "1123", "short_name": "1123", "types": ["postal_code_suffix"]}],
+    "formatted_address": "2741 N Central Park Ave, Chicago, IL 60647, USA",
+    "geometry": 
+     {"bounds": {"northeast": {"lat": 41.9313274, "lng": -87.7167834}, "southwest": {"lat": 41.9312581, "lng": -87.7170508}},
+      "location": {"lat": 41.9313057, "lng": -87.71688069999999},
+      "location_type": "ROOFTOP",
+      "viewport": {"northeast": {"lat": 41.9326417302915, "lng": -87.71562571970848}, "southwest": {"lat": 41.9299437697085, "lng": -87.7183236802915}}},
+    "place_id": "ChIJv8h4UXPND4gRNPeviFsrXqw",
+    "types": ["premise"]}],
+ "status": "OK"}

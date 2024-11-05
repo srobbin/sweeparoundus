@@ -1,11 +1,19 @@
 <%= form_with url: area_alerts_path(@area) do |f| %>
   <%= f.label :email, class: "sr-only" %>
-  <div class="mt-1 flex rounded-md shadow-sm">
-    <div class="relative flex items-stretch flex-grow focus-within:z-10">
-      <%= f.text_field :email, class: "focus:ring-blue-500 focus:border-blue-500 block w-full rounded-none rounded-l-md border-gray-300", placeholder: "you@example.com" %>
+  <% if !@alert || !@alert.persisted? %>
+    <div class="mt-4 flex flex-col rounded-md shadow-sm">
+        <div class="flex gap-2 align-middle">
+          <%= f.check_box :is_save_street_address, checked: session[:is_save_street_address_checked], class: "h-5 w-5 rounded border-gray-500 text-blue-500 focus:ring-blue-500" %>
+          <%= f.label :is_save_street_address, "Save my street address so I won't need to re-subscribe next year", class: "text-blue-500" %>
+        </div>
+        <div class="flex mt-3">
+          <div class="relative flex items-stretch flex-grow focus-within:z-10">
+            <%= f.text_field :email, class: "focus:ring-blue-500 focus:border-blue-500 block w-full rounded-none rounded-l-md border-gray-300", placeholder: "you@example.com" %>
+          </div>
+          <button class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            Subscribe
+          </button>
+        </div>
     </div>
-    <button class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-      Subscribe
-    </button>
-  </div>
+  <% end %>
 <% end %>

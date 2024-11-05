@@ -1,12 +1,16 @@
-<div class="flex-1 items-center justify-center text-center lg:flex">
+<div class="flex flex-1 flex-col items-center justify-center max-w-6xl mx-auto px-4 text-center">
   <div class="my-8">
     <%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 w-96 mx-auto" %>
-    <div class="text-xl">
+    <div class="text-xl mt-2">
       <% if @alert %>
         Thank you for confirming your subscription.
       <% else %>
         I'm sorry, we could not find your subscription.
       <% end %>
     </div>
+    <div class="flex justify-center mt-7">
+      <a href="https://www.buymeacoffee.com/wethesweeple"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=☕&slug=wethesweeple&button_colour=b3ddf2&font_colour=000000&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" /></a>
+    </div>
   </div>
 </div>
+

@@ -57,6 +57,11 @@ docker-compose run app bin/rails console
 
 # Start a bash shell
 docker-compose run app /bin/bash
+
+# Run rspec tests
+docker-compose run app rake spec
+OR
+docker-compose run app bundle exec rake spec
 ```
 
 ### Emails

@@ -2,7 +2,7 @@
 # BASE #
 ########
 
-FROM ruby:3.1.4-slim as base
+FROM ruby:3.3.0-slim as base
 
 # Install dependencies
 RUN apt-get update -qq \
@@ -19,7 +19,7 @@ COPY . ./
 FROM base as dev
 ENV BUNDLE_PATH=/bundle
 RUN bundle config set path ${BUNDLE_PATH}
-RUN gem install bundler -v 2.3.25
+RUN gem install bundler -v 2.4.10
 
 ########
 # PROD #
