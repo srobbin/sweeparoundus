@@ -14,12 +14,11 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        image: postgres:17
         ports:
           - 5432:5432
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -40,11 +39,7 @@ jobs:
           gem install bundler -v 2.4.10
           bundle install --jobs 4 --retry 3
 
-      - name: Setup database
-        run: |
-          cp config/database.yml.ci config/database.yml
-          RAILS_ENV=test bundle exec rails db:create db:schema:load
-
       - name: Run tests
         run: |
-          bin/rails test
+          bundle exec rails db:setup
+          bundle exec rails test
