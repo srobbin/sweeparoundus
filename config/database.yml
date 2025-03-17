@@ -1,7 +1,7 @@
 default: &default
   adapter: postgis
   encoding: unicode
-  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  host: db
   username: postgres
   password: <%= ENV['POSTGRES_PASSWORD'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

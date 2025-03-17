@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: demo4u!
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -14,8 +18,8 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: demo4u!
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -38,6 +42,7 @@ jobs:
 
       - name: Setup database
         run: |
+          cp config/database.yml.ci config/database.yml
           RAILS_ENV=test bundle exec rails db:create db:schema:load
 
       - name: Run tests
