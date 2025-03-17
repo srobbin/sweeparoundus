@@ -2,6 +2,7 @@ class CarryOverExistingAlerts
   attr_reader :write
   attr_accessor :failures
 
+  # CarryOverExistingAlerts.new(write: false).call
   def initialize(write: false)
     @write = write
     @failures = []
