@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe DestroyEligibleAlerts, type: :service do
+RSpec.describe DestroyIneligibleAlerts, type: :service do
   describe '.call' do
     let!(:area) { create(:area) }
     let!(:alert_confirmed_no_address) { create(:alert, :confirmed, area: area, created_at: 1.year.ago) }

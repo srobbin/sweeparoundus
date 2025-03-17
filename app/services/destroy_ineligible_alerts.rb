@@ -1,6 +1,8 @@
-class DestroyEligibleAlerts
+# destroys alerts that are ineligible for annual carry-over due to being unconfirmed or sans a street address
+class DestroyIneligibleAlerts
   attr_reader :alerts_to_destroy, :alerts_to_notify, :write
 
+  # DestroyIneligibleAlerts.new(write: false).call
   def initialize(write: false)
     @alerts_to_destroy = Alert.without_street_address.or(Alert.unconfirmed)
     @alerts_to_notify = @alerts_to_destroy.confirmed
