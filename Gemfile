@@ -7,7 +7,7 @@ gem "rails", "~> 7.1.5.1"
 gem "pg", "~> 1.1"
 gem "jbuilder", "~> 2.7"
 
-gem "activeadmin", "~> 3.2"
+gem "activeadmin", "~> 3.3"
 gem "activerecord-postgis-adapter", "~> 9.0.1"
 gem "bootsnap", "~> 1.17", require: false
 gem "dartsass-rails", "~> 0.5.0"
