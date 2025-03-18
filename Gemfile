@@ -18,7 +18,7 @@ gem "hotwire-rails", "~> 0.1.3"
 gem "icalendar", "~> 2.10"
 gem "jwt", "~> 2.2"
 gem "mailgun-ruby", "~> 1.2"
-gem "puma", "~> 6.4.3"
+gem "puma", "~> 6.6.0"
 gem "pundit", "~> 2.1"
 gem 'redis', '~> 5.0', '>= 5.0.8'
 gem "rgeo-geojson", "2.0.0"
