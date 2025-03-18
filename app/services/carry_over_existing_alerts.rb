@@ -23,12 +23,11 @@ class CarryOverExistingAlerts
       area = find_area(lat, lng)
 
       if area
-        alert.update(area: area, lat: lat, lng: lng) if write
         updated_count += 1
         puts "#{updated_count}/#{total_alert_count} alerts updated"
+        update_alert(alert, area, lat, lng) if write
       else
         add_to_failures(alert)
-        puts "failure"
       end
     end
 
@@ -50,11 +49,8 @@ class CarryOverExistingAlerts
       response = make_request(url)
     rescue StandardError => e
       if retry_count < max_retries
-        # Double the wait time for each retry (simplified exponential backoff)
-        wait_time = 2**retry_count
-  
-        sleep(wait_time)
-  
+        # Double the wait time for each retry (simplified exponential backoff)  
+        sleep(2**retry_count)
         retry_count += 1
         retry
       else
@@ -84,7 +80,18 @@ class CarryOverExistingAlerts
     end
   end
 
+  def update_alert(alert, area, lat, lng)
+    begin
+      alert.update!(area: area, lat: lat, lng: lng)
+      alert.reload
+      AlertMailer.with(alert: alert).annual_schedule_live.deliver_later
+    rescue ActiveRecord::RecordInvalid
+      add_to_failures(alert)
+    end
+  end
+
   def add_to_failures(alert)
+    puts "failure"
     failures << { id: alert.id, address: alert.street_address }
   end
 

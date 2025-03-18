@@ -6,7 +6,7 @@ Click here to confirm your subscription:
 <%= @confirmation_url %>
 
 Cheers,
-<%= ENV["SITE_NAME"] %>
+<%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
 
 <%= @disclaimer %>
 
