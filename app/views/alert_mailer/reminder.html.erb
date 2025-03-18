@@ -9,8 +9,8 @@
 <p><%= @dates.join("<br />").html_safe %></p>
 
 <p>
-Cheers,<br />
-<%= ENV["SITE_NAME"] %>
+  Cheers,<br />
+  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
 </p>
 
 <p><%= @disclaimer %></p>

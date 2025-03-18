@@ -1,0 +1,20 @@
+<p>Hello,</p>
+
+<p>
+  You are receiving this email because you subscribed to Chicago street sweeping alerts for the following street address: <%= @street_address %> (<%= link_to @area.name, @area %>).
+</p>
+
+<p>
+  If you no longer want to receive alerts for this address, <%= link_to "unsubscribe by clicking here", @unsubscribe_url %>.
+</p>
+
+<p>
+  If you have moved and wish to receive alerts for a new address, <%= link_to "create a new subscription", ENV["SITE_URL"] %>.
+</p>
+
+<p>
+  Cheers,<br />
+  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
+</p>
+
+<p><%= @disclaimer %></p>

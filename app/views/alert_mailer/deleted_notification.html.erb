@@ -5,10 +5,10 @@
 </p>
 
 <p>
-  If you'd like to continue receiving alerts for this (or another) area, <%= link_to "please visit our website and re-subscribe", @home_url %>.
+  If you'd like to continue receiving alerts for this (or another) area, <%= link_to "please visit our website and re-subscribe", ENV["SITE_URL"] %>.
 </p>
 
 <p>
-Cheers,<br />
-<%= ENV["SITE_NAME"] %>
+  Cheers,<br />
+  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
 </p>
