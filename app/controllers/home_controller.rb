@@ -13,7 +13,7 @@ class HomeController < ApplicationController
     @note_header =
       if sweeping_done_for_year?
         "SWEEP YOU NEXT YEAR"
-      elsif NEW_SCHEDULES_LIVE && !is_january_or_feb?
+      elsif NEW_SCHEDULES_LIVE && !is_beginning_of_year?
         "#{current_year} SCHEDULES NOW LIVE"
       else
         "#{current_year} SCHEDULES COMING SOON"
@@ -22,10 +22,10 @@ class HomeController < ApplicationController
 
   def set_note
     @note = "Please note that alert subscriptions do not carry over from year to year, unless you save your street address when signing up for notifications."
-    if NEW_SCHEDULES_LIVE && !is_january_or_feb?
+    if NEW_SCHEDULES_LIVE && !is_beginning_of_year?
       @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe your old address from an alert email."
     elsif !sweeping_done_for_year? && !NEW_SCHEDULES_LIVE
-      @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
+      @note += " New schedules will be posted after the City publishes them (typically in late March / early April), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
     end
   end
 
@@ -37,8 +37,8 @@ class HomeController < ApplicationController
     is_month_in?([12])
   end
 
-  def is_january_or_feb?
-    is_month_in?([1, 2])
+  def is_beginning_of_year?
+    is_month_in?([1, 2, 3])
   end
 
   def is_month_in?(months)
