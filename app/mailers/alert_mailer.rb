@@ -8,7 +8,7 @@ class AlertMailer < ApplicationMailer
   before_action :set_mailer_urls, only: [:confirm, :reminder]
   before_action :set_home_url, only: [:deleted_notification]
 
-  DISCLAIMER = "Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. Please consult the Department of Streets and Sanitation website, your Ward's / alderperson's website, and street signage for up-to-date parking information."
+  DISCLAIMER = "Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. For for up-to-date parking information, please consult street signage and the websites for the Department of Streets and Sanitation and your local Ward or alderperson."
 
   def yearly
     mail(
