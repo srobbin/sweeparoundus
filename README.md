@@ -74,6 +74,8 @@ In development, emails are captured and stored in `/tmp/letter_opener`.
   - "Street Sweeping Zones - 202X" => `Street Sweeping Zones - 202X.geojson`
   - "Street Sweeping Schedule - 202X" => `Street_Sweeping_Schedule_-_202X.csv`
 - Add exported data files to the `db/data` directory.
+- Run rspec test suite.
+- Merge into main and deploy.
 - Temporarily enable 'Maintenance Mode' on Heroku prior to running any non-TEST service calls.
 - Seed db with new zone and schedule data:
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
