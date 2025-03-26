@@ -25,7 +25,7 @@ class HomeController < ApplicationController
     if NEW_SCHEDULES_LIVE && !is_beginning_of_year?
       @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe your old address from an alert email."
     elsif !sweeping_done_for_year? && !NEW_SCHEDULES_LIVE
-      @note += " New schedules will be posted after the City publishes them (typically in late March / early April), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
+      @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
     end
   end
 
