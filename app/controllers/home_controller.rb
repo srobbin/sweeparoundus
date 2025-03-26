@@ -13,7 +13,7 @@ class HomeController < ApplicationController
     @note_header =
       if sweeping_done_for_year?
         "SWEEP YOU NEXT YEAR"
-      elsif NEW_SCHEDULES_LIVE && !is_beginning_of_year?
+      elsif NEW_SCHEDULES_LIVE || !is_beginning_of_year?
         "#{current_year} SCHEDULES NOW LIVE"
       else
         "#{current_year} SCHEDULES COMING SOON"
@@ -38,7 +38,7 @@ class HomeController < ApplicationController
   end
 
   def is_beginning_of_year?
-    is_month_in?([1, 2, 3])
+    Date.today < Date.new(current_year, 3, 31)
   end
 
   def is_month_in?(months)
