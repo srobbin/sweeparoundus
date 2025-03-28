@@ -82,9 +82,9 @@ In development, emails are captured and stored in `/tmp/letter_opener`.
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s).call`
 - Disable 'Maintenance Mode' on Heroku prior to running non-TEST `SeedYearlyData` service.
 - Flip `NEW_SCHEDULES_LIVE` boolean value.
-- Carry over existing alerts:
-  - TEST: `CarryOverExistingAlerts.new(write: false).call`
-  - `CarryOverExistingAlerts.new(write: true).call`
 - Destroy alerts that are unconfirmed or don't have an associated street address:
   - TEST: `DestroyIneligibleAlerts.new(write: false).call`
   - `DestroyIneligibleAlerts.new(write: true).call`
+- Carry over existing alerts:
+  - TEST: `CarryOverExistingAlerts.new(write: false).call`
+  - `CarryOverExistingAlerts.new(write: true).call`
