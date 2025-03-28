@@ -77,9 +77,11 @@ In development, emails are captured and stored in `/tmp/letter_opener`.
 - Run rspec test suite.
 - Merge into main and deploy.
 - Temporarily enable 'Maintenance Mode' on Heroku prior to running non-TEST `SeedYearlyData` service.
-- Seed db with new zone and schedule data:
+- Seed db with new zone and schedule data (note that this will nullify `area_id` in existing alerts):
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s).call`
+- Disable 'Maintenance Mode' on Heroku prior to running non-TEST `SeedYearlyData` service.
+- Flip `NEW_SCHEDULES_LIVE` boolean value.
 - Carry over existing alerts:
   - TEST: `CarryOverExistingAlerts.new(write: false).call`
   - `CarryOverExistingAlerts.new(write: true).call`
