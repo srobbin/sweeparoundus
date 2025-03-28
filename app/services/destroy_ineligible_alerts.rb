@@ -4,7 +4,7 @@ class DestroyIneligibleAlerts
 
   # DestroyIneligibleAlerts.new(write: false).call
   def initialize(write: false)
-    @alerts_to_destroy = Alert.without_street_address.or(Alert.unconfirmed)
+    @alerts_to_destroy = Alert.without_street_address.or(Alert.unconfirmed).where('created_at < ?', Time.current - 1.hour)
     @alerts_to_notify = @alerts_to_destroy.confirmed
     @write = write
   end
