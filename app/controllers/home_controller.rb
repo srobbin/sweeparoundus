@@ -2,7 +2,7 @@ class HomeController < ApplicationController
   before_action :set_note_header
   before_action :set_note
 
-  NEW_SCHEDULES_LIVE = false
+  NEW_SCHEDULES_LIVE = true
 
   def index
   end
