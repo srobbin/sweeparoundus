@@ -88,7 +88,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include("This is a reminder that street sweeping for #{alert.street_address}")
       expect(html_body).to include(area_url(area))
       expect(html_body).to include('will begin tomorrow.')
-      expect(html_body).to include(Date.tomorrow.strftime('%B %-d'))
+      expect(html_body).to include(sweep.date_1.strftime('%B %-d'))
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])

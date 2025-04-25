@@ -17,6 +17,9 @@ class Area < ApplicationRecord
   end
 
   def next_sweep
-    self.sweeps.where("date_1 > ?", Time.now).first
+    self.sweeps.where(
+      "date_1 >= :today OR date_2 >= :today OR date_3 >= :today OR date_4 >= :today",
+      today: Time.current.to_date
+    ).order(:date_1).first
   end
 end
