@@ -23,7 +23,7 @@ class HomeController < ApplicationController
   def set_note
     @note = "Please note that alert subscriptions do not carry over from year to year, unless you save your street address when signing up for notifications."
     if NEW_SCHEDULES_LIVE && !is_beginning_of_year?
-      @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe your old address from an alert email."
+      @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe the old address via an alert email."
     elsif !sweeping_done_for_year? && !NEW_SCHEDULES_LIVE
       @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
     end
