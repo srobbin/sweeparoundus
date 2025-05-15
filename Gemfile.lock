@@ -105,7 +105,7 @@ GEM
     benchmark (0.4.0)
     bigdecimal (3.1.9)
     bindex (0.8.1)
-    bootsnap (1.18.3)
+    bootsnap (1.18.6)
       msgpack (~> 1.2)
     builder (3.3.0)
     byebug (11.1.3)
@@ -242,7 +242,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
     minitest (5.25.5)
-    msgpack (1.7.2)
+    msgpack (1.8.0)
     mutex_m (0.3.0)
     net-imap (0.5.6)
       date
@@ -440,7 +440,7 @@ PLATFORMS
 DEPENDENCIES
   activeadmin (~> 3.3)
   activerecord-postgis-adapter (~> 9.0.1)
-  bootsnap (~> 1.17)
+  bootsnap (~> 1.18)
   byebug
   capybara (>= 3.26)
   dartsass-rails (~> 0.5.0)
