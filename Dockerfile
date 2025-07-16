@@ -2,7 +2,7 @@
 # BASE #
 ########
 
-FROM ruby:3.3.0-slim as base
+FROM ruby:3.4.5-slim as base
 
 # Install dependencies
 RUN apt-get update -qq \
