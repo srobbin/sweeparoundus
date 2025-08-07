@@ -12,7 +12,7 @@ class AreaDecorator < ApplicationDecorator
     marker = object.shape.contains?(search_point) ? "&markers=|#{session[:search_lat]},#{session[:search_lng]}|" : ""
 
     # Generate the static map image
-    url = "https://maps.googleapis.com/maps/api/staticmap?size=600x600#{marker}&path=color:0x00000000|weight:5|fillcolor:0xAA000033#{path}&sensor=false&key=#{ENV["GOOGLE_API_KEY"]}"
+    url = "https://maps.googleapis.com/maps/api/staticmap?size=600x600#{marker}&path=color:0x00000000|weight:5|fillcolor:0xAA000033#{path}&sensor=false&key=#{ENV["GOOGLE_MAPS_BACKEND_API_KEY"]}"
 
     # Return an image
     image_tag url, alt: "Sweep area map for #{object.name}"

@@ -38,7 +38,7 @@ class CarryOverExistingAlerts
 
   def get_address_coords(alert)
     address = alert.street_address
-    api_key = ENV["GOOGLE_API_KEY"]
+    api_key = ENV["GOOGLE_MAPS_BACKEND_API_KEY"]
     escaped_address = CGI.escape(address)
     url = URI("https://maps.googleapis.com/maps/api/geocode/json?address=#{escaped_address}&key=#{api_key}")
   
