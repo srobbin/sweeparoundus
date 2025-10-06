@@ -10,6 +10,18 @@ export default class SearchController extends Controller {
   }
 
   connect() {
+    // Check if Google Maps is already loaded
+    if (window.google && window.google.maps && window.google.maps.places) {
+      this.initializeAutocomplete();
+    } else {
+      // Wait for Google Maps to load asynchronously
+      document.addEventListener('google-maps-loaded', () => {
+        this.initializeAutocomplete();
+      });
+    }
+  }
+
+  initializeAutocomplete() {
     this.autocomplete = new google.maps.places.Autocomplete(this.addressTarget, {
       bounds: new google.maps.LatLngBounds(
         new google.maps.LatLng( 41.6446, -87.9395 ),
@@ -22,7 +34,9 @@ export default class SearchController extends Controller {
   }
 
   disconnect() {
-    google.maps.event.removeListener(this.autocomplete, 'place_changed', this.boundPlaceChanged);
+    if (this.autocomplete && google.maps && google.maps.event) {
+      google.maps.event.removeListener(this.autocomplete, 'place_changed', this.boundPlaceChanged);
+    }
   }
 
   submit(event) {
