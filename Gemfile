@@ -25,7 +25,7 @@ gem "rgeo-geojson", "2.0.0"
 gem "sassc", "~> 2.4"
 gem 'sidekiq', '~> 7.2'
 gem "sidekiq-cron", "~> 1.11"
-gem "sprockets-rails", "~> 3.4"
+gem "sprockets-rails", "~> 3.5"
 gem "tailwindcss-rails", "~> 0.3"
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
