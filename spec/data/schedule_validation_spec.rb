@@ -42,6 +42,12 @@ RSpec.describe 'Schedule file validation' do
       dates.each do |date|
         errors << "Invalid date #{date} for month #{month_number}" unless date.between?(1, max_days)
       end
+
+      # Validate DATES are in ascending order
+      sorted_dates = dates.sort
+      unless dates == sorted_dates
+        errors << "Dates not in ascending order for Ward #{ward}, Section #{section}, #{month_name}: #{row['DATES']}"
+      end
     end
 
     expect(errors).to be_empty, errors.join("\n")
