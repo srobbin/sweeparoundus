@@ -41,7 +41,7 @@ group :development, :test do
 end
 
 group :development do
-  gem "foreman", "~> 0.87.2"
+  gem "foreman", "~> 0.90.0"
   gem "letter_opener", "~> 1.8"
   gem "listen", "~> 3.9"
   gem "web-console", ">= 4.1.0"
