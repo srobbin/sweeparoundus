@@ -18,3 +18,9 @@
 <p>
   <%= link_to "Unsubscribe", @unsubscribe_url %>
 </p>
+
+<% if ENV["COFFEE_LINK_URL"].present? %>
+<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+  ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
+</p>
+<% end %>
