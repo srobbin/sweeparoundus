@@ -6,7 +6,7 @@ FROM ruby:3.4.7-slim as base
 
 # Install dependencies
 RUN apt-get update -qq \
-  && apt-get install -y build-essential libpq-dev postgresql-client libgeos-dev vim
+  && apt-get install -y build-essential libpq-dev postgresql-client libgeos-dev vim libyaml-dev
 
 # Set the working directory and copy files
 WORKDIR /app
