@@ -74,11 +74,10 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
   config.action_mailer.default_url_options = { host: ENV["SITE_URL"] }
 
-  # Mailgun
-  config.action_mailer.delivery_method = :mailgun
-  config.action_mailer.mailgun_settings = {
-    api_key: ENV["MAILGUN_API_KEY"],
-    domain: ENV["MAILGUN_DOMAIN"],
+  # Postmark
+  config.action_mailer.delivery_method = :postmark
+  config.action_mailer.postmark_settings = {
+    api_token: ENV["POSTMARK_API_TOKEN"]
   }
 
   # Ignore bad email addresses and do not raise email delivery errors.
