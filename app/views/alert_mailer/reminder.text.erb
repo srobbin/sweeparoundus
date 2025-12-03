@@ -14,3 +14,7 @@ Cheers,
 <%= @disclaimer %>
 
 Unsubscribe: <%= @unsubscribe_url %>
+
+<% if ENV["COFFEE_LINK_URL"].present? %>
+☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
+<% end %>
