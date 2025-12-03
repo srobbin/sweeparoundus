@@ -17,7 +17,7 @@ gem "friendly_id", "~> 5.4"
 gem "hotwire-rails", "~> 0.1.3"
 gem "icalendar", "~> 2.10"
 gem "jwt", "~> 2.2"
-gem "mailgun-ruby", "~> 1.2"
+gem "postmark-rails", "~> 0.22.1"
 gem "puma", "~> 6.6.0"
 gem "pundit", "~> 2.1"
 gem 'redis', '~> 5.0', '>= 5.0.8'
