@@ -31,7 +31,7 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Avoid breaking changes
 gem "stimulus-rails", "0.2.4"
-gem "turbo-rails", "0.5.12"
+gem "turbo-rails", "2.0.20"
 
 group :development, :test do
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
