@@ -10,7 +10,7 @@ gem "jbuilder", "~> 2.7"
 gem "activeadmin", "~> 3.3"
 gem "activerecord-postgis-adapter", "~> 9.0.1"
 gem "bootsnap", "~> 1.18", require: false
-gem "dartsass-rails", "~> 0.5.0"
+gem "dartsass-rails", "~> 0.5.1"
 gem "devise", "~> 4.9"
 gem "draper", "~> 4.0"
 gem "friendly_id", "~> 5.4"
