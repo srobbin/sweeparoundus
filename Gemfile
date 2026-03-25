@@ -3,12 +3,12 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.4.7"
 
-gem "rails", "~> 7.1.5.1"
+gem "rails", "~> 7.2.3.1"
 gem "pg", "~> 1.1"
 gem "jbuilder", "~> 2.7"
 
 gem "activeadmin", "~> 3.3"
-gem "activerecord-postgis-adapter", "~> 9.0.1"
+gem "activerecord-postgis-adapter", "~> 10.0"
 gem "bootsnap", "~> 1.18", require: false
 gem "dartsass-rails", "~> 0.5.1"
 gem "devise", "~> 4.9"
@@ -21,7 +21,7 @@ gem "sendgrid-ruby", "~> 6.7"
 gem "puma", "~> 6.6.0"
 gem "pundit", "~> 2.1"
 gem 'redis', '~> 5.0', '>= 5.0.8'
-gem "rgeo-geojson", "2.0.0"
+gem "rgeo-geojson", "~> 2.2"
 gem "sassc", "~> 2.4"
 gem 'sidekiq', '~> 7.2'
 gem "sidekiq-cron", "~> 1.11"

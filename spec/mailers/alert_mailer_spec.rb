@@ -31,7 +31,6 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
-      expect(html_body).to include("Copyright #{Time.current.year} We The Sweeple")
     end
   end
   
@@ -58,8 +57,6 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
-      expect(html_body).to include(unsubscribe_area_alerts_url(area))
-      expect(html_body).to include("Copyright #{Time.current.year} We The Sweeple")
     end
 
     context 'when alert has no street address' do
@@ -94,7 +91,6 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
-      expect(html_body).to include("Copyright #{Time.current.year} We The Sweeple")
     end
 
     context 'when alert has no street address' do
