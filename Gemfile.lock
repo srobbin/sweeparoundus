@@ -255,7 +255,9 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-gnu)
       racc (~> 1.4)
+    observer (0.1.2)
     orm_adapter (0.5.0)
+    ostruct (0.6.3)
     pg (1.5.4)
     pp (0.6.3)
       prettyprint
@@ -446,6 +448,8 @@ DEPENDENCIES
   jwt (~> 2.2)
   letter_opener (~> 1.8)
   listen (~> 3.9)
+  observer (~> 0.1)
+  ostruct (~> 0.6)
   pg (~> 1.1)
   puma (~> 6.6.0)
   pundit (~> 2.1)

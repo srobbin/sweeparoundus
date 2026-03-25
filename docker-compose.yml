@@ -15,7 +15,8 @@ services:
       - db
       - redis
   db:
-    image: postgis/postgis
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64
     env_file: ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
