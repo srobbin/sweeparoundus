@@ -33,6 +33,7 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "stimulus-rails", "0.2.4"
 gem "turbo-rails", "0.5.12"
 
+gem "connection_pool", "~> 2.4"
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
