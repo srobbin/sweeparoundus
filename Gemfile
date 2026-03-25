@@ -7,11 +7,11 @@ gem "rails", "~> 7.2.3.1"
 gem "pg", "~> 1.1"
 gem "jbuilder", "~> 2.7"
 
-gem "activeadmin", "~> 3.3"
+gem "activeadmin", "~> 3.5"
 gem "activerecord-postgis-adapter", "~> 10.0"
 gem "bootsnap", "~> 1.18", require: false
 gem "dartsass-rails", "~> 0.5.1"
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 gem "draper", "~> 4.0"
 gem "friendly_id", "~> 5.4"
 gem "hotwire-rails", "~> 0.1.3"
