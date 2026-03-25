@@ -27,4 +27,4 @@ RUN gem install bundler -v 2.4.10
 
 FROM base as prod
 RUN bundle install
-RUN RAILS_ENV=production SECRET_KEY_BASE=DUMMY bin/rails assets:precompile
+RUN RAILS_ENV=production SECRET_KEY_BASE=DUMMY bin/rails assets:precompile --trace
