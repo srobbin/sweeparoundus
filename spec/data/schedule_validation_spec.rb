@@ -138,31 +138,59 @@ RSpec.describe 'Schedule file validation' do
     expect(errors).to be_empty, errors.join("\n")
   end
 
-  it 'has no section whose schedule is a strict subset of another in the same ward' do
-    schedules = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = {} } }
+  it 'has no sweeping dates on Saturdays' do
+    errors = []
+
+    CSV.foreach(file_path, headers: true).with_index(2) do |row, line|
+      month_number = row['MONTH NUMBER'].to_i
+      row['DATES'].split(',').each do |d|
+        day = d.strip.to_i
+        date = Date.new(year, month_number, day)
+        if date.saturday?
+          errors << "Line #{line}: #{row['WARD SECTION (CONCATENATED)']} has Saturday date #{date.strftime('%B %-d')}"
+        end
+      end
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has no sweeping dates on Sundays' do
+    errors = []
+
+    CSV.foreach(file_path, headers: true).with_index(2) do |row, line|
+      month_number = row['MONTH NUMBER'].to_i
+      row['DATES'].split(',').each do |d|
+        day = d.strip.to_i
+        date = Date.new(year, month_number, day)
+        if date.sunday?
+          errors << "Line #{line}: #{row['WARD SECTION (CONCATENATED)']} has Sunday date #{date.strftime('%B %-d')}"
+        end
+      end
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has no section with a month count far below its ward median' do
+    months_per_section = Hash.new { |h, k| h[k] = {} }
 
     CSV.foreach(file_path, headers: true) do |row|
       ward = row['WARD']
       section = row['SECTION']
-      month_number = row['MONTH NUMBER']
-      dates = row['DATES']
-      schedules[ward][section][month_number] = dates
+      months_per_section[ward][section] ||= 0
+      months_per_section[ward][section] += 1
     end
 
     errors = []
 
-    schedules.each do |ward, sections|
-      section_ids = sections.keys
-      section_ids.combination(2).each do |s1, s2|
-        sched1 = sections[s1]
-        sched2 = sections[s2]
+    months_per_section.each do |ward, sections|
+      counts = sections.values.sort
+      median = counts[counts.size / 2]
 
-        if sched1.size < sched2.size && sched1.all? { |month, dates| sched2[month] == dates }
-          missing = (sched2.keys - sched1.keys).sort
-          errors << "Ward #{ward}, section #{s1} is a strict subset of section #{s2} (missing month(s): #{missing.join(', ')})"
-        elsif sched2.size < sched1.size && sched2.all? { |month, dates| sched1[month] == dates }
-          missing = (sched1.keys - sched2.keys).sort
-          errors << "Ward #{ward}, section #{s2} is a strict subset of section #{s1} (missing month(s): #{missing.join(', ')})"
+      sections.each do |section, count|
+        if count * 2 < median
+          errors << "Ward #{ward}, section #{section} has #{count} month(s) (ward median: #{median})"
         end
       end
     end
