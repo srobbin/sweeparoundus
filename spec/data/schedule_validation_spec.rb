@@ -52,4 +52,121 @@ RSpec.describe 'Schedule file validation' do
 
     expect(errors).to be_empty, errors.join("\n")
   end
+
+  it 'has no duplicate rows' do
+    seen = {}
+
+    CSV.foreach(file_path, headers: true).with_index(2) do |row, line|
+      key = row.fields.join('|')
+
+      if seen[key]
+        seen[key] << line
+      else
+        seen[key] = [line]
+      end
+    end
+
+    duplicates = seen.select { |_, lines| lines.size > 1 }
+
+    errors = duplicates.map do |key, lines|
+      "Duplicate row on lines #{lines.join(', ')}: #{key}"
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has no duplicate ward_section + month combinations' do
+    seen = {}
+
+    CSV.foreach(file_path, headers: true).with_index(2) do |row, line|
+      ward_section = row['WARD SECTION (CONCATENATED)']
+      month_number = row['MONTH NUMBER']
+      key = "#{ward_section}|#{month_number}"
+
+      if seen[key]
+        seen[key] << line
+      else
+        seen[key] = [line]
+      end
+    end
+
+    duplicates = seen.select { |_, lines| lines.size > 1 }
+
+    errors = duplicates.map do |key, lines|
+      ward_section, month = key.split('|')
+      "Ward section #{ward_section}, month #{month} appears on lines #{lines.join(', ')}"
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has at least 2 months of sweeping per ward section' do
+    month_counts = Hash.new(0)
+
+    CSV.foreach(file_path, headers: true) do |row|
+      month_counts[row['WARD SECTION (CONCATENATED)']] += 1
+    end
+
+    errors = month_counts.select { |_, count| count < 2 }.map do |ward_section, count|
+      "Ward section #{ward_section} only has #{count} month(s)"
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has no gaps in section numbering within a ward' do
+    sections_by_ward = Hash.new { |h, k| h[k] = [] }
+
+    CSV.foreach(file_path, headers: true) do |row|
+      ward = row['WARD'].to_i
+      section = row['SECTION'].to_i
+      sections_by_ward[ward] << section
+    end
+
+    errors = []
+
+    sections_by_ward.each do |ward, sections|
+      unique = sections.uniq.sort
+      expected = (unique.first..unique.last).to_a
+      missing = expected - unique
+      missing.each do |section|
+        errors << "Ward %02d is missing section %02d (sections range from %02d to %02d)" %
+          [ward, section, unique.first, unique.last]
+      end
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
+  it 'has no section whose schedule is a strict subset of another in the same ward' do
+    schedules = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = {} } }
+
+    CSV.foreach(file_path, headers: true) do |row|
+      ward = row['WARD']
+      section = row['SECTION']
+      month_number = row['MONTH NUMBER']
+      dates = row['DATES']
+      schedules[ward][section][month_number] = dates
+    end
+
+    errors = []
+
+    schedules.each do |ward, sections|
+      section_ids = sections.keys
+      section_ids.combination(2).each do |s1, s2|
+        sched1 = sections[s1]
+        sched2 = sections[s2]
+
+        if sched1.size < sched2.size && sched1.all? { |month, dates| sched2[month] == dates }
+          missing = (sched2.keys - sched1.keys).sort
+          errors << "Ward #{ward}, section #{s1} is a strict subset of section #{s2} (missing month(s): #{missing.join(', ')})"
+        elsif sched2.size < sched1.size && sched2.all? { |month, dates| sched1[month] == dates }
+          missing = (sched1.keys - sched2.keys).sort
+          errors << "Ward #{ward}, section #{s2} is a strict subset of section #{s1} (missing month(s): #{missing.join(', ')})"
+        end
+      end
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
 end
