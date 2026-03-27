@@ -1,15 +1,17 @@
 class SearchController < ApplicationController
   def index
-    point = RGeo::Geos.factory(srid: 0).point(params[:lng].to_f, params[:lat].to_f)
-    areas = Area.arel_table
-    @area =  Area.where(areas[:shape].st_contains(point)).first
+    unless params[:lat].present? && params[:lng].present?
+      flash[:error] = "Please enter an address to search."
+      return redirect_to root_path
+    end
 
-    session[:search_lat] = params[:lat]
-    session[:search_lng] = params[:lng]
-    session[:street_address] = params[:address]
-    session[:is_save_street_address_checked] = true
+    @area = Area.find_by_coordinates(params[:lat], params[:lng])
 
     if @area
+      session[:search_lat] = params[:lat]
+      session[:search_lng] = params[:lng]
+      session[:street_address] = params[:address]
+      session[:is_save_street_address_checked] = true
       redirect_to @area
     else
       flash[:error] = "Sorry, we could not find the sweep area associated with your address."

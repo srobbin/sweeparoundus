@@ -1,6 +1,25 @@
 require 'rails_helper'
 
 RSpec.describe Area do
+  describe '.find_by_coordinates' do
+    let!(:area) { create(:area) }
+
+    it 'returns the area containing the given lat/lng' do
+      result = Area.find_by_coordinates(41.885, -87.712)
+      expect(result).to eq(area)
+    end
+
+    it 'returns nil when no area contains the given lat/lng' do
+      result = Area.find_by_coordinates(42.0, -87.5)
+      expect(result).to be_nil
+    end
+
+    it 'handles string coordinate values' do
+      result = Area.find_by_coordinates("41.885", "-87.712")
+      expect(result).to eq(area)
+    end
+  end
+
   describe '#next_sweep' do
     let(:area) { create(:area) }
     let(:today) { Time.current.to_date }

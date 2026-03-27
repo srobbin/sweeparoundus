@@ -9,6 +9,13 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/#{ENV.fetch("ADMIN_PATH", "admin")}/sidekiq"
   end
 
+  # API
+  namespace :api do
+    namespace :v1 do
+      resources :sweeps, only: [:index]
+    end
+  end
+
   # Resources
   resources :areas, only: [:show] do
     resources :alerts, only: [:create] do
