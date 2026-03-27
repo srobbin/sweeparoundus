@@ -20,6 +20,7 @@ gem "jwt", "~> 2.2"
 gem "sendgrid-ruby", "~> 6.7"
 gem "puma", "~> 6.6.0"
 gem "pundit", "~> 2.1"
+gem "rack-attack", "~> 6.7"
 gem 'redis', '~> 5.0', '>= 5.0.8'
 gem "rgeo-geojson", "~> 2.2"
 gem "sassc", "~> 2.4"

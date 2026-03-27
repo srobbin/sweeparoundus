@@ -12,6 +12,11 @@ class Area < ApplicationRecord
   validates :shape, presence: true
   validates :shortcode, presence: true, uniqueness: true
 
+  def self.find_by_coordinates(lat, lng)
+    point = RGeo::Geos.factory(srid: 0).point(lng.to_f, lat.to_f)
+    where(arel_table[:shape].st_contains(point)).first
+  end
+
   def name
     "Ward #{self.ward}, Sweep Area #{self.number}"
   end
