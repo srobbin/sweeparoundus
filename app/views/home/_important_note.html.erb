@@ -5,7 +5,7 @@
         <%= @note_header %>
       </h3>
       <div class="mt-2 text-yellow-700">
-        <p><%= @note %></p>
+        <p><%= sanitize @note, tags: %w[a], attributes: %w[href target rel class] %></p>
       </div>
     </div>
   </div>
