@@ -25,7 +25,8 @@ class HomeController < ApplicationController
     if NEW_SCHEDULES_LIVE && !is_beginning_of_year?
       @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe the old address via an alert email."
     elsif !sweeping_done_for_year? && !NEW_SCHEDULES_LIVE
-      @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted."
+      @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted." \
+        ' Check the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs.html" target="_blank" rel="noopener noreferrer" class="underline font-medium">City of Chicago Streets &amp; Sanitation page</a> for the latest updates.'
     end
   end
 
