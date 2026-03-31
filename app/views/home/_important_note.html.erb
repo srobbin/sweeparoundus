@@ -1,11 +1,12 @@
-<div class="mt-8 rounded-md bg-yellow-50 p-4 text-sm">
+<% bg, header_color, text_color = @note_urgent ? %w[bg-orange-50 text-orange-800 text-orange-700] : %w[bg-yellow-50 text-yellow-800 text-yellow-700] %>
+<div class="mt-8 rounded-md <%= bg %> p-4 text-sm">
   <div class="flex">
     <div class="ml-3">
-      <h3 class="font-medium text-yellow-800">
+      <h3 class="font-medium <%= header_color %>">
         <%= @note_header %>
       </h3>
-      <div class="mt-2 text-yellow-700">
-        <p><%= sanitize @note, tags: %w[a], attributes: %w[href target rel class] %></p>
+      <div class="mt-2 <%= text_color %>">
+        <p><%= sanitize @note, tags: %w[a br strong], attributes: %w[href target rel class] %></p>
       </div>
     </div>
   </div>
