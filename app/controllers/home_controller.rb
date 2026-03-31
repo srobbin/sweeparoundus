@@ -28,8 +28,9 @@ class HomeController < ApplicationController
     if NEW_SCHEDULES_LIVE && !is_beginning_of_year?
       @note += " If your street address has changed, simply subscribe with your new address and then unsubscribe the old address via an alert email."
     elsif ZONE_DELAY_2026
+      @note_urgent = true
       @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted." \
-        ' <strong>Update:</strong> The City has <a href="https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/" target="_blank" rel="noopener noreferrer" class="underline font-medium">announced</a> that the 2026 street sweeping zones dataset is delayed.' \
+        ' <br><br><strong>Update:</strong> The City has <a href="https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/" target="_blank" rel="noopener noreferrer" class="underline font-medium">announced</a> that the 2026 street sweeping zones dataset is delayed.' \
         ' Please check the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs.html" target="_blank" rel="noopener noreferrer" class="underline font-medium">City of Chicago Streets &amp; Sanitation page</a> for the latest updates.'
     elsif !sweeping_done_for_year? && !NEW_SCHEDULES_LIVE
       @note += " New schedules will be posted after the City publishes them (typically in late March), at which point all subscriptions that are either unconfirmed or sans street addresses will be deleted." \
