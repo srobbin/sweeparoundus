@@ -134,3 +134,6 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 - Carry over existing alerts:
   - TEST: `CarryOverExistingAlerts.new(write: false).call`
   - `CarryOverExistingAlerts.new(write: true).call`
+- Notify ward offices that new schedules are live:
+  - TEST: `NotifyWardOffices.new(write: false, year: Time.current.year.to_s).call`
+  - `NotifyWardOffices.new(write: true, year: Time.current.year.to_s).call`

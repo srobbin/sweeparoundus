@@ -1,0 +1,37 @@
+<p>Dear Alderperson <%= @name %>,</p>
+
+<p>
+  The <%= Time.current.year %> Chicago street sweeping schedules are now live on
+  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>.
+</p>
+
+<p>
+  Residents of Ward <%= @ward %> can visit our website to look up their sweeping
+  schedule and sign up to receive free email reminders before their street is
+  swept. No app to download, no account to create — just an email address and a
+  street address.
+</p>
+
+<p>
+  If your office would like to share this resource with constituents, here is a
+  direct link:<br />
+  <%= link_to ENV["SITE_URL"], ENV["SITE_URL"] %>
+</p>
+
+<p>
+  Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of
+  Chicago. We do, however, work with City data officials to identify and resolve
+  issues with the data provided by the Department of Streets and Sanitation. If
+  your ward office is ever interested in making text message alerts available to
+  constituents, we would be happy to discuss that possibility, provided that
+  there is budget available to do so.
+</p>
+
+<p>
+  Thank you for helping to keep Chicago's streets clean!
+</p>
+
+<p>
+  Best regards,<br />
+  <%= ENV["SITE_NAME"] %>
+</p>
