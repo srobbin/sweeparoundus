@@ -102,6 +102,33 @@ RSpec.describe AlertMailer, type: :mailer do
     end
   end
 
+  describe '#sweeping_data_delayed email' do
+    let!(:alert) { create :alert, :confirmed, :with_address, area: area }
+    let(:mail) do
+      described_class
+        .with(alert: alert)
+        .sweeping_data_delayed
+        .deliver_now
+    end
+
+    it 'has the right attributes' do
+      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.subject).to eq("#{Time.current.year} Chicago street sweeping alerts are delayed")
+      expect(mail.to).to include(alert.email)
+      expect(html_body).to include('Hello,')
+      expect(html_body).to include("you subscribed to Chicago street sweeping alerts")
+      expect(html_body).to include(alert.street_address)
+      expect(html_body).to include("delayed the release of the 2026 street sweeping zone data")
+      expect(html_body).to include("We The Sweeple (unaffiliated with the City)")
+      expect(html_body).to include("Department of Streets and Sanitation page")
+      expect(html_body).to include("alerts are up and running")
+      expect(html_body).to include('Cheers,')
+      expect(html_body).to include(ENV["SITE_NAME"])
+      expect(html_body).to include(ENV["SITE_URL"])
+      expect(html_body).to include(unsubscribe_area_alerts_url(area))
+    end
+  end
+
   describe '#deleted_notification email' do
     let!(:alert) { create :alert, :confirmed, area: area }
     let(:mail) do

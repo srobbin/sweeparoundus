@@ -1,11 +1,11 @@
 class AlertMailer < ApplicationMailer
   before_action :set_alert_and_area
   before_action :set_email
-  before_action :set_street_address, only: [:reminder, :confirm, :annual_schedule_live]
+  before_action :set_street_address, only: [:reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed]
   before_action :set_formatted_address_area, only: [:confirm]
   before_action :set_disclaimer, only: [:reminder, :confirm, :annual_schedule_live]
   before_action :set_sweep_dates, only: [:reminder]
-  before_action :set_mailer_urls, only: [:confirm, :reminder, :annual_schedule_live]
+  before_action :set_mailer_urls, only: [:confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed]
 
   DISCLAIMER = "Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. For for up-to-date parking information, please consult street signage and the websites for the Department of Streets and Sanitation and your local Ward or alderperson."
 
@@ -27,6 +27,13 @@ class AlertMailer < ApplicationMailer
     mail(
       to: @email,
       subject: "#{Time.current.year} street sweeping schedule is now live",
+    )
+  end
+
+  def sweeping_data_delayed
+    mail(
+      to: @email,
+      subject: "#{Time.current.year} Chicago street sweeping alerts are delayed",
     )
   end
 
