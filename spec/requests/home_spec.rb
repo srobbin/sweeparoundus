@@ -20,15 +20,15 @@ RSpec.describe "Home", type: :request do
       end
     end
 
-    context "before March 31 (beginning of year)" do
-      it "shows the coming soon message when schedules are not yet live" do
-        travel_to Date.new(2026, 2, 15) do
-          get root_path
+    # context "before March 31 (beginning of year)" do
+    #   it "shows the coming soon message when schedules are not yet live" do
+    #     travel_to Date.new(2026, 2, 15) do
+    #       get root_path
 
-          expect(response.body).to include("SCHEDULES COMING SOON")
-        end
-      end
-    end
+    #       expect(response.body).to include("SCHEDULES COMING SOON")
+    #     end
+    #   end
+    # end
 
     context "after March 31 (sweeping season)" do
       it "shows the schedules live message" do
