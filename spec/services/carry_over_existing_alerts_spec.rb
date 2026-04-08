@@ -7,6 +7,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
 
   before do
     ActiveJob::Base.queue_adapter = :test
+    allow_any_instance_of(CarryOverExistingAlerts).to receive(:sleep)
     stub_request(:get, /maps.googleapis.com/)
       .to_return(body: File.read(Rails.root.join('spec', 'fixtures', 'google_maps_response.json')))
     allow(Area).to receive(:where).and_return([alert.area])
