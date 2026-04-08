@@ -1,4 +1,6 @@
 class CarryOverExistingAlerts
+  MAX_FAILURES = 100
+
   attr_reader :write
   attr_accessor :failures
 
@@ -13,10 +15,14 @@ class CarryOverExistingAlerts
     updated_count = 0
 
     Alert.confirmed.with_street_address.each do |alert|
+      if !write && failures.length > MAX_FAILURES
+        puts "Exceeded #{MAX_FAILURES} failures during test run, stopping early"
+        break
+      end
+
       lat, lng = get_address_coords(alert)
 
       unless lat && lng
-        add_to_failures(alert)
         next
       end
 
@@ -27,7 +33,7 @@ class CarryOverExistingAlerts
         puts "#{updated_count}/#{total_alert_count} alerts updated"
         update_alert(alert, area, lat, lng) if write
       else
-        add_to_failures(alert)
+        add_to_failures(alert, "area_not_found")
       end
     end
 
@@ -49,12 +55,11 @@ class CarryOverExistingAlerts
       response = make_request(url)
     rescue StandardError => e
       if retry_count < max_retries
-        # Double the wait time for each retry (simplified exponential backoff)  
         sleep(2**retry_count)
         retry_count += 1
         retry
       else
-        add_to_failures(alert)
+        add_to_failures(alert, "http_error: #{e.message}")
         return
       end
     end
@@ -76,7 +81,7 @@ class CarryOverExistingAlerts
   
       [lat, lng]
     else
-      add_to_failures(alert)
+      add_to_failures(alert, "geocode_status: #{json['status']}")
       nil
     end
   end
@@ -86,14 +91,14 @@ class CarryOverExistingAlerts
       alert.update!(area: area, lat: lat, lng: lng)
       alert.reload
       AlertMailer.with(alert: alert).annual_schedule_live.deliver_later
-    rescue ActiveRecord::RecordInvalid
-      add_to_failures(alert)
+    rescue ActiveRecord::RecordInvalid => e
+      add_to_failures(alert, "update_failed: #{e.message}")
     end
   end
 
-  def add_to_failures(alert)
-    puts "failure"
-    failures << { id: alert.id, address: alert.street_address }
+  def add_to_failures(alert, reason)
+    puts "failure: #{reason}"
+    failures << { id: alert.id, address: alert.street_address, reason: reason }
   end
 
   def find_area(lat, lng)
