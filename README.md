@@ -127,11 +127,11 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 - Add files to the `db/data` directory.
 - Run rspec test suite.
 - Merge into main and deploy.
-- Temporarily enable 'Maintenance Mode' on Heroku prior to running non-TEST `SeedYearlyData` service.
+- Temporarily enable 'Maintenance Mode' on Heroku.
 - Seed db with new zone and schedule data (note that this will nullify `area_id` in existing alerts):
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s).call`
-    - Disable 'Maintenance Mode' on Heroku prior to running the non-TEST `SeedYearlyData` service.
+- Disable 'Maintenance Mode' on Heroku.
 - Flip `NEW_SCHEDULES_LIVE` boolean value.
 - Destroy alerts that are unconfirmed or don't have an associated street address:
   - TEST: `DestroyIneligibleAlerts.new(write: false).call`
