@@ -46,9 +46,12 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
       expect { subject }.not_to change { alert.reload.area }
     end
 
-    it 'adds the alert to failures' do
-      subject
-      expect(subject).to include("ERROR: Failed to find areas for 1 alert(s):")
+    it 'adds the alert to failures with geocode reason' do
+      service = described_class.new(write: true)
+      service.call
+      expect(service.failures).to contain_exactly(
+        a_hash_including(id: alert.id, reason: "geocode_status: ZERO_RESULTS")
+      )
     end
   end
 
@@ -63,9 +66,12 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
       subject
     end
 
-    it 'adds the alert to failures after max retries' do
-      subject
-      expect(subject).to include("ERROR: Failed to find areas for 1 alert(s):")
+    it 'adds the alert to failures with http_error reason' do
+      service = described_class.new(write: true)
+      service.call
+      expect(service.failures).to contain_exactly(
+        a_hash_including(id: alert.id, reason: "http_error: Network error")
+      )
     end
   end
 
@@ -84,11 +90,13 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
       expect { subject }.not_to raise_error
     end
 
-    it 'records the failed alerts without corrupting subsequent lookups' do
+    it 'records the failed alerts with reasons' do
       service = described_class.new(write: true)
       service.call
-      failed_ids = service.failures.map { |f| f[:id] }
-      expect(failed_ids).to include(invalid_alert_1.id, invalid_alert_2.id)
+      expect(service.failures).to contain_exactly(
+        a_hash_including(id: invalid_alert_1.id, reason: "geocode_status: ZERO_RESULTS"),
+        a_hash_including(id: invalid_alert_2.id, reason: "geocode_status: ZERO_RESULTS")
+      )
     end
   end
 
@@ -109,9 +117,12 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
       allow_any_instance_of(Alert).to receive(:update!).and_raise(ActiveRecord::RecordInvalid.new(alert))
     end
 
-    it 'adds the alert to failures' do
-      subject
-      expect(subject).to include("ERROR: Failed to find areas for 1 alert(s):")
+    it 'adds the alert to failures with update_failed reason' do
+      service = described_class.new(write: true)
+      service.call
+      expect(service.failures).to contain_exactly(
+        a_hash_including(id: alert.id, reason: start_with("update_failed:"))
+      )
     end
 
     it 'does not send an annual schedule live email' do
