@@ -1,4 +1,4 @@
-# SweepAround.Us
+# [We The Sweeple](http://wethesweeple.com)
 
 A Chicago street sweeping alert system and searchable calendar.
 
@@ -40,8 +40,8 @@ docker compose up
 
 Once the stack is running, visit: [http://localhost:3000](http://localhost:3000)
 
-_Note: you may be required to migrate the database, but you should be able to do this from
-the website prompt._
+*Note: you may be required to migrate the database, but you should be able to do this from
+the website prompt.*
 
 ### Gems and console
 
@@ -74,10 +74,12 @@ Returns the sweep area and next scheduled sweep dates for a given location.
 
 **Parameters**
 
-| Name  | Type  | Required | Description       |
-|-------|-------|----------|-------------------|
-| `lat` | float | yes      | Latitude (−90–90) |
+
+| Name  | Type  | Required | Description          |
+| ----- | ----- | -------- | -------------------- |
+| `lat` | float | yes      | Latitude (−90–90)    |
 | `lng` | float | yes      | Longitude (−180–180) |
+
 
 **Example request**
 
@@ -105,12 +107,14 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 
 **Error responses**
 
-| Status | Condition                      | Body |
-|--------|--------------------------------|------|
-| 422    | Missing `lat` or `lng`         | `{"error": "Missing required parameter: lat"}` |
-| 422    | Non-numeric or out-of-range    | `{"error": "Invalid coordinates."}` |
-| 404    | No sweep area at coordinates   | `{"error": "No sweep area found for the given coordinates."}` |
-| 429    | Rate limit exceeded            | `{"error": "Rate limit exceeded. Try again later."}` |
+
+| Status | Condition                    | Body                                                          |
+| ------ | ---------------------------- | ------------------------------------------------------------- |
+| 422    | Missing `lat` or `lng`       | `{"error": "Missing required parameter: lat"}`                |
+| 422    | Non-numeric or out-of-range  | `{"error": "Invalid coordinates."}`                           |
+| 404    | No sweep area at coordinates | `{"error": "No sweep area found for the given coordinates."}` |
+| 429    | Rate limit exceeded          | `{"error": "Rate limit exceeded. Try again later."}`          |
+
 
 **Rate limiting** — API requests are throttled to 60 per hour per IP. Throttled responses include a `Retry-After` header.
 
@@ -119,6 +123,7 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 - In late March, export the following files from the [Chicago Data Portal](data.cityofchicago.org):
   - "Street Sweeping Zones - 202X" => `Street Sweeping Zones - 202X.geojson`
   - "Street Sweeping Schedule - 202X" => `Street_Sweeping_Schedule_-_202X.csv`
+  - "Ward Offices" => `Ward_Offices_202X.csv`
 - Add files to the `db/data` directory.
 - Run rspec test suite.
 - Merge into main and deploy.
@@ -126,7 +131,7 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 - Seed db with new zone and schedule data (note that this will nullify `area_id` in existing alerts):
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s).call`
-- Disable 'Maintenance Mode' on Heroku prior to running non-TEST `SeedYearlyData` service.
+    - Disable 'Maintenance Mode' on Heroku prior to running the non-TEST `SeedYearlyData` service.
 - Flip `NEW_SCHEDULES_LIVE` boolean value.
 - Destroy alerts that are unconfirmed or don't have an associated street address:
   - TEST: `DestroyIneligibleAlerts.new(write: false).call`
