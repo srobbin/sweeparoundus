@@ -69,6 +69,29 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
     end
   end
 
+  context 'when multiple alerts fail geocoding before a valid one' do
+    let!(:invalid_alert_1) { create(:alert, :confirmed, street_address: 'invalid address 1', area: alert.area) }
+    let!(:invalid_alert_2) { create(:alert, :confirmed, street_address: 'invalid address 2', area: alert.area) }
+
+    before do
+      failure_body = File.read(Rails.root.join('spec', 'fixtures', 'google_maps_failure_response.json'))
+
+      stub_request(:get, /maps.googleapis.com.*invalid/)
+        .to_return(body: failure_body)
+    end
+
+    it 'does not raise a TypeError from accumulated failure hashes' do
+      expect { subject }.not_to raise_error
+    end
+
+    it 'records the failed alerts without corrupting subsequent lookups' do
+      service = described_class.new(write: true)
+      service.call
+      failed_ids = service.failures.map { |f| f[:id] }
+      expect(failed_ids).to include(invalid_alert_1.id, invalid_alert_2.id)
+    end
+  end
+
   context 'when write is false' do
     subject { described_class.new(write: false).call }
 

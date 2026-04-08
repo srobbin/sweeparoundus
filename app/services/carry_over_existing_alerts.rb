@@ -77,6 +77,7 @@ class CarryOverExistingAlerts
       [lat, lng]
     else
       add_to_failures(alert)
+      nil
     end
   end
 
