@@ -1,0 +1,11 @@
+<%= turbo_stream.remove "empty-state" %>
+
+<%= turbo_stream.append "subscriptions-list" do %>
+  <%= render "subscription", alert: @alert, token: @token %>
+<% end %>
+
+<%= turbo_stream.replace "add-subscription-flash" do %>
+  <div id="add-subscription-flash">
+    <%= render "shared/flash" %>
+  </div>
+<% end %>

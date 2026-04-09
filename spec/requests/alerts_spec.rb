@@ -144,6 +144,16 @@ RSpec.describe "Alerts", type: :request do
         }.to raise_error(JWT::DecodeError)
       end
     end
+
+    context "with a manage token" do
+      let(:token) { encode_manage_jwt(valid_email) }
+
+      it "raises a JWT decode error" do
+        expect {
+          get unsubscribe_area_alerts_path(area), params: { t: token }
+        }.to raise_error(JWT::DecodeError, "Invalid token purpose")
+      end
+    end
   end
 
   describe "GET /areas/:area_id/alerts/confirm" do
@@ -182,6 +192,16 @@ RSpec.describe "Alerts", type: :request do
         expect {
           get confirm_area_alerts_path(area), params: { t: "invalid.token.here" }
         }.to raise_error(JWT::DecodeError)
+      end
+    end
+
+    context "with a manage token" do
+      let(:token) { encode_manage_jwt(valid_email) }
+
+      it "raises a JWT decode error" do
+        expect {
+          get confirm_area_alerts_path(area), params: { t: token }
+        }.to raise_error(JWT::DecodeError, "Invalid token purpose")
       end
     end
   end

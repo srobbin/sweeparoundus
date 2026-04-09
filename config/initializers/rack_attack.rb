@@ -2,6 +2,12 @@ class Rack::Attack
   API_RATE_LIMIT = 60
   API_RATE_PERIOD = 1.hour
 
+  SEND_LINK_RATE_LIMIT = 5
+  SEND_LINK_RATE_PERIOD = 15.minutes
+
+  SEND_LINK_EMAIL_RATE_LIMIT = 4
+  SEND_LINK_EMAIL_RATE_PERIOD = 1.hour
+
   if Rails.env.test?
     cache.store = ActiveSupport::Cache::MemoryStore.new
   else
@@ -10,6 +16,14 @@ class Rack::Attack
 
   throttle("api/ip", limit: API_RATE_LIMIT, period: API_RATE_PERIOD) do |req|
     req.ip if req.path.start_with?("/api/")
+  end
+
+  throttle("subscriptions/send_link/ip", limit: SEND_LINK_RATE_LIMIT, period: SEND_LINK_RATE_PERIOD) do |req|
+    req.ip if req.path == "/subscriptions/send_link" && req.post?
+  end
+
+  throttle("subscriptions/send_link/email", limit: SEND_LINK_EMAIL_RATE_LIMIT, period: SEND_LINK_EMAIL_RATE_PERIOD) do |req|
+    req.params["email"].to_s.strip.downcase.presence if req.path == "/subscriptions/send_link" && req.post?
   end
 
   self.throttled_responder = lambda do |req|

@@ -1,0 +1,25 @@
+<%= content_for :page_title, "Manage Subscriptions" %>
+
+<div class="flex-1 w-full items-center justify-center lg:flex">
+  <div class="max-w-xl p-8 text-center">
+    <%= image_tag "logo.png", class: "inline-block", alt: "#{ENV["SITE_NAME"]} logo" %>
+    <div class="my-8">
+      <%= render "shared/flash" %>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-4">Manage Your Subscriptions</h1>
+    <p class="mb-6 text-gray-600">Enter your email address and we'll send you a link to manage your street sweeping alert subscriptions.</p>
+
+    <%= form_with url: subscriptions_send_link_path, method: :post, class: "max-w-md mx-auto", data: { controller: "email-form" } do |f| %>
+      <%= f.label :email, class: "sr-only" %>
+      <div class="flex rounded-md shadow-sm">
+        <div class="relative flex items-stretch flex-grow focus-within:z-10">
+          <%= f.email_field :email, class: "focus:ring-blue-500 focus:border-blue-500 block w-full rounded-none rounded-l-md border-gray-300", placeholder: "you@example.com", required: true, data: { email_form_target: "input", action: "input->email-form#toggle" } %>
+        </div>
+        <button class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed" data-email-form-target="submit" disabled>
+          Send me a link
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
