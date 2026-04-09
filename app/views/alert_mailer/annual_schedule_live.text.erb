@@ -2,7 +2,7 @@ Hello,
 
 You are receiving this email because you subscribed to Chicago street sweeping alerts for the following street address: <%= @street_address %>.
 
-If you no longer want to receive alerts for this address, <%= link_to "unsubscribe by clicking here", @unsubscribe_url %>.
+If you no longer want to receive alerts for this address, <%= link_to "unsubscribe by clicking here", @unsubscribe_url %>, or manage your subscriptions: <%= @manage_url %>
 
 If you have moved and wish to receive alerts for a new address, <%= link_to "create a new subscription", ENV["SITE_URL"] %>.
 
