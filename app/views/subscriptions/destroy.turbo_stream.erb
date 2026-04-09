@@ -1,0 +1,13 @@
+<%= turbo_stream.remove @alert %>
+
+<% if @remaining_count == 0 %>
+  <%= turbo_stream.append "subscriptions-list" do %>
+    <p class="text-gray-500 py-4" id="empty-state">You don't have any subscriptions yet. Add one below.</p>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "manage-flash" do %>
+  <div id="manage-flash">
+    <%= render "shared/flash" %>
+  </div>
+<% end %>

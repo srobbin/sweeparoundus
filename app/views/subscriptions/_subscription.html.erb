@@ -1,0 +1,25 @@
+<div id="<%= dom_id(alert) %>" class="flex items-center justify-between py-3 border-b">
+  <div class="flex-1">
+    <div class="font-medium">
+      <%= alert.street_address || "No street address" %>
+    </div>
+    <div class="text-sm text-gray-500">
+      <% if alert.area %>
+        <%= alert.area.name %>
+      <% else %>
+        <span class="text-red-500">Area no longer available</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <% if alert.confirmed? %>
+      <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">confirmed</span>
+    <% else %>
+      <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">unconfirmed</span>
+      <%= button_to "Confirm", confirm_subscription_path(alert, t: token), method: :patch, class: "inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+    <% end %>
+
+    <%= button_to "Remove", destroy_subscription_path(alert, t: token), method: :delete, class: "inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-1 focus:ring-red-500", data: { turbo_confirm: "Are you sure you want to remove this subscription?" } %>
+  </div>
+</div>

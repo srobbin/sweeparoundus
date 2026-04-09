@@ -7,6 +7,7 @@ class Alert < ApplicationRecord
   scope :phone, -> { where.not(phone: nil) }
 
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, unless: -> { self.phone.present? }
+  validates :email, uniqueness: { scope: :street_address }, if: -> { email.present? && street_address.present? }
   validate :email_or_phone
 
   scope :confirmed, -> { where(confirmed: true) }

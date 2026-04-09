@@ -1,0 +1,48 @@
+<%= content_for :page_title, "Manage Subscriptions" %>
+
+<div class="flex-1">
+  <header class="bg-gray-100">
+    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
+      <div class="flex-1">
+        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="max-w-3xl mx-auto px-4 py-8">
+      <h1 class="text-2xl font-bold mb-6">Manage Subscriptions for <%= @email %></h1>
+
+      <div id="manage-flash">
+        <%= render "shared/flash" %>
+      </div>
+
+      <section class="mb-10">
+
+        <% if @alerts.any? { |a| !a.confirmed? } %>
+          <div class="rounded-md bg-yellow-50 p-3 mb-4 text-sm text-yellow-700">
+            Subscriptions marked as <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">unconfirmed</span> will not receive alerts until confirmed.
+          </div>
+        <% end %>
+
+        <div id="subscriptions-list">
+          <% if @alerts.any? %>
+            <% @alerts.each do |alert| %>
+              <%= render "subscription", alert: alert, token: @token %>
+            <% end %>
+          <% else %>
+            <p class="text-sm text-gray-600 py-4" id="empty-state">You don't have any subscriptions yet. Add one below.</p>
+          <% end %>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold mb-4">Add New Subscription</h2>
+        <p class="text-sm text-gray-600 mb-4">Search for a Chicago street address to subscribe to sweeping alerts.</p>
+
+        <div id="add-subscription-flash"></div>
+        <%= render "add_form", token: @token %>
+      </section>
+    </div>
+  </main>
+</div>
