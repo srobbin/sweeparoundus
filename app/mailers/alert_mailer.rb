@@ -6,6 +6,7 @@ class AlertMailer < ApplicationMailer
   before_action :set_disclaimer, only: [:reminder, :confirm, :annual_schedule_live]
   before_action :set_sweep_dates, only: [:reminder]
   before_action :set_mailer_urls, only: [:confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed]
+  before_action :set_manage_url, only: [:reminder, :annual_schedule_live, :sweeping_data_delayed]
 
   DISCLAIMER = "Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. For for up-to-date parking information, please consult street signage and the websites for the Department of Streets and Sanitation and your local Ward or alderperson."
 
@@ -81,5 +82,9 @@ class AlertMailer < ApplicationMailer
     token = encode_jwt(@email, @street_address)
     @confirmation_url = confirm_area_alerts_url(@area, t: token)
     @unsubscribe_url = unsubscribe_area_alerts_url(@area, t: token)
+  end
+
+  def set_manage_url
+    @manage_url = manage_subscriptions_url(t: encode_manage_jwt(@email, expires_in: 60.days))
   end
 end

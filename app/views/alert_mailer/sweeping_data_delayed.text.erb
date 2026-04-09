@@ -11,6 +11,7 @@ We will notify you once the schedule is available and alerts are up and running.
 Cheers,
 <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
 
+Manage subscriptions: <%= @manage_url %>
 Unsubscribe: <%= @unsubscribe_url %>
 
 <% if ENV["COFFEE_LINK_URL"].present? %>

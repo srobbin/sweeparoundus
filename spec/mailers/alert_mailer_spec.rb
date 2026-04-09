@@ -3,11 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe AlertMailer, type: :mailer do
+  include JwtHelper
+
   let!(:area) { create :area }
   let!(:sweep) { create :sweep, area: area }
   let(:html_body) do
     mail.body.parts.find { |p| p.content_type.match 'text/html' }.body.raw_source
-  end 
+  end
+  let(:text_body) do
+    mail.body.parts.find { |p| p.content_type.match 'text/plain' }.body.raw_source
+  end
   
   describe '#annual_schedule_live email' do
     let!(:alert) { create :alert, :with_address, area: area }
@@ -26,11 +31,26 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include("You are receiving this email because you subscribed to Chicago street sweeping alerts for the following street address: #{alert.street_address}")
       expect(html_body).to include('If you no longer want to receive alerts for this address,')
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
+      expect(html_body).to include('manage your subscriptions')
       expect(html_body).to include('If you have moved and wish to receive alerts for a new address,')
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
+    end
+
+    it 'embeds a valid manage JWT in the HTML body' do
+      token = html_body.match(/subscriptions\/manage\?t=([^"&\s]+)/)[1]
+      decoded = decode_manage_jwt(token)
+
+      expect(decoded["sub"]).to eq(alert.email)
+      expect(decoded["purpose"]).to eq("manage")
+      expect(decoded["exp"]).to be_within(5).of(60.days.from_now.to_i)
+    end
+
+    it 'includes the manage link in the text body' do
+      expect(text_body).to include('manage your subscriptions')
+      expect(text_body).to include(manage_subscriptions_url.to_s)
     end
   end
   
@@ -91,6 +111,21 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
+      expect(html_body).to include('Manage subscriptions')
+    end
+
+    it 'embeds a valid manage JWT in the HTML body' do
+      token = html_body.match(/subscriptions\/manage\?t=([^"&\s]+)/)[1]
+      decoded = decode_manage_jwt(token)
+
+      expect(decoded["sub"]).to eq(alert.email)
+      expect(decoded["purpose"]).to eq("manage")
+      expect(decoded["exp"]).to be_a(Integer)
+    end
+
+    it 'includes the manage link in the text body' do
+      expect(text_body).to include('Manage subscriptions')
+      expect(text_body).to include(manage_subscriptions_url.to_s)
     end
 
     context 'when alert has no street address' do
@@ -126,6 +161,21 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
+      expect(html_body).to include('Manage subscriptions')
+    end
+
+    it 'embeds a valid manage JWT in the HTML body' do
+      token = html_body.match(/subscriptions\/manage\?t=([^"&\s]+)/)[1]
+      decoded = decode_manage_jwt(token)
+
+      expect(decoded["sub"]).to eq(alert.email)
+      expect(decoded["purpose"]).to eq("manage")
+      expect(decoded["exp"]).to be_a(Integer)
+    end
+
+    it 'includes the manage link in the text body' do
+      expect(text_body).to include('Manage subscriptions')
+      expect(text_body).to include(manage_subscriptions_url.to_s)
     end
   end
 

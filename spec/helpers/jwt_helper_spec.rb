@@ -68,6 +68,13 @@ RSpec.describe JwtHelper do
       expect(decoded["purpose"]).to eq("manage")
       expect(decoded["exp"]).to be_a(Integer)
     end
+
+    it "respects a custom expires_in" do
+      token = helper_instance.encode_manage_jwt(email, expires_in: 60.days)
+      decoded = JWT.decode(token, ENV["SECRET_KEY_JWT"], true, { algorithm: "HS256" }).first
+
+      expect(decoded["exp"]).to be_within(5).of(60.days.from_now.to_i)
+    end
   end
 
   describe "#decode_manage_jwt" do
@@ -90,6 +97,13 @@ RSpec.describe JwtHelper do
       token = JWT.encode(payload, ENV["SECRET_KEY_JWT"], "HS256")
 
       expect { helper_instance.decode_manage_jwt(token) }.to raise_error(JWT::ExpiredSignature)
+    end
+
+    it "raises for a token without expiration" do
+      payload = { sub: email, purpose: "manage" }
+      token = JWT.encode(payload, ENV["SECRET_KEY_JWT"], "HS256")
+
+      expect { helper_instance.decode_manage_jwt(token) }.to raise_error(JWT::DecodeError, "Missing expiration")
     end
 
     it "raises for a tampered token" do
