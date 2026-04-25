@@ -142,3 +142,16 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 - Notify ward offices that new schedules are live:
   - TEST: `NotifyWardOffices.new(write: false, year: Time.current.year.to_s).call`
   - `NotifyWardOffices.new(write: true, year: Time.current.year.to_s).call`
+
+### Mid-season schedule corrections
+
+If the City publishes a corrected `Street_Sweeping_Schedule_-_202X.csv` mid-season (the GeoJSON zones have not changed and alerts have already received their `annual_schedule_live` welcome email), refresh just the sweep data without touching `Area` records:
+
+- Replace `db/data/Street_Sweeping_Schedule_-_202X.csv` with the corrected file.
+- Run rspec test suite.
+- Merge into main and deploy.
+- Temporarily enable 'Maintenance Mode' on Heroku.
+- Re-seed the schedule only — `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
+  - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s, skip_geojson: true).call`
+  - `SeedYearlyData.new(write: true, year: Time.current.year.to_s, skip_geojson: true).call`
+- Disable 'Maintenance Mode' on Heroku.

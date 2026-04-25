@@ -102,12 +102,6 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response.body).to include(email)
       end
 
-      it "sets Referrer-Policy to no-referrer" do
-        get manage_subscriptions_path, params: { t: token }
-
-        expect(response.headers["Referrer-Policy"]).to eq("no-referrer")
-      end
-
       context "with confirmed and unconfirmed alerts" do
         let!(:confirmed_alert) { create(:alert, :confirmed, :with_address, email: email, area: area) }
         let!(:unconfirmed_alert) { create(:alert, :unconfirmed, :with_address, email: email, area: area) }

@@ -1,12 +1,16 @@
 class CarryOverExistingAlerts
   MAX_FAILURES = 100
 
-  attr_reader :write
+  attr_reader :write, :send_mailers
   attr_accessor :failures
 
   # CarryOverExistingAlerts.new(write: false).call
-  def initialize(write: false)
+  #
+  # Pass send_mailers: false to re-link alerts to areas without enqueuing the
+  # annual_schedule_live email (e.g. for mid-season schedule corrections).
+  def initialize(write: false, send_mailers: true)
     @write = write
+    @send_mailers = send_mailers
     @failures = []
   end
 
@@ -108,7 +112,7 @@ class CarryOverExistingAlerts
     begin
       alert.update!(area: area, lat: lat, lng: lng)
       alert.reload
-      AlertMailer.with(alert: alert).annual_schedule_live.deliver_later
+      AlertMailer.with(alert: alert).annual_schedule_live.deliver_later if send_mailers
     rescue ActiveRecord::RecordInvalid => e
       add_to_failures(alert, "update_failed: #{e.message}")
     end

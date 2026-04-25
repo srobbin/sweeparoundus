@@ -1,25 +1,32 @@
 class SeedYearlyData
-  attr_reader :write, :year
+  attr_reader :write, :year, :skip_geojson
 
   # SeedYearlyData.new(write: false, year: Time.current.year.to_s).call
-  def initialize(write: false, year:)
+  #
+  # Pass skip_geojson: true to refresh sweep data from the CSV without
+  # touching Area records. Useful for mid-season schedule corrections where
+  # the GeoJSON zones haven't changed.
+  def initialize(write: false, year:, skip_geojson: false)
     @write = write
     @year = year
+    @skip_geojson = skip_geojson
   end
 
   def call
     unless write
-      import_geojson_data
+      import_geojson_data unless skip_geojson
       import_schedule_data
-      return "TEST: #{Sweep.count} sweeps and #{Area.count} areas to be deleted; geojson and schedule files opened without error"
+      return dry_run_message
     end
 
     ActiveRecord::Base.transaction do
       destroy_old_sweep_data
-      destroy_old_area_data
-      import_geojson_data
+      unless skip_geojson
+        destroy_old_area_data
+        import_geojson_data
+      end
       import_schedule_data
-      "SUCCESS: #{Area.count} areas and #{Sweep.count} sweeps created from #{year} files"
+      success_message
     end
   rescue => e
     if write
@@ -30,6 +37,21 @@ class SeedYearlyData
   end
 
   private
+
+  def dry_run_message
+    deletions = ["#{Sweep.count} sweeps"]
+    deletions << "#{Area.count} areas" unless skip_geojson
+    files = skip_geojson ? "schedule file" : "geojson and schedule files"
+    "TEST: #{deletions.join(' and ')} to be deleted; #{files} opened without error"
+  end
+
+  def success_message
+    if skip_geojson
+      "SUCCESS: #{Sweep.count} sweeps re-created from #{year} schedule file (areas unchanged)"
+    else
+      "SUCCESS: #{Area.count} areas and #{Sweep.count} sweeps created from #{year} files"
+    end
+  end
 
   def destroy_old_sweep_data
     puts "Destroying old sweep data"

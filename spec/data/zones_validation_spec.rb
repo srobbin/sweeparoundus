@@ -2,8 +2,9 @@ require 'rails_helper'
 require 'rgeo'
 require 'rgeo/geo_json'
 
-# "On the business district item, the answer I got is that it was renamed from 34CBD to 34BD. There is no sweeping data associated, but it is there for shape purposes."
-BUSINESS_DISTRICT_WARD_SECTION = "34BD"
+# Ward 34 has a special zone with no sweeping data, included only for shape purposes.
+# It was originally named 34CBD, then renamed to 34BD, and later to 34NA.
+NON_SWEEPING_WARD_SECTIONS = %w[34BD 34NA].freeze
 
 RSpec.describe 'Zone file validation' do
   let(:file_path) { "db/data/Street Sweeping Zones - #{year}.geojson" }
@@ -14,14 +15,13 @@ RSpec.describe 'Zone file validation' do
 
     File.open(file_path, "r") do |f|
       RGeo::GeoJSON.decode(f, geo_factory: RGeo::Cartesian.simple_factory).each do |object|
-        is_bd_ward_section = object.properties["ward_section"] == BUSINESS_DISTRICT_WARD_SECTION
-        
         ward_section = object.properties["ward_section"]
-        has_ward_section = ward_section.to_i > 0 || is_bd_ward_section
+        is_non_sweeping = NON_SWEEPING_WARD_SECTIONS.include?(ward_section)
+
         ward = object.properties["ward"]
         has_ward = ward.to_i > 0
         section = object.properties["section"]
-        has_section = section.to_i > 0 || is_bd_ward_section
+        has_section = section.to_i > 0 || is_non_sweeping
         area_shape = object.geometry
 
         unless [has_ward, has_section, area_shape].all?
@@ -29,7 +29,7 @@ RSpec.describe 'Zone file validation' do
         end
 
         # Validate WARD SECTION length
-        errors << "Invalid WARD SECTION length: #{ward_section}" unless ward_section.length == 4 || is_bd_ward_section
+        errors << "Invalid WARD SECTION length: #{ward_section}" unless ward_section.length == 4 || is_non_sweeping
 
         # Validate WARD SECTION against WARD
         errors << "Invalid WARD SECTION v. WARD: #{ward_section} v. #{ward}" unless ward_section[0..1] == ward
