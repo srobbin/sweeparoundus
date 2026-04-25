@@ -67,6 +67,24 @@ RSpec.describe SeedYearlyData, type: :model do
         end
       end
 
+      context 'when skip_geojson is true' do
+        subject { described_class.new(write: true, year: year, skip_geojson: true).call }
+
+        it 'does not destroy areas or import the geojson' do
+          expect_any_instance_of(described_class).not_to receive(:destroy_old_area_data)
+          expect_any_instance_of(described_class).not_to receive(:import_geojson_data)
+          subject
+        end
+
+        it 'preserves existing Area records' do
+          expect { subject }.not_to change { Area.count }
+        end
+
+        it 'returns a schedule-only success message' do
+          expect(subject).to match(/\ASUCCESS: \d+ sweeps re-created from .* schedule file \(areas unchanged\)\z/)
+        end
+      end
+
       context 'file year' do
         before do
           allow_any_instance_of(described_class).to receive(:destroy_old_sweep_data).and_call_original

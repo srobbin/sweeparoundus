@@ -21,7 +21,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
     it 'updates the alert with the correct area and coordinates' do
       subject
       alert.reload
-      expect(alert.area).to eq(alert.area)
+      expect(alert.area).not_to be_nil
       expect(alert.lat).not_to be_nil
       expect(alert.lng).not_to be_nil
     end
@@ -106,6 +106,22 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
 
     it 'does not update the alert' do
       expect { subject }.not_to change { alert.reload.area }
+    end
+
+    it 'does not send an annual schedule live email' do
+      expect { subject }.not_to have_enqueued_mail(AlertMailer, :annual_schedule_live)
+    end
+  end
+
+  context 'when send_mailers is false' do
+    subject { described_class.new(write: true, send_mailers: false).call }
+
+    it 'still updates the alert with the correct area and coordinates' do
+      subject
+      alert.reload
+      expect(alert.area).not_to be_nil
+      expect(alert.lat).not_to be_nil
+      expect(alert.lng).not_to be_nil
     end
 
     it 'does not send an annual schedule live email' do

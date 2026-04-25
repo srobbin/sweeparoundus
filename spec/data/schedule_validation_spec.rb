@@ -172,6 +172,39 @@ RSpec.describe 'Schedule file validation' do
     expect(errors).to be_empty, errors.join("\n")
   end
 
+  xit 'has no strange gaps between paired sweep dates' do
+    skip 'Not a reliable check — run manually at beginning of season'
+
+    # Sweeps usually occur either on consecutive weekdays (e.g. Mon/Tue) or on
+    # consecutive business days split by a weekend, or a weekend plus a Chicago
+    # observed holiday (e.g. Fri/Mon, Fri/Tue when Mon is a holiday). For each
+    # row with exactly two dates that are within a week of each other (so we
+    # don't false-flag rows where the two dates are halves of two separate
+    # cross-month pairs grouped into one month), the second date should equal
+    # the next business day after the first.
+    holidays = chicago_observed_holidays(year)
+    errors = []
+
+    CSV.foreach(file_path, headers: true).with_index(2) do |row, line|
+      dates = row['DATES'].split(',').map(&:strip).map(&:to_i)
+      next unless dates.length == 2
+
+      month = row['MONTH NUMBER'].to_i
+      d1 = Date.new(year, month, dates[0])
+      d2 = Date.new(year, month, dates[1])
+      next if (d2 - d1).to_i > 7
+
+      expected = next_business_day(d1, holidays)
+      next if d2 == expected
+
+      errors << "Line #{line}: #{row['WARD SECTION (CONCATENATED)']} #{row['MONTH NAME']} " \
+                "#{row['DATES']}: #{d1.strftime('%a %-d')} → #{d2.strftime('%a %-d')} " \
+                "is not consecutive business days (expected #{expected.strftime('%a %-d')})"
+    end
+
+    expect(errors).to be_empty, errors.join("\n")
+  end
+
   it 'has no section with a month count far below its ward median' do
     months_per_section = Hash.new { |h, k| h[k] = {} }
 
@@ -196,5 +229,47 @@ RSpec.describe 'Schedule file validation' do
     end
 
     expect(errors).to be_empty, errors.join("\n")
+  end
+
+  # Chicago Street & Sanitation generally does not sweep on city-observed
+  # federal/Illinois holidays. We include those that fall in Apr–Nov so the
+  # pair-gap check accepts Fri/Tue (or similar) when a Mon holiday intervenes.
+  def chicago_observed_holidays(year)
+    [
+      last_weekday_of_month(year, 5, 1),       # Memorial Day (last Mon of May)
+      observed(Date.new(year, 6, 19)),         # Juneteenth
+      observed(Date.new(year, 7, 4)),          # Independence Day
+      nth_weekday_of_month(year, 9, 1, 1),     # Labor Day (1st Mon of Sep)
+      nth_weekday_of_month(year, 10, 1, 2),    # Columbus / Indigenous Peoples' Day
+      observed(Date.new(year, 11, 11)),        # Veterans Day
+      nth_weekday_of_month(year, 11, 4, 4),    # Thanksgiving (4th Thu of Nov)
+      nth_weekday_of_month(year, 11, 4, 4) + 1 # Day after Thanksgiving
+    ]
+  end
+
+  # Federal "observed" rule: Saturday holidays observed Friday, Sunday observed Monday.
+  def observed(date)
+    return date - 1 if date.saturday?
+    return date + 1 if date.sunday?
+
+    date
+  end
+
+  def nth_weekday_of_month(year, month, wday, n)
+    d = Date.new(year, month, 1)
+    d += 1 until d.wday == wday
+    d + (7 * (n - 1))
+  end
+
+  def last_weekday_of_month(year, month, wday)
+    d = Date.new(year, month, -1)
+    d -= 1 until d.wday == wday
+    d
+  end
+
+  def next_business_day(date, holidays)
+    d = date + 1
+    d += 1 while d.saturday? || d.sunday? || holidays.include?(d)
+    d
   end
 end
