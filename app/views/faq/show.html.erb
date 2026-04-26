@@ -1,0 +1,154 @@
+<div class="flex-1">
+  <header class="bg-gray-100">
+    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
+      <div class="flex-1">
+        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
+      </div>
+      <div class="hidden lg:block">
+        <%= render "search/form" %>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="lg:flex items-center my-6">
+        <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
+          <%= ENV["SITE_NAME"] %> FAQ
+        </h1>
+      </div>
+
+      <div class="flex flex-col gap-8 text-sm mb-8">
+        <p>
+          Don't see your question below?
+          Drop us a line at <a href="mailto:info@wethesweeple.com" class="underline">info@wethesweeple.com</a>.
+        </p>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">When do you send sweep notifications?</h2>
+          <p>
+            We send a reminder email the day before the first date in your area's two-day sweep window.
+            The City sweeps one side of the street on the first date and the other side on the second date, so a single email covers the whole window.
+            Reminders only go out to <strong>confirmed</strong> subscribers, so if you signed up but never clicked the email confirmation link, you won't hear from us.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Are you affiliated with the City?</h2>
+          <p>
+            No.
+            <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> is a volunteer-run side project.
+            We're not employees of the City of Chicago, the Department of Streets and Sanitation, or any ward office.
+            We pull schedule data from the City's <%= link_to "open data portal", "https://data.cityofchicago.org/browse?category=Sanitation", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> and present it in a friendlier format, but we have no role in setting schedules, posting signs, dispatching sweepers, or—most importantly—issuing or contesting tickets.
+            (If you got one, our condolences. We've all been there. Multiple times.)
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Can I depend on <%= ENV["SITE_NAME"] %>?</h2>
+          <p>
+            We'd like to think so, but here's a disclaimer...
+          </p>
+          <p>
+            This site is only as accurate as the City's sweep zone and schedule data. And even if that data's squeaky clean, sweep dates can change due to reasons beyond anyone's control (inclement weather, street sweeper maintenance schedules, etc.).
+          </p>
+          <p>
+            According to one Ward staffer who reached out to us, if you feel that you've been ticketed wrongly, reach out to <%= link_to "your Ward office", "https://www.chicago.gov/city/en/depts/other/dataset/wards.html", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> to get a letter of support for your hearing.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Why can't you send me text alerts instead?</h2>
+          <p>We'd love to, but sending SMS notifications is more expensive than sending emails. Maybe you can convince your alderperson to fund it?</p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Who do I contact if there's a problem with the scheduled sweep dates on this site?</h2>
+          <p>Email us at <a href="mailto:info@wethesweeple.com" class="underline">info@wethesweeple.com</a> and we'll look into it. It helps if you include the following:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li>Your street address (or at least the block).</li>
+            <li>The ward and section we're showing you (e.g., "Ward 28, Sweep Area 7").</li>
+            <li>The date(s) that you believe are wrong and what they should be.</li>
+            <li>A link to or screenshot of whatever you're cross-referencing—usually <%= link_to "the City's official PDF schedule", "https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs.html", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> or a note from your ward office.</li>
+          </ul>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">What's the best place to double-check schedules?</h2>
+          <p>
+            The City of Chicago's <%= link_to "Streets & Sanitation street sweeping page", "https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs.html", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> is the official source.
+            From there you can download the PDF schedule and ward map for your ward.
+            If you'd like to see where sweepers <em>actually</em> are during the workday — 9 AM to 2 PM on weekdays during season (April 1 through mid-November, weather permitting) — the City's <%= link_to "Sweeper Tracker", "https://www.chicago.gov/sweepertracker", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> shows real-time locations on a map.
+            And of course, the neon orange flyers tied to the trees on your block.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Why didn't I get my reminder email?</h2>
+          <p>Common causes:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li>The subscription was never confirmed (check your inbox for our welcome email).</li>
+            <li>The message landed in spam — whitelisting <code>info@wethesweeple.com</code> helps.</li>
+            <li>The City delayed publishing the year's schedule.</li>
+            <li>Weather or operational issues canceled or postponed the sweep.</li>
+            <li>Your subscription was tied to a prior year and didn't carry over because no street address was saved (see the next question).</li>
+          </ul>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Do my subscriptions carry over from year to year?</h2>
+          <p>
+            Yes, but only if you saved a street address when signing up.
+            Subscriptions without a street address are cleared each spring when new schedules go live.
+            If your address has changed, visit the <%= link_to "Manage Subscriptions", subscriptions_path, class: "underline" %> page to update it.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">My address sits on the boundary between two sweep zones — which one applies?</h2>
+          <p>
+            Sweep zones follow the City's published GeoJSON boundaries, and we show the zone your address geocodes into. When in doubt, sign up for both zones!
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">How do I unsubscribe or change my email address?</h2>
+          <p>
+            Visit the <%= link_to "Manage Subscriptions", subscriptions_path, class: "underline" %> page to add, remove, or manage notifications for an already-subscribed email address.
+          </p>
+          <p>
+            If you want to change your email address, you'll need to unsubscribe from the old address and subscribe to the new one.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Is there an API I can use?</h2>
+          <p>
+            Yes — <code>GET /api/v1/sweeps?lat=&hellip;&amp;lng=&hellip;</code> returns the sweep area and next scheduled dates for a location.
+            It's rate-limited to 60 requests per hour per IP.
+            Full parameter and response details are in the <%= link_to "project README on GitHub", "https://github.com/srobbin/sweeparoundus#api", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %>.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">Can I download my schedule to my phone calendar?</h2>
+          <p>
+            Yes.
+            Every area page offers an iCalendar (<code>.ics</code>) download you can import into Google Calendar, Apple Calendar, Outlook, and similar apps.
+          </p>
+          <p>
+            There's one caveat: The City sometimes updates the schedule mid-season, which can cause the iCalendar file to be out of sync with the actual schedule.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="text-base font-semibold text-gray-900">How can I support the site?</h2>
+          <p>
+            Consider <%= link_to "buying us a coffee", ENV["COFFEE_LINK_URL"], class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %>!
+            Hosting (Heroku + Postgres + Redis + Google Maps + SendGrid + domain) works out to the cost of roughly ten street sweeping tickets a year, so every bit helps!
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

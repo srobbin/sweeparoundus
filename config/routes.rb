@@ -37,6 +37,7 @@ Rails.application.routes.draw do
 
   # Static pages
   get "about", to: 'about#show'
+  get "faq", to: 'faq#show'
   get "privacy_policy", to: 'privacy_policy#show'
 
   # Root
