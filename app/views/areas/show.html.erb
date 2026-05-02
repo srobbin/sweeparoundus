@@ -1,16 +1,7 @@
 <%= content_for :page_title, @area.name %>
 
 <div class="flex-1">
-  <header class="bg-gray-100">
-    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
-      <div class="flex-1">
-        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
-      </div>
-      <div class="hidden lg:block">
-        <%= render "search/form" %>
-      </div>
-    </div>
-  </header>
+  <%= render "shared/header" %>
 
   <main>
     <div class="max-w-6xl mx-auto px-4">
@@ -19,16 +10,16 @@
           <%= @area.name %>
         </h1>
 
-        <div class="mt-4 text-sm lg:mt-0 lg:bg-gray-100 lg:py-2 lg:px-4 ">
-          <div class="text-xs font-medium uppercase">
+        <div class="mt-4 text-sm lg:mt-0 bg-blue-50 py-2 px-4 rounded-md">
+          <div class="text-xs font-medium uppercase text-blue-600">
             Next Sweeps
           </div>
-          <%= @area.next_sweep %>
+          <div class="text-blue-800 font-medium"><%= @area.next_sweep %></div>
         </div>
       </div>
 
       <div class="lg:grid grid-cols-2 gap-8">
-        <div>
+        <div class="rounded-lg overflow-hidden">
           <%= @area.map_image %>
         </div>
 
@@ -39,12 +30,10 @@
         </aside>
       </div>
 
-      <div class="my-8 rounded-md bg-yellow-50 p-4 text-sm">
-        <div class="text-yellow-700">
-          <p>
-            Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. For up-to-date parking information, please consult street signage and the websites for the <a href="https://www.chicago.gov/city/en/depts/streets.html" class="underline" target="_blank">Department of Streets and Sanitation</a> and <a href="https://www.chicago.gov/city/en/about/wards.html" class="underline" target="_blank">your local Ward or alderperson</a>.
-          </p>
-        </div>
+      <div class="my-8 border-l-4 border-gray-300 pl-4 py-2 text-sm text-gray-500">
+        <p>
+          Note: This site does not guarantee that the information presented is accurate, or that notifications will be delivered on a timely basis. For up-to-date parking information, please consult street signage and the websites for the <a href="https://www.chicago.gov/city/en/depts/streets.html" class="underline hover:text-gray-700" target="_blank">Department of Streets and Sanitation</a> and <a href="https://www.chicago.gov/city/en/about/wards.html" class="underline hover:text-gray-700" target="_blank">your local Ward or alderperson</a>.
+        </p>
       </div>
     </div>
   </main>

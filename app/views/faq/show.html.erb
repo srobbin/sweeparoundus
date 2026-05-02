@@ -1,24 +1,15 @@
 <div class="flex-1">
-  <header class="bg-gray-100">
-    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
-      <div class="flex-1">
-        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
-      </div>
-      <div class="hidden lg:block">
-        <%= render "search/form" %>
-      </div>
-    </div>
-  </header>
+  <%= render "shared/header" %>
 
   <main>
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-3xl mx-auto px-4">
       <div class="lg:flex items-center my-6">
         <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
           <%= ENV["SITE_NAME"] %> FAQ
         </h1>
       </div>
 
-      <div class="flex flex-col gap-8 text-sm mb-8">
+      <div class="flex flex-col gap-3 text-sm mb-8">
         <p>
           Don't see your question below?
           Drop us a line at <a href="mailto:info@wethesweeple.com" class="underline">info@wethesweeple.com</a>.

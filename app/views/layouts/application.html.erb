@@ -3,6 +3,8 @@
   <head>
     <title><%= title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Get notified before street sweeping hits your block in Chicago. Email alerts and calendar feeds for every ward and schedule.">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -10,33 +12,31 @@
     <%= stylesheet_link_tag "tailwind" %>
     <%= stylesheet_link_tag "application", media: "all" %>
     <%= stimulus_include_tags %>
-    <script>
-      // Global callback for Google Maps loading
+    <%= javascript_tag nonce: true do %>
       window.initGoogleMaps = function() {
-        // Dispatch event to notify Stimulus controllers that Google Maps is ready
         document.dispatchEvent(new CustomEvent('google-maps-loaded'));
       };
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_FRONTEND_API_KEY"] %>&libraries=places&loading=async&callback=initGoogleMaps"></script>
+    <% end %>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_FRONTEND_API_KEY"] %>&libraries=places&loading=async&callback=initGoogleMaps" nonce="<%= content_security_policy_nonce %>"></script>
     <%= javascript_include_tag "turbo", type: "module-shim" %>
     <%= render "shared/analytics" if Rails.env.production? && ENV["GOOGLE_ANALYTICS_ID"].present? %>
     <%= yield :head %>
   </head>
 
-  <body class="flex-col text-gray-700 lg:flex">
+  <body class="flex flex-col min-h-screen text-gray-700">
     <%= yield %>
 
-    <footer>
+    <footer class="mt-auto">
       <div class="p-4 max-w-6xl mx-auto text-sm text-center lg:flex border-t">
-        <div class="flex flex-col mb-4 text-gray-600 gap-2 lg:mb-0 lg:flex lg:flex-row lg:gap-6">
-          <%= link_to "Home", root_path, class: "underline hover:text-black" %>
-          <%= link_to "About", about_path, class: "underline hover:text-black" %>
-          <%= link_to "FAQ", faq_path, class: "underline hover:text-black" %>
-          <%= link_to "Privacy Policy", privacy_policy_path, class: "underline hover:text-black" %>
+        <div class="flex flex-wrap justify-center mb-4 text-gray-600 gap-4 lg:mb-0 lg:justify-start lg:gap-6">
+          <%= footer_link_to "Home", root_path %>
+          <%= footer_link_to "About", about_path %>
+          <%= footer_link_to "FAQ", faq_path %>
+          <%= footer_link_to "Privacy Policy", privacy_policy_path %>
           <%= link_to "GitHub", "https://github.com/srobbin/sweeparoundus", class: "underline hover:text-black" %>
         </div>
 
-        <div class="flex-1 lg:text-right">
+        <div class="flex-1 w-full text-xs text-gray-400 mt-2 lg:w-auto lg:text-sm lg:text-gray-600 lg:text-right lg:mt-0">
           &copy; <%= Time.current.year %> <%= ENV["SITE_NAME"] %>
         </div>
       </div>

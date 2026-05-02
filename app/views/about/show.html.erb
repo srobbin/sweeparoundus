@@ -1,17 +1,8 @@
 <div class="flex-1">
-  <header class="bg-gray-100">
-    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
-      <div class="flex-1">
-        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
-      </div>
-      <div class="hidden lg:block">
-        <%= render "search/form" %>
-      </div>
-    </div>
-  </header>
+  <%= render "shared/header" %>
 
   <main>
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-3xl mx-auto px-4">
       <div class="lg:flex items-center my-6">
         <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
           <%= "About #{ENV["SITE_NAME"]}" %>
@@ -46,8 +37,8 @@
         </p>
       </div>
       <% if ENV["COFFEE_LINK_URL"].present? %>
-      <div class="flex justify-center mt-8 mb-6">
-        <a href="<%= ENV["COFFEE_LINK_URL"] %>"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=☕&slug=wethesweeple&button_colour=b3ddf2&font_colour=000000&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" /></a>
+      <div class="flex justify-center mt-6 mb-6">
+        <a href="<%= ENV["COFFEE_LINK_URL"] %>" target="_blank" rel="noopener noreferrer"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=☕&slug=wethesweeple&button_colour=b3ddf2&font_colour=000000&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" /></a>
       </div>
       <% end %>
     </div>

@@ -1,12 +1,4 @@
-<div class="mt-8 rounded-md bg-yellow-50 p-4 text-sm">
-  <div class="flex">
-    <div class="ml-3">
-      <h3 class="font-medium text-yellow-800">
-        <%= @note_header %>
-      </h3>
-      <div class="mt-2 text-yellow-700">
-        <p><%= sanitize @note, tags: %w[a br strong], attributes: %w[href target rel class] %></p>
-      </div>
-    </div>
-  </div>
+<div class="mt-8 text-xs text-gray-400">
+  <p class="font-medium text-gray-500 mb-0.5"><%= @note_header %></p>
+  <p><%= sanitize @note, tags: %w[a br strong], attributes: %w[href target rel class] %></p>
 </div>

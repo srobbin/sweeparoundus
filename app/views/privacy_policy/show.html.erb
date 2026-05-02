@@ -1,96 +1,73 @@
 <div class="flex-1">
-  <header class="bg-gray-100">
-    <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
-      <div class="flex-1">
-        <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
-      </div>
-      <div class="hidden lg:block">
-        <%= render "search/form" %>
-      </div>
-    </div>
-  </header>
+  <%= render "shared/header" %>
 
   <main>
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-3xl mx-auto px-4">
       <div class="lg:flex items-center my-6">
         <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
           <%= "Privacy Policy for #{ENV["SITE_NAME"]}" %>
         </h1>
       </div>
 
-      <div class="flex flex-col gap-5 text-sm mb-8">
-        <p>Last Revised: 11/4/2024</p>
-        <p>
+      <div class="text-sm text-gray-600 mb-8">
+        <p class="text-xs text-gray-400 mb-4">Last Revised: November 4, 2024</p>
+        <p class="mb-6">
           At We The Sweeple, we prioritize your privacy and are committed to protecting your personal information. This policy outlines how we collect, use, and safeguard your data when you visit our website.
         </p>
 
-        <p><strong>1. Information We Collect</strong></p>
-        <ul>
-          <li>
-            User-Provided Data: When you input your mailing address to find street sweeping schedules, you may subscribe to email alerts by providing your email address and mailing address. Providing this information is entirely optional.
-          </li>
-          <li>
-            Automated Data Collection: We collect non-personal data through cookies and web beacons to enhance your user experience and analyze website usage.
-          </li>
-        </ul>
+        <div class="space-y-6">
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">1. Information We Collect</h2>
+            <ul>
+              <li><strong>User-Provided Data:</strong> When you input your mailing address to find street sweeping schedules, you may subscribe to email alerts by providing your email address and mailing address. Providing this information is entirely optional.</li>
+              <li><strong>Automated Data Collection:</strong> We collect non-personal data through cookies and web beacons to enhance your user experience and analyze website usage.</li>
+            </ul>
+          </section>
 
-        <p><strong>2. How We Use Your Information</strong></p>
-        <p>We use your information to:</p>
-        <ul>
-          <li>
-            Send email alerts that provide street sweeping schedule information relevant to your area.
-          </li>
-          <li>
-            Improve our website and services based on user feedback and behavior.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">2. How We Use Your Information</h2>
+            <p class="mb-2">We use your information to:</p>
+            <ul>
+              <li>Send email alerts that provide street sweeping schedule information relevant to your area.</li>
+              <li>Improve our website and services based on user feedback and behavior.</li>
+            </ul>
+          </section>
 
-        <p><strong>3. Data Retention</strong></p>
-        <ul>
-          <li>
-            If you subscribe to email alerts without providing your mailing address, your email subscription record will be deleted between street sweeping seasons.
-          </li>
-          <li>
-            If you subscribe to email alerts and allow us to store your mailing address, we will retain both your email and mailing address data until you choose to unsubscribe.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">3. Data Retention</h2>
+            <ul>
+              <li>If you subscribe to email alerts without providing your mailing address, your email subscription record will be deleted between street sweeping seasons.</li>
+              <li>If you subscribe to email alerts and allow us to store your mailing address, we will retain both your email and mailing address data until you choose to unsubscribe.</li>
+            </ul>
+          </section>
 
-        <p><strong>4. Data Sharing</strong></p>
-        <ul>
-          <li>
-            We do not sell, rent, or share your personal information with third parties except as necessary to provide our services or comply with legal requirements.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">4. Data Sharing</h2>
+            <p>We do not sell, rent, or share your personal information with third parties except as necessary to provide our services or comply with legal requirements.</p>
+          </section>
 
-        <p><strong>5. Your Choices</strong></p>
-        <ul>
-          <li>
-            You can choose to subscribe to email alerts with or without providing your mailing address. You may opt out of email communications at any time by clicking the unsubscribe link in our emails.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">5. Your Choices</h2>
+            <p>You can choose to subscribe to email alerts with or without providing your mailing address. You may opt out of email communications at any time by clicking the unsubscribe link in our emails.</p>
+          </section>
 
-        <p><strong>6. Data Security</strong></p>
-        <ul>
-          <li>
-            We implement reasonable security measures to protect your personal information. However, please remember that no method of transmission over the internet is 100% secure.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">6. Data Security</h2>
+            <p>We implement reasonable security measures to protect your personal information. However, please remember that no method of transmission over the internet is 100% secure.</p>
+          </section>
 
-        <p><strong>7. Changes to This Policy</strong></p>
-        <ul>
-          <li>
-            We may update this privacy policy from time to time. We will notify you of any significant changes by posting a notice on our website.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">7. Changes to This Policy</h2>
+            <p>We may update this privacy policy from time to time. We will notify you of any significant changes by posting a notice on our website.</p>
+          </section>
 
-        <p><strong>8. Contact us</strong></p>
-        <ul>
-          <li>
-            If you have any questions or concerns about this privacy policy, please contact us at <a href="mailto:info@wethesweeple.com" class="underline">info@wethesweeple.com</a>.
-          </li>
-        </ul>
+          <section>
+            <h2 class="text-base font-semibold text-gray-900 mb-2">8. Contact Us</h2>
+            <p>If you have any questions or concerns about this privacy policy, please contact us at <a href="mailto:info@wethesweeple.com" class="underline hover:text-gray-900">info@wethesweeple.com</a>.</p>
+          </section>
+        </div>
 
-        <p>By using our website, you consent to the collection and use of your information as outlined in this policy.</p>
+        <p class="mt-6 text-gray-400 text-xs">By using our website, you consent to the collection and use of your information as outlined in this policy.</p>
       </div>
     </div>
   </main>
