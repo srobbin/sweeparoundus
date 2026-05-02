@@ -12,12 +12,14 @@
     <%= stylesheet_link_tag "tailwind" %>
     <%= stylesheet_link_tag "application", media: "all" %>
     <%= stimulus_include_tags %>
-    <%= javascript_tag nonce: true do %>
+    <script>
+      // Global callback for Google Maps loading
       window.initGoogleMaps = function() {
+        // Dispatch event to notify Stimulus controllers that Google Maps is ready
         document.dispatchEvent(new CustomEvent('google-maps-loaded'));
       };
-    <% end %>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_FRONTEND_API_KEY"] %>&libraries=places&loading=async&callback=initGoogleMaps" nonce="<%= content_security_policy_nonce %>"></script>
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_FRONTEND_API_KEY"] %>&libraries=places&loading=async&callback=initGoogleMaps"></script>
     <%= javascript_include_tag "turbo", type: "module-shim" %>
     <%= render "shared/analytics" if Rails.env.production? && ENV["GOOGLE_ANALYTICS_ID"].present? %>
     <%= yield :head %>
