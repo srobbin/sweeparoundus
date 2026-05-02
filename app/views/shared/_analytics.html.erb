@@ -1,5 +1,5 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=<%= ENV["GOOGLE_ANALYTICS_ID"] %>"></script>
-<script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%= ENV["GOOGLE_ANALYTICS_ID"] %>" nonce="<%= content_security_policy_nonce %>"></script>
+<%= javascript_tag nonce: true do %>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -11,5 +11,4 @@
     page_location: location.origin + location.pathname,
     page_path: location.pathname
   });
-</script>
-
+<% end %>

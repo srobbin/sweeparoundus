@@ -8,6 +8,9 @@ class Rack::Attack
   SEND_LINK_EMAIL_RATE_LIMIT = 4
   SEND_LINK_EMAIL_RATE_PERIOD = 1.hour
 
+  CSP_REPORT_RATE_LIMIT = 30
+  CSP_REPORT_RATE_PERIOD = 1.minute
+
   if Rails.env.test?
     cache.store = ActiveSupport::Cache::MemoryStore.new
   else
@@ -24,6 +27,10 @@ class Rack::Attack
 
   throttle("subscriptions/send_link/email", limit: SEND_LINK_EMAIL_RATE_LIMIT, period: SEND_LINK_EMAIL_RATE_PERIOD) do |req|
     req.params["email"].to_s.strip.downcase.presence if req.path == "/subscriptions/send_link" && req.post?
+  end
+
+  throttle("csp_reports/ip", limit: CSP_REPORT_RATE_LIMIT, period: CSP_REPORT_RATE_PERIOD) do |req|
+    req.ip if req.path == "/csp-violation-report" && req.post?
   end
 
   self.throttled_responder = lambda do |req|

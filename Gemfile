@@ -14,7 +14,7 @@ gem "dartsass-rails", "~> 0.5.1"
 gem "devise", "~> 5.0"
 gem "draper", "~> 4.0"
 gem "friendly_id", "~> 5.4"
-gem "hotwire-rails", "~> 0.1.3"
+gem "importmap-rails"
 gem "icalendar", "~> 2.12"
 gem "jwt", "~> 2.2"
 gem "sendgrid-ruby", "~> 6.7"
@@ -30,9 +30,8 @@ gem "sprockets-rails", "~> 3.5"
 gem "tailwindcss-rails", "~> 0.3"
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-# Avoid breaking changes
-gem "stimulus-rails", "0.2.4"
-gem "turbo-rails", "0.5.12"
+gem "stimulus-rails", "~> 1.3"
+gem "turbo-rails", "~> 2.0"
 
 gem "connection_pool", "~> 2.4"
 gem "observer", "~> 0.1"
