@@ -18,13 +18,13 @@ gem "importmap-rails"
 gem "icalendar", "~> 2.12"
 gem "jwt", "~> 2.2"
 gem "sendgrid-ruby", "~> 6.7"
-gem "puma", "~> 6.6.0"
+gem "puma", "~> 6.6"
 gem "pundit", "~> 2.1"
 gem "rack-attack", "~> 6.7"
 gem 'redis', '~> 5.0', '>= 5.0.8'
 gem "rgeo-geojson", "~> 2.2"
 gem "sassc", "~> 2.4"
-gem 'sidekiq', '~> 7.2'
+gem 'sidekiq', '~> 7.3'
 gem "sidekiq-cron", "~> 1.11"
 gem "sprockets-rails", "~> 3.5"
 gem "tailwindcss-rails", "~> 0.3"
@@ -54,7 +54,6 @@ end
 
 group :test do
   gem "capybara", ">= 3.26"
-  gem "selenium-webdriver"
+  gem "selenium-webdriver", "~> 4.20"
   gem "webmock", "~> 3.23"
-  gem "webdrivers"
 end
