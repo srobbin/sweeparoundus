@@ -40,6 +40,9 @@ Rails.application.routes.draw do
   get "faq", to: 'faq#show'
   get "privacy_policy", to: 'privacy_policy#show'
 
+  # CSP violation reports (browsers POST here when CSP is in report-only mode)
+  post "csp-violation-report", to: "csp_reports#create"
+
   # Root
   root to: "home#index"
 end

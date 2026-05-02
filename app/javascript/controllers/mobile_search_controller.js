@@ -1,6 +1,6 @@
-import { Controller } from 'stimulus';
+import { Controller } from "@hotwired/stimulus"
 
-export default class MobileSearchController extends Controller {
+export default class extends Controller {
   static get targets() {
     return ['panel', 'button'];
   }

@@ -1,6 +1,6 @@
-import { Controller } from 'stimulus';
+import { Controller } from "@hotwired/stimulus"
 
-export default class SearchController extends Controller {
+export default class extends Controller {
   static get targets() {
     return [
       'address',
@@ -10,11 +10,9 @@ export default class SearchController extends Controller {
   }
 
   connect() {
-    // Check if Google Maps is already loaded
     if (window.google && window.google.maps && window.google.maps.places) {
       this.initializeAutocomplete();
     } else {
-      // Wait for Google Maps to load asynchronously
       document.addEventListener('google-maps-loaded', () => {
         this.initializeAutocomplete();
       });
@@ -42,7 +40,7 @@ export default class SearchController extends Controller {
   submit(event) {
     event.preventDefault();
   }
-  
+
   placeChanged() {
     const place = this.autocomplete.getPlace();
     const { lat, lng } = place.geometry.location;
