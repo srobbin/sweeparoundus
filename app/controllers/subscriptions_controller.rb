@@ -16,7 +16,6 @@ class SubscriptionsController < ApplicationController
   end
 
   def show
-    response.headers["Referrer-Policy"] = "same-origin"
   end
 
   def create
