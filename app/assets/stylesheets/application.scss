@@ -16,3 +16,7 @@ ul {
 li:not(:last-child) { 
   margin-bottom: 8px;  
 }
+
+summary::-webkit-details-marker {
+  display: none;
+}
