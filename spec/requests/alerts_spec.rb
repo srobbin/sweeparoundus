@@ -88,6 +88,42 @@ RSpec.describe "Alerts", type: :request do
       end
     end
 
+    context "subscribing to an adjacent area (search point outside the area being subscribed to)" do
+      let!(:other_area) do
+        shape = RGeo::Geos.factory(srid: 0).parse_wkt(
+          "MULTIPOLYGON (((-87.69 41.86, -87.69 41.87, -87.68 41.87, -87.68 41.86, -87.69 41.86)))"
+        )
+        create(:area, ward: 28, number: 8, shortcode: "W28A8", slug: "ward-28-sweep-area-8", shape: shape)
+      end
+
+      before do
+        get "/search", params: { lat: "41.885", lng: "-87.712", address: "123 Main St" }
+      end
+
+      it "re-renders the form via Turbo Stream with the adjacent-area warning and no save-address checkbox" do
+        post area_alerts_path(other_area),
+          params: { email: valid_email, from_neighbor: 1 },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("subscription to notifications for this adjacent area")
+        expect(response.body).not_to include("Save my street address")
+      end
+
+      it "does not save the street address even if the form param is forced" do
+        post area_alerts_path(other_area), params: {
+          email: valid_email,
+          from_neighbor: 1,
+          is_save_street_address: "1"
+        }
+
+        alert = Alert.last
+        expect(alert.street_address).to be_nil
+        expect(alert.lat).to be_nil
+        expect(alert.lng).to be_nil
+      end
+    end
+
     context "with a duplicate subscription" do
       before do
         create(:alert, area: area, email: valid_email, street_address: nil, lat: nil, lng: nil)
