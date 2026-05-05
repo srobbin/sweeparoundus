@@ -1,7 +1,11 @@
 class AreasController < ApplicationController
-  def show
-    @area = Area.find(params[:id]).decorate
+  include SearchContext
 
+  before_action :find_area, only: :show
+  before_action :set_search_context, only: :show, if: -> { request.format.html? }
+  before_action :load_neighbors, only: :show, if: -> { request.format.html? }
+
+  def show
     respond_to do |format|
       format.html
       format.ics do
@@ -11,6 +15,10 @@ class AreasController < ApplicationController
   end
 
   private
+
+  def find_area
+    @area = Area.find(params[:id]).decorate
+  end
 
   def calendar
     cal = Icalendar::Calendar.new

@@ -1,0 +1,27 @@
+<div class="mt-8 border border-amber-200 bg-amber-50 rounded-lg p-5">
+  <h2 class="flex items-center mb-2 text-lg font-semibold text-gray-900">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+    </svg>
+    <span class="ml-2">Adjacent Sweep Areas</span>
+  </h2>
+  <p class="text-sm text-gray-600 mb-4">Your address is near the edge of a sweep zone. Consider signing up for alerts in the adjacent sweep zone(s):</p>
+
+  <div class="space-y-3">
+    <% @neighbors.each do |neighbor| %>
+      <div class="bg-white border border-gray-200 rounded-md p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <%= link_to neighbor.area.name, area_path(neighbor.area, from_neighbor: 1), class: "text-blue-600 hover:text-blue-800 font-medium", target: "_blank", rel: "noopener noreferrer" %>
+            <span class="text-xs text-gray-400 ml-1"><%= neighbor.area.shortcode %></span>
+          </div>
+          <span class="text-xs text-gray-500">&asymp; <%= neighbor.distance_feet %> ft <%= neighbor.direction %></span>
+        </div>
+        <% if neighbor.nearest_address.present? %>
+          <p class="text-sm text-gray-500 italic mt-1">Near <%= neighbor.nearest_address %></p>
+        <% end %>
+        <p class="text-sm text-gray-700 mt-1">Next sweeps: <%= neighbor.area.next_sweep %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

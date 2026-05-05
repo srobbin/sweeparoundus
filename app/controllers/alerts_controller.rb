@@ -1,7 +1,9 @@
 class AlertsController < ApplicationController
   include JwtHelper
+  include SearchContext
 
   before_action :find_area
+  before_action :set_search_context, only: [:create]
   before_action :find_alert, only: [:unsubscribe, :confirm]
 
   def new
@@ -10,12 +12,15 @@ class AlertsController < ApplicationController
 
   def create
     email = params[:email].strip.downcase
-    @alert = @area.alerts.find_or_initialize_by(
-      email: email,
-      street_address: street_address,
-      lat: street_address ? session[:search_lat] : nil,
-      lng: street_address ? session[:search_lng] : nil
-    )
+    # Identity for the unique index is (email, street_address); lat/lng
+    # are written as attributes only — including them in the lookup makes
+    # re-subscribes with slightly different float precision miss the
+    # existing row and trip the unique index.
+    @alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
+    if street_address
+      @alert.lat = session[:search_lat]
+      @alert.lng = session[:search_lng]
+    end
 
     if @alert.save
       flash.now[:notice] = "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
@@ -58,6 +63,7 @@ class AlertsController < ApplicationController
   end
 
   def save_street_address?
+    return false if search_session_present? && !searched_in_this_area?
     params[:is_save_street_address] == "1"
   end
 end

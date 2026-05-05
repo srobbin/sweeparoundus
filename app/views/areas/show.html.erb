@@ -6,9 +6,16 @@
   <main>
     <div class="max-w-6xl mx-auto px-4">
       <div class="lg:flex items-center my-6">
-        <h1 class="flex-1 mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate lg:mb-0">
-          <%= @area.name %>
-        </h1>
+        <div class="flex-1 lg:mb-0">
+          <h1 class="mb-1 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+            <%= @area.name %>
+          </h1>
+          <% if @searched_address.present? %>
+            <p class="text-sm text-gray-500 mt-1"><%= @searched_address %></p>
+          <% elsif @adjacent_to_address.present? %>
+            <p class="text-sm text-gray-500 mt-1">Adjacent sweep area (<%= @adjacent_to_address %>)</p>
+          <% end %>
+        </div>
 
         <div class="mt-4 text-sm lg:mt-0 bg-blue-50 py-2 px-4 rounded-md">
           <div class="text-xs font-medium uppercase text-blue-600">
@@ -20,13 +27,14 @@
 
       <div class="lg:grid grid-cols-2 gap-8">
         <div class="rounded-lg overflow-hidden">
-          <%= @area.map_image %>
+          <%= @area.map_image(show_marker: @show_search_marker) %>
         </div>
 
         <aside class="flex-1 my-6 lg:my-0 max-w-xl">
           <!-- Subscribe -->
           <%= render "subscribe" %>
           <%= render "schedule" %>
+          <%= render "neighbors" if @neighbors.present? %>
         </aside>
       </div>
 

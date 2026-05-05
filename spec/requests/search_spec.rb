@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Search", type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let!(:area) { create(:area) }
 
   describe "GET /search" do
@@ -14,9 +16,18 @@ RSpec.describe "Search", type: :request do
       it "stores search params in the session" do
         get "/search", params: { lat: "41.885", lng: "-87.712", address: "123 Main St" }
 
-        expect(session[:search_lat]).to eq("41.885")
-        expect(session[:search_lng]).to eq("-87.712")
+        expect(session[:search_lat]).to eq(41.885)
+        expect(session[:search_lng]).to eq(-87.712)
+        expect(session[:search_area_id]).to eq(area.id)
         expect(session[:street_address]).to eq("123 Main St")
+      end
+
+      it "stamps the search time so SearchContext can expire stale sessions" do
+        freeze_time do
+          get "/search", params: { lat: "41.885", lng: "-87.712", address: "123 Main St" }
+
+          expect(session[:search_set_at]).to eq(Time.current.to_i)
+        end
       end
     end
 
