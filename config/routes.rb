@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/#{ENV.fetch("ADMIN_PATH", "admin")}/sidekiq"
   end
 
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
   # API
   namespace :api do
     namespace :v1 do

@@ -2,7 +2,7 @@
 
 <p>
   Chicago's street sweeping season officially begins on Wednesday, April 1. Unfortunately, the City of Chicago has
-  <a href="https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/">delayed the release of the 2026 street sweeping zone data</a>
+  <%= link_to "delayed the release of the #{Time.current.year} street sweeping zone data", "https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/" %>
   that <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %> relies upon in order to send street sweeping alerts to subscribers.
 </p>
 
@@ -12,7 +12,7 @@
 
 <p>
   We wanted to let your office know in case constituents reach out about street sweeping schedules. In the meantime, residents can check the
-  <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping2026.html">Department of Streets and Sanitation page</a>
+  <%= link_to "Department of Streets and Sanitation page", "https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping2026.html" %>
   for upcoming sweeps in their area.
 </p>
 
@@ -24,7 +24,4 @@
   Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago.
 </p>
 
-<p>
-  Best regards,<br />
-  <%= ENV["SITE_NAME"] %>
-</p>
+<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>

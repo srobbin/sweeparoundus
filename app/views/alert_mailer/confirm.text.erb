@@ -4,8 +4,4 @@ You are receiving this email because we have received a request to subscribe <%=
 
 Click here to confirm your subscription:
 <%= @confirmation_url %>
-
-Cheers,
-<%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-
-<%= @disclaimer %>
+<%= render "shared/email_footer", coffee_link: false %>

@@ -1,6 +1,6 @@
 Dear Alderperson <%= @name %>,
 
-Chicago's street sweeping season officially begins on Wednesday, April 1. Unfortunately, the City of Chicago has delayed the release of the 2026 street sweeping zone data (https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/) that <%= ENV["SITE_NAME"] %> relies upon in order to send street sweeping alerts to subscribers.
+Chicago's street sweeping season officially begins on Wednesday, April 1. Unfortunately, the City of Chicago has delayed the release of the <%= Time.current.year %> street sweeping zone data (https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/) that <%= ENV["SITE_NAME"] %> (<%= ENV["SITE_URL"] %>) relies upon in order to send street sweeping alerts to subscribers.
 
 Until the City publishes this data, we will not be able to send alerts to residents of Ward <%= @ward %> (or any other ward) who have subscribed to our service.
 
@@ -9,6 +9,4 @@ We wanted to let your office know in case constituents reach out about street sw
 We will send a follow-up once the data is available and alerts are up and running.
 
 Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago.
-
-Best regards,
-<%= ENV["SITE_NAME"] %>
+<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>

@@ -2,12 +2,70 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
     <style>
-      /* Email styles need to be inline */
+      /*
+       * Match Gmail's default compose styling: Arial 10pt. Keeps our
+       * emails visually consistent with the inbox most subscribers are
+       * reading them in.
+       *
+       * `line-height: 1.5` is a deliberate bump over the browser default
+       * (~1.2) — without it, wrapped paragraphs feel cramped at 10pt.
+       */
+      body, table, td, p, a, li, h1, h2, h3, h4, h5, h6 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+        line-height: 1.5;
+      }
+
+      /* Slightly larger gaps between paragraphs and bullet rows than the
+       * browser default (1em / 0). Email clients that ignore <style>
+       * blocks (notably Outlook desktop) fall back to their own defaults,
+       * which are close enough that the difference isn't jarring. */
+      p {
+        margin: 0 0 1.25em;
+      }
+      ul, ol {
+        margin: 0 0 1.25em;
+      }
+
+      /* Override the user-agent default link color (-webkit-link, an
+       * over-saturated `#0000ee`) with a refined Tailwind blue-600 that
+       * holds up on white backgrounds, then bump it to a lighter shade
+       * for dark-mode-aware clients. Outlook desktop ignores both, but
+       * its native blue is acceptable on its always-white surface. */
+      a {
+        color: #2563eb;
+      }
+      @media (prefers-color-scheme: dark) {
+        a { color: #93c5fd !important; }
+      }
     </style>
   </head>
 
-  <body>
-    <%= yield %>
+  <body style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.5; margin: 0;">
+    <%# Preview text shown next to the subject in inbox lists. The trailing
+        non-breaking spaces push real body content past Gmail's preview
+        truncation point so we don't accidentally leak "Hello,..." into the
+        preview snippet. %>
+    <% if content_for?(:preheader) %>
+      <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; opacity: 0; color: transparent; height: 0; width: 0;">
+        <%= yield :preheader %>
+        <%= ("&zwnj;&nbsp;" * 60).html_safe %>
+      </div>
+    <% end %>
+
+    <%# Centered 600px-wide content column. The HTML width="100%" attribute
+        is for Outlook desktop (which ignores max-width); other clients
+        respect the inline max-width to cap line lengths on wide screens. %>
+    <table align="center" cellpadding="0" cellspacing="0" border="0" width="100%" role="presentation"
+           style="max-width: 600px; margin: 0 auto;">
+      <tr>
+        <td style="padding: 24px;">
+          <%= yield %>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

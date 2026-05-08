@@ -31,7 +31,4 @@
   Thank you for helping to keep Chicago's streets clean!
 </p>
 
-<p>
-  Best regards,<br />
-  <%= ENV["SITE_NAME"] %>
-</p>
+<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>

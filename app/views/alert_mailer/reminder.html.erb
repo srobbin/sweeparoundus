@@ -1,3 +1,5 @@
+<% content_for :preheader do %>Heads up: street sweeping for <%= @street_address || @area.name %> begins tomorrow.<% end %>
+
 <p>Hello,</p>
 
 <% if @street_address %>
@@ -6,21 +8,10 @@
   <p>This is a reminder that street sweeping for <%= link_to @area.name, @area %> will begin tomorrow.</p>
 <% end %>
 
-<p><%= @dates.join("<br />").html_safe %></p>
+<ul>
+  <% @dates.each do |date| %>
+    <li><%= date %></li>
+  <% end %>
+</ul>
 
-<p>
-  Cheers,<br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
-
-<p><%= @disclaimer %></p>
-
-<p>
-  <%= link_to "Manage subscriptions", @manage_url %> | <%= link_to "Unsubscribe", @unsubscribe_url %>
-</p>
-
-<% if ENV["COFFEE_LINK_URL"].present? %>
-<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-  ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
-</p>
-<% end %>
+<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>
