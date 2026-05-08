@@ -55,55 +55,13 @@ class CarryOverExistingAlerts
   end
 
   def geocode_address(alert)
-    address = alert.street_address
-    api_key = ENV["GOOGLE_MAPS_BACKEND_API_KEY"]
-    escaped_address = CGI.escape(address)
-    url = URI("https://maps.googleapis.com/maps/api/geocode/json?address=#{escaped_address}&key=#{api_key}")
+    geocoder = GeocodeAddress.new(address: alert.street_address)
+    result = geocoder.call
 
-    max_retries = 5
-    retry_count = 0
-
-    loop do
-      begin
-        response = make_request(url)
-      rescue StandardError => e
-        if retry_count < max_retries
-          sleep(2**retry_count)
-          retry_count += 1
-          next
-        else
-          add_to_failures(alert, "http_error: #{e.message}")
-          return
-        end
-      end
-
-      result = parse_response(response, alert, retry_count, max_retries)
-      return result unless result == :retry
-
-      retry_count += 1
-      next
-    end
-  end
-
-  def make_request(url)
-    sleep(0.1)
-    Net::HTTP.get(url)
-  end
-
-  def parse_response(response, alert, retry_count, max_retries)
-    json = JSON.parse(response)
-
-    if json["status"] == "OK"
-      result = json["results"][0]
-      lat = result.dig("geometry", "location", "lat")
-      lng = result.dig("geometry", "location", "lng")
-
-      [lat, lng]
-    elsif %w[REQUEST_DENIED OVER_QUERY_LIMIT UNKNOWN_ERROR].include?(json["status"]) && retry_count < max_retries
-      sleep(2**retry_count)
-      :retry
+    if result
+      [result.lat, result.lng]
     else
-      add_to_failures(alert, "geocode_status: #{json['status']}")
+      add_to_failures(alert, geocoder.error_reason || "geocode_failed")
       nil
     end
   end

@@ -7,7 +7,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
 
   before do
     ActiveJob::Base.queue_adapter = :test
-    allow_any_instance_of(CarryOverExistingAlerts).to receive(:sleep)
+    stub_const("GoogleGeocoder::RETRY_BASE_DELAY", 0)
     stub_request(:get, /maps.googleapis.com/)
       .to_return(body: File.read(Rails.root.join('spec', 'fixtures', 'google_maps_response.json')))
     allow(Area).to receive(:where).and_return([alert.area])
@@ -57,22 +57,43 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
   end
 
   context 'when there is a network error' do
-    before do
-      stub_request(:get, /maps.googleapis.com/)
-        .to_raise(StandardError.new('Network error'))
+    context 'with a retryable transient error (Net::OpenTimeout)' do
+      before do
+        stub_request(:get, /maps.googleapis.com/)
+          .to_raise(Net::OpenTimeout.new('timed out'))
+      end
+
+      it 'retries via GoogleGeocoder up to MAX_RETRIES + 1 attempts' do
+        described_class.new(write: true).call
+
+        expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+          .times(GoogleGeocoder::MAX_RETRIES + 1)
+      end
+
+      it 'adds the alert to failures with an http_error reason' do
+        service = described_class.new(write: true)
+        service.call
+        expect(service.failures).to contain_exactly(
+          a_hash_including(id: alert.id, reason: start_with("http_error:"))
+        )
+      end
     end
 
-    it 'retries the request' do
-      expect_any_instance_of(CarryOverExistingAlerts).to receive(:sleep).at_least(:once)
-      subject
-    end
+    context 'with a non-retryable generic StandardError' do
+      before do
+        stub_request(:get, /maps.googleapis.com/)
+          .to_raise(StandardError.new('Network error'))
+      end
 
-    it 'adds the alert to failures with http_error reason' do
-      service = described_class.new(write: true)
-      service.call
-      expect(service.failures).to contain_exactly(
-        a_hash_including(id: alert.id, reason: "http_error: Network error")
-      )
+      it 'does not retry and reports the http_error' do
+        service = described_class.new(write: true)
+        service.call
+
+        expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+        expect(service.failures).to contain_exactly(
+          a_hash_including(id: alert.id, reason: "http_error: Network error")
+        )
+      end
     end
   end
 

@@ -4,6 +4,15 @@ RSpec.describe "Areas", type: :request do
   let!(:area) { create(:area) }
   let(:today) { Time.current.to_date }
 
+  # SearchController geocodes server-side, so any test that hits
+  # `GET /search` needs the geocoder stubbed.
+  before do
+    allow(GeocodeAddress).to receive(:new).and_return(
+      instance_double(GeocodeAddress,
+                      call: GeocodeAddress::Result.new(lat: 41.885, lng: -87.712))
+    )
+  end
+
   describe "GET /areas/:id" do
     context "HTML format" do
       it "renders the area show page" do

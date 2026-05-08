@@ -5,16 +5,17 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
   let(:lat) { 41.88500 }
   let(:lng) { -87.70600 }
-  # The test environment uses :null_store, which would make every
-  # cache-behavior assertion below pass vacuously (or fail, depending
-  # on direction). Substitute a real in-memory store so the cache
-  # round-trip is actually exercised.
+  # Test env defaults to :null_store; use a real in-memory store so
+  # cache round-trip assertions actually exercise the cache.
   let(:memory_cache) { ActiveSupport::Cache::MemoryStore.new }
 
   subject { described_class.new(lat: lat, lng: lng) }
 
   before do
     allow(Rails).to receive(:cache).and_return(memory_cache)
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("GOOGLE_MAPS_BACKEND_API_KEY").and_return("test-key")
+    stub_const("GoogleGeocoder::RETRY_BASE_DELAY", 0)
   end
 
   describe "#call" do
@@ -29,6 +30,12 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
       it "returns the formatted address with trailing USA stripped" do
         expect(subject.call).to eq("3300 N California Ave, Chicago, IL 60618")
+      end
+
+      it "passes the lat,lng as the `latlng` query param" do
+        subject.call
+        expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+          .with(query: hash_including("latlng" => "#{lat},#{lng}", "key" => "test-key"))
       end
 
       it "caches the address for CACHE_TTL and reuses it on subsequent calls" do
@@ -49,6 +56,11 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         expect(subject.call).to be_nil
       end
 
+      it "exposes a granular error_reason" do
+        subject.call
+        expect(subject.error_reason).to eq("geocode_status: ZERO_RESULTS")
+      end
+
       it "caches the nil result to prevent repeated API calls" do
         subject.call
         described_class.new(lat: lat, lng: lng).call
@@ -56,25 +68,26 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         expect(WebMock).to have_requested(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/).once
       end
 
-      it "caches a hash wrapper with nil address to distinguish from a cache miss" do
+      it "caches a hash wrapper with nil value to distinguish from a cache miss" do
         subject.call
         cached = memory_cache.read("reverse_geocode:#{lat.round(5)},#{lng.round(5)}")
 
         expect(cached).to be_a(Hash)
-        expect(cached[:address]).to be_nil
+        expect(cached).to have_key(:value)
+        expect(cached[:value]).to be_nil
       end
     end
 
-    context "when the API returns an unexpected status" do
+    context "when the API returns a non-retryable error status" do
       before do
         stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
-          .to_return(body: { status: "OVER_QUERY_LIMIT", results: [] }.to_json)
+          .to_return(body: { status: "REQUEST_DENIED", results: [] }.to_json)
         allow(Rails.logger).to receive(:warn)
       end
 
       it "returns nil and logs a warning" do
         expect(subject.call).to be_nil
-        expect(Rails.logger).to have_received(:warn).with(/OVER_QUERY_LIMIT/)
+        expect(Rails.logger).to have_received(:warn).with(/REQUEST_DENIED/)
       end
 
       it "does not retry within the request" do
@@ -85,9 +98,21 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
       it "caches with ERROR_CACHE_TTL, not the longer NIL_CACHE_TTL" do
         freeze_time do
           subject.call
-          travel described_class::ERROR_CACHE_TTL + 1.second
+          travel GoogleGeocoder::ERROR_CACHE_TTL + 1.second
           expect(memory_cache.read("reverse_geocode:#{lat.round(5)},#{lng.round(5)}")).to be_nil
         end
+      end
+    end
+
+    context "when the API returns OVER_QUERY_LIMIT (retryable)" do
+      before { allow(Rails.logger).to receive(:warn) }
+
+      it "retries and recovers if a later attempt succeeds" do
+        stub_request(:get, /maps.googleapis.com/)
+          .to_return(body: { status: "OVER_QUERY_LIMIT", results: [] }.to_json).then
+          .to_return(body: { status: "OK", results: [{ formatted_address: "Recovered" }] }.to_json)
+
+        expect(subject.call).to eq("Recovered")
       end
     end
 
@@ -103,10 +128,10 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         expect(Rails.logger).to have_received(:warn).with(/HTTP 500/)
       end
 
-      it "caches with ERROR_CACHE_TTL" do
+      it "caches the nil result with ERROR_CACHE_TTL" do
         freeze_time do
           subject.call
-          travel described_class::ERROR_CACHE_TTL + 1.second
+          travel GoogleGeocoder::ERROR_CACHE_TTL + 1.second
           expect(memory_cache.read("reverse_geocode:#{lat.round(5)},#{lng.round(5)}")).to be_nil
         end
       end
@@ -127,7 +152,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
       it "caches the nil result with ERROR_CACHE_TTL" do
         freeze_time do
           subject.call
-          travel described_class::ERROR_CACHE_TTL + 1.second
+          travel GoogleGeocoder::ERROR_CACHE_TTL + 1.second
           expect(memory_cache.read("reverse_geocode:#{lat.round(5)},#{lng.round(5)}")).to be_nil
         end
       end
@@ -135,7 +160,6 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
     context "when the API key is not configured" do
       before do
-        allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with("GOOGLE_MAPS_BACKEND_API_KEY").and_return(nil)
       end
 
