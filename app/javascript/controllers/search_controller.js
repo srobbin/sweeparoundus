@@ -6,10 +6,14 @@ export default class extends Controller {
       'address',
       'lat',
       'lng',
+      'submit',
+      'spinner',
+      'label',
     ];
   }
 
   connect() {
+    this.updateSubmitState();
     if (window.google && window.google.maps && window.google.maps.places) {
       this.initializeAutocomplete();
     } else {
@@ -21,6 +25,10 @@ export default class extends Controller {
 
   initializeAutocomplete() {
     this.autocomplete = new google.maps.places.Autocomplete(this.addressTarget, {
+      // Only show street addresses. Without this, Places returns businesses,
+      // POIs, etc. whose coords can be far from their formatted address,
+      // causing alerts to store mismatched address/coordinate pairs.
+      types: ['address'],
       bounds: new google.maps.LatLngBounds(
         new google.maps.LatLng( 41.6446, -87.9395 ),
         new google.maps.LatLng( 42.0229, -87.5245 )
@@ -41,12 +49,37 @@ export default class extends Controller {
     event.preventDefault();
   }
 
+  updateSubmitState() {
+    if (!this.hasSubmitTarget) return;
+
+    if (this.hasLatTarget) {
+      this.latTarget.value = '';
+    }
+    if (this.hasLngTarget) {
+      this.lngTarget.value = '';
+    }
+    this.submitTarget.disabled = true;
+  }
+
+  showLoading() {
+    if (!this.hasSubmitTarget) return;
+
+    this.submitTarget.disabled = true;
+    if (this.hasSpinnerTarget) this.spinnerTarget.classList.remove('hidden');
+    if (this.hasLabelTarget) this.labelTarget.classList.add('hidden');
+  }
+
   placeChanged() {
     const place = this.autocomplete.getPlace();
+    if (!place || !place.geometry || !place.geometry.location) {
+      return;
+    }
     const { lat, lng } = place.geometry.location;
 
     this.latTarget.value = lat();
     this.lngTarget.value = lng();
+
+    this.showLoading();
     this.element.submit();
   }
 }
