@@ -1,3 +1,5 @@
+<% content_for :preheader do %>Use this link to manage your <%= ENV["SITE_NAME"] %> alert subscriptions.<% end %>
+
 <p>Hello,</p>
 
 <p>
@@ -12,7 +14,4 @@
   This link will expire in 1 hour. If you did not request this, you can safely ignore this email.
 </p>
 
-<p>
-  Cheers,<br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
+<%= render "shared/email_footer", coffee_link: false %>

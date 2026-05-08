@@ -1,3 +1,5 @@
+<% content_for :preheader do %>Your subscription for <%= @area.name %> has been canceled. You can re-subscribe anytime.<% end %>
+
 <p>Hello,</p>
 
 <p>
@@ -8,13 +10,4 @@
   If you'd like to continue receiving alerts for this (or another) area, <%= link_to "please visit our website and re-subscribe", ENV["SITE_URL"] %>.
 </p>
 
-<p>
-  Cheers,<br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
-
-<% if ENV["COFFEE_LINK_URL"].present? %>
-<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-  ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
-</p>
-<% end %>
+<%= render "shared/email_footer" %>

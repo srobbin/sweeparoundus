@@ -1,3 +1,5 @@
+<% content_for :preheader do %><%= Time.current.year %> Chicago street sweeping data is delayed; alerts are paused until the City publishes the schedule.<% end %>
+
 <p>Hello,</p>
 
 <p>
@@ -5,28 +7,15 @@
 </p>
 
 <p>
-  Chicago's street sweeping season officially begins on Wednesday, April 1. Unfortunately, the City of Chicago has <a href="https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/">delayed the release of the 2026 street sweeping zone data</a> that we rely upon in order to determine when your street will be swept.
+  Chicago's street sweeping season officially begins on Wednesday, April 1. Unfortunately, the City of Chicago has <%= link_to "delayed the release of the #{Time.current.year} street sweeping zone data", "https://data.cityofchicago.org/stories/s/Delayed-Street-Sweeping-Zones-Dataset-3-31-2026/fuz6-n5nj/" %> that we rely upon in order to determine when your street will be swept.
 </p>
 
 <p>
-  Until the City publishes this data and We The Sweeple (unaffiliated with the City) is able to process that data, we will not be able to send street sweeping alerts. Because of that, please check the <a href="https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping2026.html">Department of Streets and Sanitation page</a> for upcoming sweeps in your area.
+  Until the City publishes this data and We The Sweeple (unaffiliated with the City) is able to process that data, we will not be able to send street sweeping alerts. Because of that, please check the <%= link_to "Department of Streets and Sanitation page", "https://www.chicago.gov/city/en/depts/streets/provdrs/streets_san/svcs/street_sweeping2026.html" %> for upcoming sweeps in your area.
 </p>
 
 <p>
   We will notify you once the schedule is available and alerts are up and running.
 </p>
 
-<p>
-  Cheers,<br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
-
-<p>
-  <%= link_to "Manage subscriptions", @manage_url %> | <%= link_to "Unsubscribe", @unsubscribe_url %>
-</p>
-
-<% if ENV["COFFEE_LINK_URL"].present? %>
-<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-  ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
-</p>
-<% end %>
+<%= render "shared/email_footer", manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>

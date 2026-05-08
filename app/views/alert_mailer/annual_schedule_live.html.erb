@@ -1,3 +1,5 @@
+<% content_for :preheader do %>The <%= Time.current.year %> Chicago street sweeping schedule is now live.<% end %>
+
 <p>Hello,</p>
 
 <p>
@@ -12,15 +14,4 @@
   If you have moved and wish to receive alerts for a new address, <%= link_to "create a new subscription", ENV["SITE_URL"] %>.
 </p>
 
-<p>
-  Cheers,<br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
-
-<p><%= @disclaimer %></p>
-
-<% if ENV["COFFEE_LINK_URL"].present? %>
-<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-  ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
-</p>
-<% end %>
+<%= render "shared/email_footer", disclaimer: true %>

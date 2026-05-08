@@ -1,21 +1,10 @@
 Hello,
 
 <% if @street_address %>
-  This is a reminder that street sweeping for <%= @street_address %> (<%= @area.name %>) will begin tomorrow.
+This is a reminder that street sweeping for <%= @street_address %> (<%= @area.name %>) will begin tomorrow.
 <% else %>
-  This is a reminder that street sweeping for <%= @area.name %> will begin tomorrow.
+This is a reminder that street sweeping for <%= @area.name %> will begin tomorrow.
 <% end %>
 
 <%= @dates.join(" / ") %>
-
-Cheers,
-<%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-
-<%= @disclaimer %>
-
-Manage subscriptions: <%= @manage_url %>
-Unsubscribe: <%= @unsubscribe_url %>
-
-<% if ENV["COFFEE_LINK_URL"].present? %>
-☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
-<% end %>
+<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>

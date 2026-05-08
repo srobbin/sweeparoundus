@@ -1,3 +1,5 @@
+<% content_for :preheader do %>Confirm your subscription to street sweeping alerts for <%= @formatted_address_area %>.<% end %>
+
 <p>Hello,</p>
 
 <p>
@@ -10,10 +12,4 @@
   <%= link_to "Click here to confirm your subscription", @confirmation_url %>
 </p>
 
-<p>
-Cheers,<br />
-<%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
-
-<p><%= @disclaimer %></p>
-
+<%= render "shared/email_footer", coffee_link: false %>

@@ -1,0 +1,45 @@
+<%#
+  Shared footer for every user-facing mailer. Pulls the boilerplate
+  (cheers signoff, disclaimer, manage/unsubscribe links, coffee link)
+  into one place so future style tweaks don't require editing 6+
+  templates with predictable drift.
+
+  Locals (all optional):
+    signoff:        String — closing line above the linked site name.
+                    Defaults to "Cheers,". Pass "Best regards," for
+                    ward-office-style outreach.
+    disclaimer:     true to render ApplicationMailer::DISCLAIMER.
+    manage_url:     URL to manage subscriptions; renders link if present.
+    unsubscribe_url: URL to one-click unsubscribe; renders link if present.
+    coffee_link:    Defaults to true. Pass false to suppress the
+                    "Buy us a coffee" footer (e.g. on confirmation /
+                    transactional emails where it's noise).
+%>
+<% signoff      = local_assigns.fetch(:signoff, "Cheers,") %>
+<% disclaimer   = local_assigns.fetch(:disclaimer, false) %>
+<% manage_url   = local_assigns[:manage_url] %>
+<% unsubscribe_url = local_assigns[:unsubscribe_url] %>
+<% coffee_link  = local_assigns.fetch(:coffee_link, true) %>
+
+<p>
+  <%= signoff %><br />
+  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
+</p>
+
+<% if disclaimer %>
+  <p style="font-size: 9pt; color: #6b7280;"><%= ApplicationMailer::DISCLAIMER %></p>
+<% end %>
+
+<% if manage_url || unsubscribe_url %>
+  <p>
+    <% if manage_url %><%= link_to "Manage subscriptions", manage_url %><% end %><%
+    if manage_url && unsubscribe_url %> | <% end %><%
+    if unsubscribe_url %><%= link_to "Unsubscribe", unsubscribe_url %><% end %>
+  </p>
+<% end %>
+
+<% if coffee_link && ENV["COFFEE_LINK_URL"].present? %>
+  <p style="margin-top: 1.5em; padding-top: 1em; border-top: 1px solid #e5e7eb;">
+    ☕ Enjoying this free service? <%= link_to "Buy us a coffee!", ENV["COFFEE_LINK_URL"] %>
+  </p>
+<% end %>

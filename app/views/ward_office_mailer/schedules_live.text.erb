@@ -10,6 +10,4 @@ If your office would like to share this resource with constituents, here is a di
 Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago. We do, however, work with City data officials to identify and resolve issues with the data provided by the Department of Streets and Sanitation. If your ward office is ever interested in making text message alerts available to constituents, we would be happy to discuss that possibility, provided that there is budget available to do so.
 
 Thank you for helping to keep Chicago's streets clean!
-
-Best regards,
-<%= ENV["SITE_NAME"] %>
+<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>

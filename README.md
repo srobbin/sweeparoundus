@@ -64,7 +64,7 @@ docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
 
 ### Emails
 
-In development, emails are captured and stored in `/tmp/letter_opener`.
+In development, emails are captured and viewable at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener).
 
 ## API
 

@@ -36,7 +36,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
-      expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
+      expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
     end
 
     it 'embeds a valid manage JWT in the HTML body' do
@@ -76,7 +76,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
-      expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
+      expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
     end
 
     context 'when alert has no street address' do
@@ -109,7 +109,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
-      expect(html_body).to include(CGI.escapeHTML(AlertMailer::DISCLAIMER))
+      expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
       expect(html_body).to include('Manage subscriptions')
     end
