@@ -14,4 +14,16 @@
   <% end %>
 </ul>
 
+<% if @static_map_url %>
+  <p style="margin-bottom: 0;">
+    <%= image_tag @static_map_url,
+          alt: "Map showing the sweep area for #{@street_address || @area.name}",
+          width: AlertStaticMap::WIDTH,
+          style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
+  </p>
+  <p style="font-size: 12px; color: #555; margin-top: 0.25em;">
+    The blue <strong>H</strong> marker is your address. The shaded area is your sweep zone.
+  </p>
+<% end %>
+
 <%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>
