@@ -90,6 +90,11 @@ class CarryOverExistingAlerts
   def log_result
     if failures.any?
       unique_failures = failures.uniq
+      Sentry.capture_message(
+        "[CarryOverExistingAlerts] #{unique_failures.count} alert(s) failed",
+        level: :warning,
+        contexts: { carry_over: { failure_count: unique_failures.count, sample: unique_failures.first(10) } },
+      )
       "ERROR: Failed to find areas for #{unique_failures.count} alert(s): #{unique_failures}"
     else
       "SUCCESS: All alerts have been assigned to an area"

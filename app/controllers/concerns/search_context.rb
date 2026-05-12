@@ -40,6 +40,7 @@ module SearchContext
     ).call
   rescue StandardError => e
     Rails.logger.error("[SearchContext] Failed to load neighbors for area #{@area.id}: #{e.class}: #{e.message}")
+    Sentry.capture_exception(e, contexts: { search_context: { area_id: @area.id } })
     @neighbors = []
   end
 

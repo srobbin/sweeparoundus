@@ -62,11 +62,14 @@ class FindAdjacentSweepAreas
     unless thread.join(GEOCODE_THREAD_TIMEOUT)
       thread.kill
       Rails.logger.warn("[FindAdjacentSweepAreas] Geocode thread timed out")
+      Sentry.capture_message("[FindAdjacentSweepAreas] Geocode thread timed out", level: :warning,
+        contexts: { find_adjacent: { area_id: @area.id } })
       return nil
     end
     thread.value
   rescue StandardError => e
     Rails.logger.warn("[FindAdjacentSweepAreas] Geocode thread failed: #{e.class}: #{e.message}")
+    Sentry.capture_exception(e, contexts: { find_adjacent: { area_id: @area.id } })
     nil
   end
 

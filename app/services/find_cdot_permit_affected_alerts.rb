@@ -92,6 +92,11 @@ class FindCdotPermitAffectedAlerts
         "[FindCdotPermitAffectedAlerts] Permit #{@permit.unique_key} " \
         "has no pre-geocoded segment coordinates"
       )
+      Sentry.capture_message(
+        "[FindCdotPermitAffectedAlerts] Permit has no pre-geocoded segment coordinates",
+        level: :warning,
+        contexts: { permit: { unique_key: @permit.unique_key, permit_id: @permit.id } },
+      )
       return nil
     end
 

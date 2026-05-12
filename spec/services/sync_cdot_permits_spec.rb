@@ -10,10 +10,8 @@ RSpec.describe SyncCdotPermits, type: :service do
   let(:api_url_pattern) { %r{data\.cityofchicago\.org/resource/pubx-yq2d\.json} }
 
   before do
-    stub_const("SyncCdotPermits::GEOCODE_THROTTLE_DELAY", 0)
-    allow(GeocodeAddress).to receive(:new) do |address:|
-      instance_double(GeocodeAddress, call: nil)
-    end
+    allow(GeocodePermitSegmentJob).to receive(:set).and_return(GeocodePermitSegmentJob)
+    allow(GeocodePermitSegmentJob).to receive(:perform_later)
   end
 
   # The CDOT API returns numeric strings for uniquekey. Tests default to a
@@ -533,37 +531,19 @@ RSpec.describe SyncCdotPermits, type: :service do
       end
     end
 
-    context "segment geocoding during sync" do
-      let(:endpoint_a) { GeocodeAddress::Result.new(lat: 41.94142, lng: -87.69870) }
-      let(:endpoint_b) { GeocodeAddress::Result.new(lat: 41.94284, lng: -87.69870) }
-
-      before do
-        stub_const("SyncCdotPermits::GEOCODE_THROTTLE_DELAY", 0)
-        allow(GeocodeAddress).to receive(:new) do |address:|
-          result = case address
-                   when /\A3300\b/ then endpoint_a
-                   when /\A3350\b/ then endpoint_b
-                   end
-          instance_double(GeocodeAddress, call: result)
-        end
-      end
-
-      it "geocodes and stores segment coordinates for new permits" do
-        rows = [build_api_row("1000001")]
+    context "segment geocoding enqueuing" do
+      it "enqueues a geocode job for new permits" do
+        rows = [build_api_row("1000001"), build_api_row("1000002")]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
 
         subject.call
-        permit = CdotPermit.find_by(unique_key: "1000001")
 
-        expect(permit.segment_from_lat).to be_within(0.0001).of(41.94142)
-        expect(permit.segment_from_lng).to be_within(0.0001).of(-87.69870)
-        expect(permit.segment_to_lat).to be_within(0.0001).of(41.94284)
-        expect(permit.segment_to_lng).to be_within(0.0001).of(-87.69870)
+        expect(GeocodePermitSegmentJob).to have_received(:perform_later).twice
       end
 
-      it "re-geocodes when a permit's address fields change" do
+      it "enqueues a geocode job when a permit's address fields change" do
         create(:cdot_permit, unique_key: "1000001",
                street_number_from: 3300, street_number_to: 3350,
                direction: "N", street_name: "CALIFORNIA", suffix: "AVE",
@@ -576,13 +556,12 @@ RSpec.describe SyncCdotPermits, type: :service do
                      headers: { "Content-Type" => "application/json" })
 
         subject.call
-        permit = CdotPermit.find_by(unique_key: "1000001")
 
-        expect(permit.street_name).to eq("DAMEN")
-        expect(GeocodeAddress).to have_received(:new).at_least(:once)
+        expect(GeocodePermitSegmentJob).to have_received(:perform_later)
+          .with(CdotPermit.find_by(unique_key: "1000001").id)
       end
 
-      it "skips geocoding for unchanged permits" do
+      it "does not enqueue geocoding for unchanged permits" do
         create(:cdot_permit,
           unique_key: "1000001",
           application_number: "APP-1000001",
@@ -614,42 +593,25 @@ RSpec.describe SyncCdotPermits, type: :service do
 
         subject.call
 
-        expect(GeocodeAddress).not_to have_received(:new)
+        expect(GeocodePermitSegmentJob).not_to have_received(:perform_later)
       end
 
-      it "does not fail the sync when geocoding raises an error" do
-        allow(GeocodeAddress).to receive(:new).and_raise(RuntimeError, "geocoder down")
-        allow(Rails.logger).to receive(:warn)
+      it "enqueues geocoding for updated permits that are not yet geocoded" do
+        permit = create(:cdot_permit, unique_key: "1000001",
+               street_number_from: 3300, street_number_to: 3350,
+               direction: "N", street_name: "CALIFORNIA", suffix: "AVE",
+               detail: "old detail",
+               segment_from_lat: nil, segment_from_lng: nil,
+               segment_to_lat: nil, segment_to_lng: nil)
 
-        rows = [build_api_row("1000001")]
-        stub_request(:get, api_url_pattern)
-          .to_return(status: 200, body: rows.to_json,
-                     headers: { "Content-Type" => "application/json" })
-
-        result = subject.call
-
-        expect(result).to include("created=1")
-        expect(CdotPermit.find_by(unique_key: "1000001")).to be_present
-        expect(Rails.logger).to have_received(:warn).with(/Geocode failed/)
-      end
-
-      it "falls back to permit lat/lng when both endpoint geocodes fail" do
-        allow(GeocodeAddress).to receive(:new) do |address:|
-          instance_double(GeocodeAddress, call: nil)
-        end
-
-        rows = [build_api_row("1000001")]
+        rows = [build_api_row("1000001", "detail" => "new detail")]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
 
         subject.call
-        permit = CdotPermit.find_by(unique_key: "1000001")
 
-        expect(permit.segment_from_lat).to be_within(0.001).of(41.885)
-        expect(permit.segment_from_lng).to be_within(0.001).of(-87.706)
-        expect(permit.segment_to_lat).to be_within(0.001).of(41.885)
-        expect(permit.segment_to_lng).to be_within(0.001).of(-87.706)
+        expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(permit.id)
       end
     end
 
