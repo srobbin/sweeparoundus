@@ -23,7 +23,7 @@ class Alert < ApplicationRecord
   scope :permit_notifications_enabled, -> { where(permit_notifications: true) }
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[area_id confirmed email phone street_address updated_at lat lng]
+    %w[area_id confirmed email permit_notifications phone street_address updated_at lat lng]
   end
 
   def self.ransackable_associations(auth_object = nil)
