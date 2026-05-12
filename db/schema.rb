@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_08_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_12_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
@@ -40,9 +40,12 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_08_000001) do
     t.string "street_address"
     t.decimal "lat", precision: 10, scale: 6
     t.decimal "lng", precision: 10, scale: 6
+    t.boolean "permit_notifications", default: true, null: false
+    t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}
     t.index ["area_id"], name: "index_alerts_on_area_id"
     t.index ["email", "street_address"], name: "index_alerts_on_subscription_uniqueness", unique: true
     t.index ["email"], name: "index_alerts_on_email"
+    t.index ["location"], name: "index_alerts_on_location", using: :gist
   end
 
   create_table "areas", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -55,6 +58,55 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_08_000001) do
     t.string "shortcode"
     t.index ["shortcode"], name: "index_areas_on_shortcode", unique: true
     t.index ["slug"], name: "index_areas_on_slug", unique: true
+  end
+
+  create_table "cdot_permits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "unique_key", null: false
+    t.string "application_number"
+    t.string "application_name"
+    t.string "application_type"
+    t.string "application_description"
+    t.string "work_type"
+    t.string "work_type_description"
+    t.string "application_status"
+    t.datetime "application_start_date"
+    t.datetime "application_end_date"
+    t.datetime "application_expire_date"
+    t.datetime "application_issued_date"
+    t.text "detail"
+    t.string "parking_meter_posting_or_bagging"
+    t.integer "street_number_from"
+    t.integer "street_number_to"
+    t.string "direction"
+    t.string "street_name"
+    t.string "suffix"
+    t.text "placement"
+    t.string "street_closure"
+    t.integer "ward"
+    t.decimal "x_coordinate", precision: 12, scale: 4
+    t.decimal "y_coordinate", precision: 12, scale: 4
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}
+    t.datetime "data_synced_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "processed_alert_ids", default: []
+    t.datetime "notifications_sent_at"
+    t.decimal "segment_from_lat", precision: 10, scale: 6
+    t.decimal "segment_from_lng", precision: 10, scale: 6
+    t.decimal "segment_to_lat", precision: 10, scale: 6
+    t.decimal "segment_to_lng", precision: 10, scale: 6
+    t.index ["application_expire_date"], name: "index_cdot_permits_on_application_expire_date"
+    t.index ["application_number"], name: "index_cdot_permits_on_application_number"
+    t.index ["application_start_date"], name: "index_cdot_permits_on_application_start_date"
+    t.index ["application_status"], name: "index_cdot_permits_on_application_status"
+    t.index ["data_synced_at"], name: "index_cdot_permits_on_data_synced_at"
+    t.index ["location"], name: "index_cdot_permits_on_location", using: :gist
+    t.index ["notifications_sent_at"], name: "index_cdot_permits_on_notifications_sent_at"
+    t.index ["parking_meter_posting_or_bagging"], name: "index_cdot_permits_on_parking_meter"
+    t.index ["unique_key"], name: "index_cdot_permits_on_unique_key", unique: true
+    t.index ["ward"], name: "index_cdot_permits_on_ward"
   end
 
   create_table "sweeps", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

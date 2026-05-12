@@ -1,0 +1,18 @@
+Hello,
+
+<% if @matches.size > 1 %>
+Heads up: temporary "No Parking" signs may be going up near <%= @street_address %> for <%= @matches.size %> upcoming City of Chicago permits.
+
+<% @matches.each_with_index do |match, i| %>
+-- Permit <%= i + 1 %> of <%= @matches.size %> --
+<%= render "match", match: match %>
+<% end %>
+<% else %>
+Heads up: temporary "No Parking" signs may be going up near <%= @street_address %> for an upcoming City of Chicago permit.
+
+<%= render "match", match: @matches.first %>
+<% end %>
+Signs may already be posted, so check your block before parking. If signs are up and you ignore them, your car may be ticketed or towed.
+
+(Permit notifications are a new, experimental feature based on data for Chicago Department of Transportation permits that block or affect public streets. If you'd rather not receive them, use the "Manage subscriptions" link below to opt out.)
+<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url %>

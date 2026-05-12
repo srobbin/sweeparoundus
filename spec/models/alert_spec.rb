@@ -96,12 +96,41 @@ RSpec.describe Alert do
         expect(Alert.with_coords).to include(confirmed_with_address)
         expect(Alert.with_coords).not_to include(unconfirmed_without_address)
       end
+
+      it "excludes alerts with only one of lat or lng set" do
+        lat_only = create(:alert, :confirmed, area: area, lat: 41.885, lng: nil)
+        lng_only = create(:alert, :confirmed, area: area, lat: nil, lng: -87.712)
+
+        expect(Alert.with_coords).not_to include(lat_only)
+        expect(Alert.with_coords).not_to include(lng_only)
+      end
     end
 
     describe ".without_coords" do
       it "returns alerts without lat and lng" do
         expect(Alert.without_coords).to include(unconfirmed_without_address)
         expect(Alert.without_coords).not_to include(confirmed_with_address)
+      end
+    end
+
+    describe ".with_location" do
+      it "returns alerts that have a PostGIS location" do
+        expect(Alert.with_location).to include(confirmed_with_address)
+        expect(Alert.with_location).not_to include(unconfirmed_without_address)
+      end
+    end
+
+    describe ".permit_notifications_enabled" do
+      let!(:opted_in) do
+        create(:alert, :confirmed, area: area, permit_notifications: true)
+      end
+      let!(:opted_out) do
+        create(:alert, :confirmed, area: area, permit_notifications: false)
+      end
+
+      it "returns only alerts with permit_notifications enabled" do
+        expect(Alert.permit_notifications_enabled).to include(opted_in)
+        expect(Alert.permit_notifications_enabled).not_to include(opted_out)
       end
     end
 
@@ -121,6 +150,43 @@ RSpec.describe Alert do
         expect(Alert.phone).to include(phone_only_alert)
         expect(Alert.phone).not_to include(confirmed_with_address)
       end
+    end
+  end
+
+  describe "#update_location_from_coords" do
+    it "populates location from lat and lng on create" do
+      alert = create(:alert, :confirmed, area: area, lat: 41.885, lng: -87.712)
+
+      expect(alert.location).to be_present
+      expect(alert.location.latitude).to be_within(0.001).of(41.885)
+      expect(alert.location.longitude).to be_within(0.001).of(-87.712)
+    end
+
+    it "updates location when lat or lng changes" do
+      alert = create(:alert, :confirmed, area: area, lat: 41.885, lng: -87.712)
+
+      alert.update!(lat: 41.920, lng: -87.650)
+
+      expect(alert.location.latitude).to be_within(0.001).of(41.920)
+      expect(alert.location.longitude).to be_within(0.001).of(-87.650)
+    end
+
+    it "clears location when lat is set to nil" do
+      alert = create(:alert, :confirmed, area: area, lat: 41.885, lng: -87.712)
+      expect(alert.location).to be_present
+
+      alert.update!(lat: nil, lng: nil)
+
+      expect(alert.reload.location).to be_nil
+    end
+
+    it "does not touch location when unrelated attributes change" do
+      alert = create(:alert, :confirmed, area: area, lat: 41.885, lng: -87.712)
+      original_location = alert.location
+
+      alert.update!(street_address: "999 New St")
+
+      expect(alert.reload.location).to eq(original_location)
     end
   end
 end

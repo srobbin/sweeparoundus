@@ -1,0 +1,33 @@
+<% preheader_lead = @matches.first&.permit_dates ? "on #{@matches.first.permit_dates}" : "soon" %>
+<% content_for :preheader do %>Heads up: temporary "No Parking" signs may be going up near <%= @street_address %> <%= preheader_lead %>.<% end %>
+
+<p>Hello,</p>
+
+<% if @matches.size > 1 %>
+  <p>
+    Heads up: temporary <strong>&ldquo;No Parking&rdquo; signs may be going up near <%= @street_address %></strong> for <%= @matches.size %> upcoming City of Chicago permits.
+  </p>
+
+  <% @matches.each_with_index do |match, i| %>
+    <p style="<%= 'border-top: 1px solid #e5e7eb; padding-top: 1.25em; ' if i.positive? %>margin: 1.5em 0 0.5em; font-size: 11pt; font-weight: bold;">
+      Permit <%= i + 1 %> of <%= @matches.size %>
+    </p>
+    <%= render "match", match: match %>
+  <% end %>
+<% else %>
+  <p>
+    Heads up: temporary <strong>&ldquo;No Parking&rdquo; signs may be going up near <%= @street_address %></strong> for an upcoming City of Chicago permit.
+  </p>
+
+  <%= render "match", match: @matches.first %>
+<% end %>
+
+<p>
+  Signs may already be posted, so check your block before parking. If signs are up and you ignore them, your car may be ticketed or towed.
+</p>
+
+<p style="font-size: 11px; color: #888;">
+  (Permit notifications are a new, experimental feature based on data for Chicago Department of Transportation permits that block or affect public streets. If you'd rather not receive them, use the &ldquo;Manage subscriptions&rdquo; link below to opt out.)
+</p>
+
+<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url %>

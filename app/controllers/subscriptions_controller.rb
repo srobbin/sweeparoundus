@@ -1,7 +1,7 @@
 class SubscriptionsController < ApplicationController
   include JwtHelper
 
-  before_action :authenticate_manage_token, only: [:show, :create, :confirm, :destroy]
+  before_action :authenticate_manage_token, only: [:show, :create, :update, :confirm, :destroy]
   before_action :set_alerts, only: [:show]
 
   def new
@@ -60,6 +60,23 @@ class SubscriptionsController < ApplicationController
     redirect_to manage_subscriptions_path(t: params[:t]), notice: "You already have a subscription for this address."
   end
 
+  def update
+    @alert = Alert.find_by(id: params[:id], email: @email)
+
+    unless @alert
+      return redirect_to manage_subscriptions_path(t: params[:t]), alert: "Subscription not found."
+    end
+
+    unless @alert.update(permit_notifications: params[:permit_notifications] == "1")
+      return redirect_to manage_subscriptions_path(t: params[:t]), alert: "Could not update subscription."
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to manage_subscriptions_path(t: params[:t]) }
+    end
+  end
+
   def confirm
     @alert = Alert.find_by(id: params[:id], email: @email)
 
@@ -67,6 +84,7 @@ class SubscriptionsController < ApplicationController
       return redirect_to manage_subscriptions_path(t: params[:t]), alert: "Could not confirm subscription."
     end
 
+    set_alerts
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to manage_subscriptions_path(t: params[:t]) }
@@ -81,7 +99,7 @@ class SubscriptionsController < ApplicationController
     end
 
     @alert.destroy
-    @remaining_count = Alert.where(email: @email).count
+    set_alerts
 
     respond_to do |format|
       format.turbo_stream { flash.now[:notice] = "Subscription removed." }
@@ -103,6 +121,7 @@ class SubscriptionsController < ApplicationController
 
   def set_alerts
     @alerts = Alert.where(email: @email).includes(:area).order(:created_at)
+    @pending_alerts, @active_alerts = @alerts.partition { |a| !a.confirmed? }
   end
 
   def render_manage_with_error

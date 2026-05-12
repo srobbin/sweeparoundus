@@ -1,0 +1,33 @@
+<div id="subscriptions-wrapper">
+  <% if pending.any? %>
+    <section id="pending-subscriptions" class="mb-6" aria-labelledby="pending-heading">
+      <div class="flex items-baseline gap-2 mb-1">
+        <h2 id="pending-heading" class="text-base font-semibold text-gray-900">Needs your attention</h2>
+        <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800" aria-label="<%= pending.size %> pending"><%= pending.size %></span>
+      </div>
+      <p class="text-sm text-gray-600 mb-3">
+        Click <strong>Confirm</strong> on each subscription below to start receiving alerts.
+      </p>
+      <div id="pending-list" class="space-y-3">
+        <% pending.each do |alert| %>
+          <%= render "subscription", alert: alert, token: token %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section id="active-subscriptions" aria-labelledby="active-heading">
+    <h2 id="active-heading" class="text-base font-semibold text-gray-900 mb-2 <%= 'sr-only' unless pending.any? %>">Active subscriptions</h2>
+    <div id="active-list" class="space-y-3">
+      <% if active.any? %>
+        <% active.each do |alert| %>
+          <%= render "subscription", alert: alert, token: token %>
+        <% end %>
+      <% elsif pending.any? %>
+        <p class="text-sm text-gray-600 py-4">No active subscriptions yet. Confirm your pending subscriptions above to start receiving alerts.</p>
+      <% else %>
+        <p class="text-sm text-gray-600 py-4" id="empty-state">You don't have any subscriptions yet. Add one below.</p>
+      <% end %>
+    </div>
+  </section>
+</div>

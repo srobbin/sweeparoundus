@@ -1,3 +1,15 @@
 send_alerts:
-  cron: "0 14 * * *"
+  cron: "30 9 * * * America/Chicago"
   class: "SendAlertsJob"
+
+sync_cdot_permits:
+  cron: "0 4 * * * America/Chicago"
+  class: "SyncCdotPermitsJob"
+
+cleanup_stale_cdot_permits:
+  cron: "0 5 * * * America/Chicago"
+  class: "CleanupStaleCdotPermitsJob"
+
+send_permit_alerts:
+  cron: "0 6 * * * America/Chicago"
+  class: "SendPermitAlertsJob"

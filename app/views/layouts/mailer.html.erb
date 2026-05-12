@@ -56,13 +56,13 @@
       </div>
     <% end %>
 
-    <%# Centered 600px-wide content column. The HTML width="100%" attribute
-        is for Outlook desktop (which ignores max-width); other clients
-        respect the inline max-width to cap line lengths on wide screens. %>
+    <%# Centered content column. The HTML width="100%" attribute is for
+        Outlook desktop (which ignores max-width); other clients respect
+        the inline max-width to cap line lengths on wide screens. %>
     <table align="center" cellpadding="0" cellspacing="0" border="0" width="100%" role="presentation"
-           style="max-width: 600px; margin: 0 auto;">
+           style="max-width: 680px; margin: 0 auto;">
       <tr>
-        <td style="padding: 24px;">
+        <td style="padding: 24px 20px;">
           <%= yield %>
         </td>
       </tr>

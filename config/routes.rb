@@ -35,6 +35,7 @@ Rails.application.routes.draw do
   get "subscriptions/manage", to: "subscriptions#show", as: :manage_subscriptions
   post "subscriptions", to: "subscriptions#create", as: :create_subscription
   patch "subscriptions/:id/confirm", to: "subscriptions#confirm", as: :confirm_subscription
+  patch "subscriptions/:id", to: "subscriptions#update", as: :update_subscription
   delete "subscriptions/:id", to: "subscriptions#destroy", as: :destroy_subscription
 
   # Static pages
