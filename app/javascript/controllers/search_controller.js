@@ -16,65 +16,48 @@ export default class extends Controller {
     this.submitting = false;
     this.boundSubmitEnd = this.resetAfterSubmit.bind(this);
     this.element.addEventListener("turbo:submit-end", this.boundSubmitEnd);
-    this.updateSubmitState();
+    if (this.hasSubmitTarget) this.submitTarget.disabled = true;
+
     if (window.google && window.google.maps && window.google.maps.places) {
-      this.initializeAutocomplete();
+      this.configureAutocomplete();
     } else {
       document.addEventListener('google-maps-loaded', () => {
-        this.initializeAutocomplete();
-      });
+        this.configureAutocomplete();
+      }, { once: true });
     }
   }
 
-  initializeAutocomplete() {
-    this.autocomplete = new google.maps.places.Autocomplete(this.addressTarget, {
-      // Only show street addresses. Without this, Places returns businesses,
-      // POIs, etc. whose coords can be far from their formatted address,
-      // causing alerts to store mismatched address/coordinate pairs.
-      types: ['address'],
-      bounds: new google.maps.LatLngBounds(
-        new google.maps.LatLng( 41.6446, -87.9395 ),
-        new google.maps.LatLng( 42.0229, -87.5245 )
-      )
-    });
-
-    this.boundPlaceChanged = this.placeChanged.bind(this);
-    google.maps.event.addListener(this.autocomplete, 'place_changed', this.boundPlaceChanged);
+  configureAutocomplete() {
+    this.addressTarget.locationBias = {
+      west: -87.9395,
+      south: 41.6446,
+      east: -87.5245,
+      north: 42.0229,
+    };
   }
 
   disconnect() {
     this.element.removeEventListener("turbo:submit-end", this.boundSubmitEnd);
-    if (this.autocomplete && google.maps && google.maps.event) {
-      google.maps.event.removeListener(this.autocomplete, 'place_changed', this.boundPlaceChanged);
-    }
   }
 
   resetAfterSubmit() {
     this.submitting = false;
     if (this.hasSpinnerTarget) this.spinnerTarget.classList.add('hidden');
     if (this.hasLabelTarget) this.labelTarget.classList.remove('hidden');
-    this.updateSubmitState();
+    if (this.hasSubmitTarget) this.submitTarget.disabled = true;
+    if (this.hasLatTarget) this.latTarget.value = '';
+    if (this.hasLngTarget) this.lngTarget.value = '';
+    this.clearAutocompleteInput();
+  }
+
+  clearAutocompleteInput() {
+    this.addressTarget.value = '';
+    const input = this.addressTarget.shadowRoot?.querySelector('input');
+    if (input) input.value = '';
   }
 
   submit(event) {
     event.preventDefault();
-  }
-
-  updateSubmitState() {
-    if (!this.hasSubmitTarget) return;
-    // Don't clobber a submit-in-flight: Places sometimes fires synthetic
-    // input events after `place_changed`, and the user can also tap the
-    // field after picking. Either would wipe the lat/lng we just filled
-    // and abort the submission mid-flight.
-    if (this.submitting) return;
-
-    if (this.hasLatTarget) {
-      this.latTarget.value = '';
-    }
-    if (this.hasLngTarget) {
-      this.lngTarget.value = '';
-    }
-    this.submitTarget.disabled = true;
   }
 
   showLoading() {
@@ -85,21 +68,22 @@ export default class extends Controller {
     if (this.hasLabelTarget) this.labelTarget.classList.add('hidden');
   }
 
-  placeChanged() {
-    // Guard against double-submit: if the user picks a place, then quickly
-    // picks another before the in-flight POST returns, `place_changed`
-    // would fire again and the server could persist two alerts (each with
-    // a different geocoded address).
+  async placeChanged(event) {
     if (this.submitting) return;
 
-    const place = this.autocomplete.getPlace();
-    if (!place || !place.geometry || !place.geometry.location) {
+    let place;
+    try {
+      place = event.placePrediction.toPlace();
+      await place.fetchFields({ fields: ['location'] });
+    } catch (e) {
+      console.error('Places fetchFields failed:', e);
       return;
     }
-    const { lat, lng } = place.geometry.location;
 
-    this.latTarget.value = lat();
-    this.lngTarget.value = lng();
+    if (!place.location) return;
+
+    this.latTarget.value = place.location.lat();
+    this.lngTarget.value = place.location.lng();
 
     this.submitting = true;
     this.showLoading();
