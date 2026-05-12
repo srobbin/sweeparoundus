@@ -196,6 +196,14 @@ class SyncCdotPermits
     Rails.logger.error("[SyncCdotPermits] Failed after #{pages} pages " \
                        "(created=#{created} updated=#{updated} unchanged=#{unchanged} " \
                        "skipped=#{skipped}): #{e.class}: #{e.message}")
+    Sentry.set_context("sync_cdot_permits", {
+      pages: pages,
+      created: created,
+      updated: updated,
+      unchanged: unchanged,
+      skipped: skipped,
+      last_unique_key: last_unique_key,
+    })
     raise
   end
 
