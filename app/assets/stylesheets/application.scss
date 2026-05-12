@@ -35,3 +35,27 @@ summary::-webkit-details-marker {
   border-left: 4px solid rgb(202 138 4);
 }
 
+.search-autocomplete {
+  flex: 1 1 0%;
+  border: 1px solid rgb(209 213 219);
+  font-family: 'Inter var', ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+  color-scheme: light;
+}
+
+.search-autocomplete--rounded-l {
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.search-autocomplete::part(input) {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .search-autocomplete::part(input) {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+

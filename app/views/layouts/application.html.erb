@@ -16,6 +16,40 @@
       window.initGoogleMaps = function() {
         document.dispatchEvent(new CustomEvent('google-maps-loaded'));
       };
+
+      // Force the autocomplete's shadow root open so we can clear its
+      // internal input, and inject styles for the clear button. Fragile:
+      // depends on Google's internal class names (.clear-button, etc.).
+      (function() {
+        var orig = Element.prototype.attachShadow;
+        Element.prototype.attachShadow = function(init) {
+          if (this.localName === 'gmp-place-autocomplete') {
+            var shadow = orig.call(this, Object.assign({}, init, { mode: 'open' }));
+            var s = document.createElement('style');
+            s.textContent =
+              '.input-container button.clear-button {' +
+              '  height: 28px !important;' +
+              '  width: 28px !important;' +
+              '  margin-right: 6px !important;' +
+              '}' +
+              '.input-container button.clear-button svg {' +
+              '  display: none !important;' +
+              '}' +
+              '.input-container button.clear-button::after {' +
+              '  content: "\\2715";' +
+              '  color: rgb(106,106,106);' +
+              '  font-size: 15px;' +
+              '  -webkit-text-stroke: 1px rgb(106,106,106);' +
+              '}' +
+              '.input-container button.clear-button:hover {' +
+              '  background-color: rgb(229,231,235) !important;' +
+              '}';
+            shadow.appendChild(s);
+            return shadow;
+          }
+          return orig.call(this, init);
+        };
+      })();
     <% end %>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_FRONTEND_API_KEY"] %>&libraries=places&loading=async&callback=initGoogleMaps" nonce="<%= content_security_policy_nonce %>"></script>
     <%= render "shared/analytics" if Rails.env.production? && ENV["GOOGLE_ANALYTICS_ID"].present? %>

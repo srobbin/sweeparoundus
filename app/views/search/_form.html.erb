@@ -2,18 +2,16 @@
 <form method="GET" action="/search/" data-controller="search" data-action="search#submit">
   <label for="address" class="block font-medium sr-only">Search for a Chicago address</label>
   <div class="mt-1 flex rounded-md shadow-sm">
-    <div class="relative flex items-stretch flex-grow focus-within:z-10">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-      </div>
-      <input
-        type="text"
+    <div class="flex items-stretch flex-grow">
+      <gmp-place-autocomplete
         name="address"
-        class="focus:ring-blue-500 focus:border-blue-500 block w-full rounded-none rounded-l-md pl-10 py-3 lg:py-2 border-gray-300 text-base"
+        class="search-autocomplete search-autocomplete--rounded-l"
         placeholder="e.g. 3324 North California Ave, Chicago, IL"
+        included-primary-types="street_address"
+        included-region-codes="us"
         data-search-target="address"
-        data-action="input->search#updateSubmitState"
-      >
+        data-action="gmp-select->search#placeChanged"
+      ></gmp-place-autocomplete>
       <input type="hidden" name="lat" data-search-target="lat" />
       <input type="hidden" name="lng" data-search-target="lng" />
     </div>
