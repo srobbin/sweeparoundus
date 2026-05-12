@@ -98,7 +98,7 @@ RSpec.describe "Subscriptions", type: :request do
         get manage_subscriptions_path, params: { t: token }
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Manage Subscriptions")
+        expect(response.body).to include("Your subscriptions")
         expect(response.body).to include(email)
       end
 
@@ -113,11 +113,24 @@ RSpec.describe "Subscriptions", type: :request do
           expect(response.body).to include(unconfirmed_alert.street_address)
         end
 
-        it "shows confirmation status indicators" do
+        it "shows status indicators" do
           get manage_subscriptions_path, params: { t: token }
 
-          expect(response.body).to include("confirmed")
-          expect(response.body).to include("unconfirmed")
+          expect(response.body).to include("Active")
+          expect(response.body).to include("Pending")
+        end
+      end
+
+      context "with only unconfirmed alerts" do
+        let!(:pending_alert) { create(:alert, :unconfirmed, :with_address, email: email, area: area) }
+
+        it "shows the pending section and the 'no active subscriptions' message" do
+          get manage_subscriptions_path, params: { t: token }
+
+          expect(response.body).to include("Needs your attention")
+          expect(response.body).to include(pending_alert.street_address)
+          expect(response.body).to include("No active subscriptions yet")
+          expect(response.body).not_to include("empty-state")
         end
       end
 
@@ -209,25 +222,24 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response).to redirect_to(manage_subscriptions_path(t: token))
       end
 
-      it "returns turbo_stream with append and flash" do
+      it "returns turbo_stream with the updated subscriptions list and flash" do
         post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng },
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response).to have_http_status(:ok)
         expect(response.media_type).to eq("text/vnd.turbo-stream.html")
         expect(response.body).to include("turbo-stream")
-        expect(response.body).to include("subscriptions-list")
+        expect(response.body).to include("subscriptions-wrapper")
         expect(response.body).to include(address)
         expect(response.body).to include("Subscription added")
         expect(response.body).to include("add-subscription-flash")
       end
 
-      it "removes the empty-state element via turbo_stream" do
+      it "no longer renders the empty-state element after the first subscription is added" do
         post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng },
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
-        expect(response.body).to include("empty-state")
-        expect(response.body).to match(/action="remove"[^>]*target="empty-state"|target="empty-state"[^>]*action="remove"/)
+        expect(response.body).not_to include("empty-state")
       end
 
       context "with a duplicate subscription" do
@@ -353,6 +365,122 @@ RSpec.describe "Subscriptions", type: :request do
     end
   end
 
+  describe "PATCH /subscriptions/:id" do
+    let(:token) { encode_manage_jwt(email) }
+    let!(:alert) do
+      create(:alert, :confirmed, :with_address, email: email, area: area,
+             permit_notifications: true)
+    end
+
+    context "with a valid token" do
+      it "turns permit_notifications off when '0' is submitted" do
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "0" }
+
+        expect(alert.reload.permit_notifications).to be false
+      end
+
+      it "turns permit_notifications back on when '1' is submitted" do
+        alert.update!(permit_notifications: false)
+
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "1" }
+
+        expect(alert.reload.permit_notifications).to be true
+      end
+
+      it "treats anything other than '1' as off (defensive against unchecked toggles)" do
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "" }
+
+        expect(alert.reload.permit_notifications).to be false
+      end
+
+      it "redirects back to the manage page on HTML requests" do
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "0" }
+
+        expect(response).to redirect_to(manage_subscriptions_path(t: token))
+      end
+
+      it "returns a turbo_stream that replaces the alert row in place" do
+        patch update_subscription_path(alert, t: token),
+          params: { permit_notifications: "0" },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+        expect(response.body).to include("turbo-stream")
+        # update.turbo_stream.erb replaces just the alert row, not the
+        # whole wrapper (confirm/destroy do replace the wrapper because
+        # they change which section the alert belongs to).
+        expect(response.body).to include(ActionView::RecordIdentifier.dom_id(alert))
+        expect(response.body).not_to include("subscriptions-wrapper")
+        expect(response.body).to include(alert.street_address)
+      end
+    end
+
+    context "when the alert belongs to a different email" do
+      let!(:other_alert) do
+        create(:alert, :confirmed, :with_address, email: "other@example.com", area: area,
+               permit_notifications: true)
+      end
+
+      it "does not update the alert and redirects with an error" do
+        patch update_subscription_path(other_alert, t: token), params: { permit_notifications: "0" }
+
+        expect(other_alert.reload.permit_notifications).to be true
+        expect(response).to redirect_to(manage_subscriptions_path(t: token))
+        follow_redirect!
+        expect(response.body).to include("Subscription not found")
+      end
+    end
+
+    context "with a non-existent alert ID" do
+      it "redirects with an error" do
+        patch update_subscription_path(id: SecureRandom.uuid, t: token),
+          params: { permit_notifications: "0" }
+
+        expect(response).to redirect_to(manage_subscriptions_path(t: token))
+        follow_redirect!
+        expect(response.body).to include("Subscription not found")
+      end
+    end
+
+    context "when the update fails at the model layer" do
+      before do
+        allow_any_instance_of(Alert).to receive(:update).and_return(false)
+      end
+
+      it "redirects with a generic error rather than rendering a success turbo_stream" do
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "0" }
+
+        expect(response).to redirect_to(manage_subscriptions_path(t: token))
+        follow_redirect!
+        expect(response.body).to include("Could not update subscription")
+      end
+    end
+
+    context "with an expired token" do
+      let(:token) do
+        payload = { sub: email, purpose: "manage", exp: 1.hour.ago.to_i }
+        JWT.encode(payload, ENV["SECRET_KEY_JWT"], "HS256")
+      end
+
+      it "redirects to the subscriptions page without updating the alert" do
+        patch update_subscription_path(alert, t: token), params: { permit_notifications: "0" }
+
+        expect(alert.reload.permit_notifications).to be true
+        expect(response).to redirect_to(subscriptions_path)
+      end
+    end
+
+    context "with an invalid token" do
+      it "redirects to the subscriptions page without updating the alert" do
+        patch update_subscription_path(alert, t: "garbage"), params: { permit_notifications: "0" }
+
+        expect(alert.reload.permit_notifications).to be true
+        expect(response).to redirect_to(subscriptions_path)
+      end
+    end
+  end
+
   describe "PATCH /subscriptions/:id/confirm" do
     let(:token) { encode_manage_jwt(email) }
     let!(:alert) { create(:alert, :unconfirmed, :with_address, email: email, area: area) }
@@ -420,19 +548,20 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response).to redirect_to(manage_subscriptions_path(t: token))
       end
 
-      it "returns turbo_stream removing the alert with flash" do
+      it "returns turbo_stream replacing the subscriptions list with flash" do
         delete destroy_subscription_path(alert, t: token),
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response).to have_http_status(:ok)
         expect(response.media_type).to eq("text/vnd.turbo-stream.html")
         expect(response.body).to include("turbo-stream")
-        expect(response.body).to include("remove")
+        expect(response.body).to include("subscriptions-wrapper")
         expect(response.body).to include("Subscription removed")
         expect(response.body).to include("manage-flash")
+        expect(response.body).not_to include(alert.street_address)
       end
 
-      it "restores the empty state via turbo_stream when the last alert is removed" do
+      it "renders the empty state when the last alert is removed" do
         delete destroy_subscription_path(alert, t: token),
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
@@ -443,7 +572,7 @@ RSpec.describe "Subscriptions", type: :request do
       context "when other alerts remain" do
         let!(:other_alert) { create(:alert, :confirmed, :with_address, email: email, area: area) }
 
-        it "does not restore the empty state" do
+        it "does not render the empty state" do
           delete destroy_subscription_path(alert, t: token),
             headers: { "Accept" => "text/vnd.turbo-stream.html" }
 

@@ -1,0 +1,11 @@
+<% if match.segment_label.present? %>Where: <%= match.segment_label %><% if match.distance_feet %> (about <%= match.distance_feet %> ft from your address)<% end %>
+<% elsif match.distance_feet %>Distance: about <%= match.distance_feet %> ft from your address
+<% end %>
+<% if match.permit_dates %>When: <%= match.permit_dates %>
+<% end %>
+<% if match.work_type_description.present? %>Work type: <%= match.work_type_description %>
+<% end %>
+<% if match.application_description.present? %>Description: <%= match.application_description %>
+<% end %>
+<% if match.static_map_url %>Map: <%= match.static_map_url %>
+<% end %>

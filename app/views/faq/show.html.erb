@@ -26,7 +26,7 @@
             <p>
               We send a reminder email the day before the first date in your area's two-day sweep window.
               The City sweeps one side of the street on the first date and the other side on the second date, so a single email covers the whole window.
-              Reminders only go out to <strong>confirmed</strong> subscribers, so if you signed up but never clicked the email confirmation link, you won't hear from us.
+              Reminders only go out to <strong>active</strong> subscribers — that is, anyone who clicked the confirmation link in their welcome email. Subscriptions that haven't been confirmed yet show as <strong>Pending</strong> on your <%= link_to "Manage Subscriptions", subscriptions_path, class: "underline" %> page and will not receive alerts until you confirm them.
             </p>
           </div>
         </details>
@@ -39,7 +39,7 @@
           <div class="px-4 pb-4 flex flex-col gap-2">
             <p>Common causes:</p>
             <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li>The subscription was never confirmed (check your inbox for our welcome email).</li>
+              <li>The subscription was never confirmed — check your inbox for our welcome email, or visit the <%= link_to "Manage Subscriptions", subscriptions_path, class: "underline" %> page to confirm any subscriptions still marked <strong>Pending</strong>.</li>
               <li>The message landed in spam — whitelisting <code>info@wethesweeple.com</code> helps.</li>
               <li>The City delayed publishing the year's schedule.</li>
               <li>Weather or operational issues canceled or postponed the sweep.</li>
@@ -101,6 +101,24 @@
             </p>
             <p>
               There's one caveat: The City sometimes updates the schedule mid-season, which can cause the iCalendar file to be out of sync with the actual schedule.
+            </p>
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg">
+          <summary class="flex items-center justify-between cursor-pointer list-none px-4 py-3 text-base font-semibold text-gray-900 rounded-lg hover:bg-gray-50">
+            What are the temporary &ldquo;No Parking&rdquo; permit alerts?
+            <svg class="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="px-4 pb-4 flex flex-col gap-2">
+            <p>
+              The Chicago Department of Transportation (CDOT) routinely issues permits that temporarily block or restrict parking on public streets (for things like construction, utility work, or special events). Permit holders often—but not always—post temporary "No Parking" signs along the affected stretch of street, and cars parked there during the posted window can be ticketed or towed.
+            </p>
+            <p>
+              When we detect a new CDOT permit starting today or tomorrow near your address, we'll send you a heads-up email with the dates, location, and type of work involved.
+            </p>
+            <p>
+              This is a new, experimental feature, so the data may be incomplete and there may be false positives. You can opt out at any time from the <%= link_to "Manage Subscriptions", subscriptions_path, class: "underline" %> page.
             </p>
           </div>
         </details>

@@ -13,6 +13,9 @@ export default class extends Controller {
   }
 
   connect() {
+    this.submitting = false;
+    this.boundSubmitEnd = this.resetAfterSubmit.bind(this);
+    this.element.addEventListener("turbo:submit-end", this.boundSubmitEnd);
     this.updateSubmitState();
     if (window.google && window.google.maps && window.google.maps.places) {
       this.initializeAutocomplete();
@@ -40,9 +43,17 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.element.removeEventListener("turbo:submit-end", this.boundSubmitEnd);
     if (this.autocomplete && google.maps && google.maps.event) {
       google.maps.event.removeListener(this.autocomplete, 'place_changed', this.boundPlaceChanged);
     }
+  }
+
+  resetAfterSubmit() {
+    this.submitting = false;
+    if (this.hasSpinnerTarget) this.spinnerTarget.classList.add('hidden');
+    if (this.hasLabelTarget) this.labelTarget.classList.remove('hidden');
+    this.updateSubmitState();
   }
 
   submit(event) {
@@ -51,6 +62,11 @@ export default class extends Controller {
 
   updateSubmitState() {
     if (!this.hasSubmitTarget) return;
+    // Don't clobber a submit-in-flight: Places sometimes fires synthetic
+    // input events after `place_changed`, and the user can also tap the
+    // field after picking. Either would wipe the lat/lng we just filled
+    // and abort the submission mid-flight.
+    if (this.submitting) return;
 
     if (this.hasLatTarget) {
       this.latTarget.value = '';
@@ -70,6 +86,12 @@ export default class extends Controller {
   }
 
   placeChanged() {
+    // Guard against double-submit: if the user picks a place, then quickly
+    // picks another before the in-flight POST returns, `place_changed`
+    // would fire again and the server could persist two alerts (each with
+    // a different geocoded address).
+    if (this.submitting) return;
+
     const place = this.autocomplete.getPlace();
     if (!place || !place.geometry || !place.geometry.location) {
       return;
@@ -79,6 +101,7 @@ export default class extends Controller {
     this.latTarget.value = lat();
     this.lngTarget.value = lng();
 
+    this.submitting = true;
     this.showLoading();
     this.element.submit();
   }
