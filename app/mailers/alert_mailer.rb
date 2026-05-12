@@ -6,6 +6,7 @@ class AlertMailer < ApplicationMailer
   before_action :set_sweep_dates, only: [:reminder]
   before_action :set_mailer_urls, only: [:confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed]
   before_action :set_manage_url, only: [:reminder, :annual_schedule_live, :sweeping_data_delayed]
+  before_action :set_static_map_url, only: [:reminder, :confirm]
 
   def reminder
     mail(
@@ -79,5 +80,9 @@ class AlertMailer < ApplicationMailer
 
   def set_manage_url
     @manage_url = manage_subscriptions_url(t: encode_manage_jwt(@email, expires_in: 60.days))
+  end
+
+  def set_static_map_url
+    @static_map_url = AlertStaticMap.new(alert: @alert, area: @area).url
   end
 end
