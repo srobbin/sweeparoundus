@@ -8,7 +8,6 @@ class SyncCdotPermits
   READ_TIMEOUT = 30
   MAX_RETRIES = 3
   RETRY_BASE_DELAY = 2
-  GEOCODE_THROTTLE_DELAY = 0.15
   # Cap any server-supplied Retry-After to keep one slow upstream from
   # parking the worker for an unbounded amount of time.
   MAX_RETRY_AFTER = 60
@@ -164,7 +163,7 @@ class SyncCdotPermits
           end
         end
 
-        geocode_segments(needs_geocoding)
+        enqueue_geocoding(needs_geocoding)
       end
 
       break if rows.size < PAGE_SIZE
@@ -336,49 +335,12 @@ class SyncCdotPermits
     nil
   end
 
-  def geocode_segments(permits)
+  GEOCODE_JOB_STAGGER = 0.3.seconds
+
+  def enqueue_geocoding(permits)
     permits.each_with_index do |permit, i|
-      sleep(GEOCODE_THROTTLE_DELAY) if i > 0
-      geocode_segment(permit)
-    rescue StandardError => e
-      Rails.logger.warn(
-        "[SyncCdotPermits] Geocode failed for permit #{permit.unique_key}: " \
-        "#{e.class}: #{e.message}"
-      )
+      GeocodePermitSegmentJob.set(wait: i * GEOCODE_JOB_STAGGER).perform_later(permit.id)
     end
-  end
-
-  def geocode_segment(permit)
-    addresses = permit.segment_addresses
-    return if addresses.compact.empty?
-
-    from_result = geocode_address(addresses[0])
-    sleep(GEOCODE_THROTTLE_DELAY) if addresses[1].present?
-    to_result = geocode_address(addresses[1])
-
-    fallback = permit_fallback_point(permit)
-    from_result ||= fallback
-    to_result   ||= fallback
-    from_result ||= to_result
-    to_result   ||= from_result
-    return if from_result.nil?
-
-    permit.update!(
-      segment_from_lat: from_result.lat,
-      segment_from_lng: from_result.lng,
-      segment_to_lat: to_result.lat,
-      segment_to_lng: to_result.lng,
-    )
-  end
-
-  def geocode_address(address)
-    return nil if address.nil?
-    GeocodeAddress.new(address: address).call
-  end
-
-  def permit_fallback_point(permit)
-    return nil if permit.latitude.blank? || permit.longitude.blank?
-    GeocodeAddress::Result.new(lat: permit.latitude, lng: permit.longitude)
   end
 
 end

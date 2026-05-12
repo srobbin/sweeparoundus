@@ -20,6 +20,12 @@ class CleanupStaleCdotPermits
       "(expired before #{expiration_cutoff.iso8601} AND not synced since #{sync_cutoff.iso8601})"
   rescue => e
     Rails.logger.error("[CleanupStaleCdotPermits] #{e.class}: #{e.message}")
+    Sentry.capture_exception(e, contexts: {
+      cleanup_stale_cdot_permits: {
+        expiration_cutoff: expiration_cutoff.iso8601,
+        sync_cutoff: sync_cutoff.iso8601,
+      },
+    })
     raise
   end
 end

@@ -10,6 +10,10 @@ cleanup_stale_cdot_permits:
   cron: "0 5 * * * America/Chicago"
   class: "CleanupStaleCdotPermitsJob"
 
+backfill_permit_segment_geocoding:
+  cron: "30 5 * * * America/Chicago"
+  class: "BackfillPermitSegmentGeocodingJob"
+
 send_permit_alerts:
   cron: "0 6 * * * America/Chicago"
   class: "SendPermitAlertsJob"

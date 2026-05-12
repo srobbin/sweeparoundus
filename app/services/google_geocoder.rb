@@ -97,10 +97,16 @@ class GoogleGeocoder
       end
       @error_reason = exhausted_retry_reason(e)
       log_warn("#{e.class}: #{e.message} (after #{retries} retries)")
+      Sentry.capture_exception(e, level: :warning, contexts: {
+        google_geocoder: { class: self.class.name, identifier: log_identifier, retries: retries },
+      })
       [nil, true]
     rescue StandardError => e
       @error_reason = "http_error: #{e.message}"
       log_warn("#{e.class}: #{e.message}")
+      Sentry.capture_exception(e, level: :warning, contexts: {
+        google_geocoder: { class: self.class.name, identifier: log_identifier },
+      })
       [nil, true]
     end
   end
@@ -122,6 +128,8 @@ class GoogleGeocoder
       end
       @error_reason = "http_status: #{response.code}"
       log_warn("HTTP #{response.code}")
+      Sentry.capture_message("[#{self.class.name}] HTTP #{response.code}", level: :warning,
+        contexts: { google_geocoder: { identifier: log_identifier } })
       return [nil, true]
     end
 
@@ -160,6 +168,8 @@ class GoogleGeocoder
     else
       @error_reason = "geocode_status: #{json["status"]}"
       log_warn("Unexpected status=#{json["status"]}")
+      Sentry.capture_message("[#{self.class.name}] Unexpected status=#{json["status"]}", level: :warning,
+        contexts: { google_geocoder: { identifier: log_identifier, status: json["status"] } })
       [nil, true]
     end
   end
