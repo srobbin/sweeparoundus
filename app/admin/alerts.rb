@@ -3,14 +3,18 @@ ActiveAdmin.register Alert do
   actions :all, except: [:show]
   config.sort_order = "created_at_desc"
 
+  controller do
+    def scoped_collection
+      super.includes(:area)
+    end
+  end
+
   index do
     column :email
     column :phone
     column :area do |alert|
       if alert.area_id
         link_to alert.area.name, area_url(alert.area), target: "_blank"
-      else
-        nil
       end
     end
     column :street_address do |alert|
