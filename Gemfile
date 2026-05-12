@@ -27,7 +27,7 @@ gem "sassc", "~> 2.4"
 gem 'sidekiq', '~> 7.3'
 gem "sidekiq-cron", "~> 1.11"
 gem "sprockets-rails", "~> 3.5"
-gem "tailwindcss-rails", "~> 0.3"
+gem "tailwindcss-rails", "~> 2.7"
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "stimulus-rails", "~> 1.3"

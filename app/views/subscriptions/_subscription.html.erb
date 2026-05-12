@@ -36,17 +36,17 @@
       <% if has_address %>
         <%= form_with url: update_subscription_path(alert, t: token), method: :patch, class: "mt-1.5", data: { controller: "auto-submit" } do |f| %>
           <label for="<%= toggle_id %>" class="inline-flex items-center cursor-pointer text-xs text-gray-600 select-none">
-            <span class="subscription-toggle">
+            <span class="relative inline-block w-9 h-5 flex-shrink-0">
               <%= f.check_box :permit_notifications,
                     { id: toggle_id,
                       checked: alert.permit_notifications?,
-                      class: "subscription-toggle__input",
+                      class: "peer sr-only",
                       role: "switch",
                       aria: { label: "Temporary No Parking alerts for #{alert.street_address}" },
                       data: { action: "change->auto-submit#submit" } },
                     "1", "0" %>
-              <span class="subscription-toggle__track" aria-hidden="true"></span>
-              <span class="subscription-toggle__thumb" aria-hidden="true"></span>
+              <span class="absolute inset-0 bg-gray-300 rounded-full transition-colors peer-checked:bg-blue-600 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2" aria-hidden="true"></span>
+              <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" aria-hidden="true"></span>
             </span>
             <span class="ml-2">Temporary &ldquo;No Parking&rdquo; alerts</span>
           </label>
