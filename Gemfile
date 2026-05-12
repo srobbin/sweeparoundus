@@ -27,6 +27,8 @@ gem "sassc", "~> 2.4"
 gem "sentry-rails", "~> 6.5"
 gem "sentry-ruby", "~> 6.5"
 gem "sentry-sidekiq", "~> 6.5"
+gem "scout_apm", "~> 6.2"
+gem "scout_apm_logging", "~> 2.1"
 gem "stackprof", "~> 0.2"
 gem 'sidekiq', '~> 7.3'
 gem "sidekiq-cron", "~> 1.11"
