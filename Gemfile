@@ -31,7 +31,7 @@ gem "scout_apm", "~> 6.2"
 gem "scout_apm_logging", "~> 2.1"
 gem "stackprof", "~> 0.2"
 gem 'sidekiq', '~> 7.3'
-gem "sidekiq-cron", "~> 1.11"
+gem "sidekiq-cron", "~> 2.0"
 gem "sprockets-rails", "~> 3.5"
 gem "tailwindcss-rails", "~> 2.7"
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]

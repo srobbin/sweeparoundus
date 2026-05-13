@@ -1,5 +1,5 @@
 send_alerts:
-  cron: "30 9 * * * America/Chicago"
+  cron: "25 22 * * * America/Chicago"
   class: "SendAlertsJob"
 
 sync_cdot_permits:
