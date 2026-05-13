@@ -65,9 +65,19 @@ class SendPermitAlertsJob < ApplicationJob
 
   def mark_permits_notified(permits, alert_ids_by_permit)
     now = Time.current
-    permits.each do |permit|
-      ids = alert_ids_by_permit.fetch(permit.id, []).uniq
-      permit.update!(processed_alert_ids: ids, notifications_sent_at: now)
+
+    with_alerts, without_alerts = permits.partition do |permit|
+      alert_ids_by_permit.fetch(permit.id, []).any?
+    end
+
+    if without_alerts.any?
+      CdotPermit.where(id: without_alerts.map(&:id))
+                .update_all(processed_alert_ids: [], notifications_sent_at: now, updated_at: now)
+    end
+
+    with_alerts.each do |permit|
+      ids = alert_ids_by_permit.fetch(permit.id).uniq
+      permit.update_columns(processed_alert_ids: ids, notifications_sent_at: now, updated_at: now)
     end
   end
 
