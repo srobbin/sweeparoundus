@@ -183,20 +183,31 @@ RSpec.describe "Alerts", type: :request do
     end
 
     context "with an invalid token" do
-      it "raises a JWT decode error" do
-        expect {
-          get unsubscribe_area_alerts_path(area), params: { t: "invalid.token.here" }
-        }.to raise_error(JWT::DecodeError)
+      it "renders the invalid link page" do
+        get unsubscribe_area_alerts_path(area), params: { t: "invalid.token.here" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
+      end
+    end
+
+    context "with no token" do
+      it "renders the invalid link page" do
+        get unsubscribe_area_alerts_path(area)
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
       end
     end
 
     context "with a manage token" do
       let(:token) { encode_manage_jwt(valid_email) }
 
-      it "raises a JWT decode error" do
-        expect {
-          get unsubscribe_area_alerts_path(area), params: { t: token }
-        }.to raise_error(JWT::DecodeError, "Invalid token purpose")
+      it "renders the invalid link page" do
+        get unsubscribe_area_alerts_path(area), params: { t: token }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
       end
     end
   end
@@ -233,20 +244,31 @@ RSpec.describe "Alerts", type: :request do
     end
 
     context "with an invalid token" do
-      it "raises a JWT decode error" do
-        expect {
-          get confirm_area_alerts_path(area), params: { t: "invalid.token.here" }
-        }.to raise_error(JWT::DecodeError)
+      it "renders the invalid link page" do
+        get confirm_area_alerts_path(area), params: { t: "invalid.token.here" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
+      end
+    end
+
+    context "with no token" do
+      it "renders the invalid link page" do
+        get confirm_area_alerts_path(area)
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
       end
     end
 
     context "with a manage token" do
       let(:token) { encode_manage_jwt(valid_email) }
 
-      it "raises a JWT decode error" do
-        expect {
-          get confirm_area_alerts_path(area), params: { t: token }
-        }.to raise_error(JWT::DecodeError, "Invalid token purpose")
+      it "renders the invalid link page" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to include("This link is invalid or has expired")
       end
     end
   end

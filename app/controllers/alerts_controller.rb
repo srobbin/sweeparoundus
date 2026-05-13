@@ -50,10 +50,19 @@ class AlertsController < ApplicationController
   end
 
   def find_alert
-    decoded_params = decode_jwt(params[:t])
+    token = params[:t]
+    return render_invalid_link unless token.present?
+
+    decoded_params = decode_jwt(token)
     email = decoded_params["sub"]
     address = decoded_params["street_address"]
     @alert = Alert.find_by(area: @area, email: email, street_address: address)
+  rescue JWT::DecodeError, JSON::ParserError
+    render_invalid_link
+  end
+
+  def render_invalid_link
+    render "alerts/invalid_link", status: :bad_request
   end
 
   def street_address
