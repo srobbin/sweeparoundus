@@ -19,6 +19,7 @@ ActiveAdmin.register CdotPermit do
     column :street_closure
     column :application_start_date
     column :application_expire_date
+    column :processed_alert_ids
     column :notifications_sent_at
     actions
   end
