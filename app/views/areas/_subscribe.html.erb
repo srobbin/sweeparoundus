@@ -1,9 +1,7 @@
 <div class="space-y-4">
   <div class="border border-gray-200 rounded-lg p-5">
     <h2 class="flex items-center mb-3 text-lg font-semibold text-gray-900">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
+      <%= icon "envelope-simple", class: "h-5 w-5 text-gray-500", aria: { hidden: true } %>
       <span class="ml-2">Email Alerts</span>
     </h2>
     <p class="text-sm text-gray-600 mb-1">Get notified before sweeping day</p>
@@ -14,18 +12,14 @@
 
   <div class="border border-gray-200 rounded-lg p-5">
     <h2 class="flex items-center mb-3 text-lg font-semibold text-gray-900">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
+      <%= icon "calendar-blank", class: "h-5 w-5 text-gray-500", aria: { hidden: true } %>
       <span class="ml-2">Calendar Feed</span>
     </h2>
     <p class="text-sm text-gray-600 mb-3">Add sweep dates to iCal, Google Calendar, or Outlook</p>
     <%= link_to area_url(@area, format: :ics), class: "inline-flex items-center gap-1.5 px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-    </svg>
+    <%= icon "download-simple", class: "h-4 w-4", aria: { hidden: true } %>
     Download
     <% end %>
-    <p class="text-xs text-gray-400 mt-3">May become outdated if the City updates sweep dates mid-season</p>
+    <p class="text-xs text-gray-400 mt-3">May become outdated if the City updates its sweep schedule mid-season</p>
   </div>
 </div>

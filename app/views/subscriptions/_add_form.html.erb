@@ -20,10 +20,7 @@
             data-search-target="submit"
             class="-ml-px relative inline-flex items-center justify-center w-20 px-4 py-2 border border-transparent font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled>
-      <svg data-search-target="spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-      </svg>
+      <%= icon "circle-notch", class: "hidden animate-spin h-5 w-5 text-white", data: { search_target: "spinner" }, aria: { hidden: true } %>
       <span data-search-target="label">Add</span>
     </button>
   </div>
