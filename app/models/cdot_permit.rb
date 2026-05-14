@@ -73,6 +73,10 @@ class CdotPermit < ApplicationRecord
        data_synced_at created_at updated_at]
   end
 
+  def self.ransackable_associations(_ = nil)
+    []
+  end
+
   private
 
   def segment_address(number)
