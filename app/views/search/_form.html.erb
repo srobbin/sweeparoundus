@@ -18,18 +18,12 @@
     <% if variant == :secondary %>
       <button data-search-target="submit" class="-ml-px relative inline-flex items-center space-x-2 px-5 py-3 lg:py-2 border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
         <span data-search-target="label">Search</span>
-        <svg data-search-target="spinner" class="hidden animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
+        <%= icon "circle-notch", class: "hidden animate-spin h-5 w-5", data: { search_target: "spinner" }, aria: { hidden: true } %>
       </button>
     <% else %>
       <button data-search-target="submit" class="-ml-px relative inline-flex items-center space-x-2 px-5 py-3 lg:py-2 border border-transparent font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
         <span data-search-target="label">Search</span>
-        <svg data-search-target="spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
+        <%= icon "circle-notch", class: "hidden animate-spin h-5 w-5 text-white", data: { search_target: "spinner" }, aria: { hidden: true } %>
       </button>
     <% end %>
   </div>
