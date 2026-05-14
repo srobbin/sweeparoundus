@@ -1,6 +1,17 @@
 class ApplicationMailer < ActionMailer::Base
   include JwtHelper
 
+  rescue_from StandardError do |exception|
+    Sentry.set_context("mailer", {
+      mailer: self.class.name,
+      action: action_name,
+      to: message.to,
+      params: params&.transform_values { |v| v.try(:id) || v.class.name },
+    })
+    Sentry.capture_exception(exception)
+    raise
+  end
+
   # Standard small-print disclaimer surfaced at the bottom of any user-facing
   # email that informs subscribers about parking/sweeping/permit data. Lives
   # on the base mailer so the shared footer partial can read it directly
