@@ -38,3 +38,12 @@ Rails.application.configure do
   config.content_security_policy_nonce_directives = %w[script-src]
   config.content_security_policy_report_only = true
 end
+
+# Active Admin uses Sprockets + Arbre which don't propagate CSP nonces onto
+# their <script> tags.  Admin pages are behind authentication so we can safely
+# drop strict-dynamic there and fall back to 'self' + 'unsafe-inline'.
+Rails.application.config.after_initialize do
+  ActiveAdmin::BaseController.content_security_policy do |policy|
+    policy.script_src :self, :unsafe_inline
+  end
+end
