@@ -276,13 +276,14 @@ class SyncCdotPermits
   end
 
   def build_uri(last_unique_key)
-    start_of_today = Time.current.in_time_zone("America/Chicago")
-                          .beginning_of_day
-                          .strftime("%Y-%m-%dT%H:%M:%S")
+    chicago = Time.current.in_time_zone("America/Chicago")
+    start_of_today = chicago.beginning_of_day.strftime("%Y-%m-%dT%H:%M:%S")
+    six_months_ago = (chicago - 6.months).beginning_of_day.strftime("%Y-%m-%dT%H:%M:%S")
 
     predicates = [
       "applicationstatus='Open'",
       "applicationexpiredate>='#{start_of_today}'",
+      "applicationstartdate>='#{six_months_ago}'",
       *REQUIRED_API_FIELDS.map { |f| "#{f} IS NOT NULL" },
     ]
 
