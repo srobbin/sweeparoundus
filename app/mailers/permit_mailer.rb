@@ -28,6 +28,11 @@ class PermitMailer < ApplicationMailer
 
     @manage_url = manage_subscriptions_url(t: encode_manage_jwt(@email, expires_in: 60.days))
 
+    Sentry.logger.info(
+      "permit_mailer.notify alert_id=%{alert_id} matches_count=%{matches_count}",
+      alert_id: @alert.id, matches_count: @matches.size,
+    )
+
     mail(to: @email, subject: subject_line)
   end
 

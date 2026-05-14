@@ -120,6 +120,8 @@ class SyncCdotPermits
         skipped += unusable_rows.size
         Rails.logger.warn("[SyncCdotPermits] Skipped #{unusable_rows.size} row(s) " \
                           "with missing required fields or unexpected uniquekey format")
+        Sentry.logger.warn("sync_cdot_permits.unusable_rows skipped_count=%{skipped_count} page=%{page}",
+          skipped_count: unusable_rows.size, page: pages)
       end
 
       usable_rows.each { |row| key_widths << row["uniquekey"].length }
@@ -185,11 +187,17 @@ class SyncCdotPermits
       Rails.logger.warn("[SyncCdotPermits] uniquekey widths drifted across pages: " \
                         "#{key_widths.sort.inspect}. Lexicographic ordering will diverge " \
                         "from numeric ordering; pagination remains self-consistent.")
+      Sentry.logger.warn("sync_cdot_permits.key_width_drift widths=%{widths}",
+        widths: key_widths.sort.inspect)
     end
 
     message = "SUCCESS: created=#{created} updated=#{updated} unchanged=#{unchanged} " \
               "skipped=#{skipped} (#{pages} pages)"
     Rails.logger.info("[SyncCdotPermits] #{message}")
+    Sentry.logger.info(
+      "sync_cdot_permits.completed created=%{created} updated=%{updated} unchanged=%{unchanged} skipped=%{skipped} pages=%{pages}",
+      created: created, updated: updated, unchanged: unchanged, skipped: skipped, pages: pages,
+    )
     message
   rescue => e
     Rails.logger.error("[SyncCdotPermits] Failed after #{pages} pages " \

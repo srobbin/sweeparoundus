@@ -10,4 +10,7 @@ Sentry.init do |config|
     "ActionController::RoutingError",
     "ActiveRecord::RecordNotFound",
   ]
+
+  config.enable_logs = true
+  config.enabled_patches << :logger
 end
