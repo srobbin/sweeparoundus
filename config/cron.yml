@@ -15,5 +15,5 @@ backfill_permit_segment_geocoding:
   class: "BackfillPermitSegmentGeocodingJob"
 
 send_permit_alerts:
-  cron: "30 10 * * * America/Chicago"
+  cron: "50 10 * * * America/Chicago"
   class: "SendPermitAlertsJob"
