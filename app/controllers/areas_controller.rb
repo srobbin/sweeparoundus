@@ -9,7 +9,7 @@ class AreasController < ApplicationController
     respond_to do |format|
       format.html
       format.ics do
-        Sentry::Metrics.count("ics_calendar.downloaded", 1, attributes: { area: @area.shortcode })
+        Sentry.metrics.count("ics_calendar.downloaded", value: 1, attributes: { area: @area.shortcode })
         send_data calendar, filename: "#{ENV["SITE_NAME"].gsub(" ", "")}_#{@area.shortcode}.ics"
       end
     end
