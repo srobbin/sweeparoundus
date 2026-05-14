@@ -18,7 +18,7 @@ class SearchController < ApplicationController
     @area = Area.find_by_coordinates(geocoded.lat, geocoded.lng)
 
     if @area
-      Sentry::Metrics.count("search.area_found", 1, attributes: { area: @area.shortcode })
+      Sentry.metrics.count("search.area_found", value: 1, attributes: { area: @area.shortcode })
       session[:search_lat] = geocoded.lat
       session[:search_lng] = geocoded.lng
       session[:search_area_id] = @area.id
