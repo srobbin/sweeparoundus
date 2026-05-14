@@ -48,6 +48,10 @@ class SendPermitAlertsJob < ApplicationJob
         "segment=#{permit.segment_label.inspect} " \
         "matched=#{affected.size} notified=#{notifiable_alerts.size}"
       )
+      Sentry.logger.info(
+        "send_permit_alerts.permit_matched permit_key=%{permit_key} matched=%{matched} notified=%{notified}",
+        permit_key: permit.unique_key, matched: affected.size, notified: notifiable_alerts.size,
+      )
     end
 
     enqueued_count = 0
@@ -88,6 +92,11 @@ class SendPermitAlertsJob < ApplicationJob
       "#{pre_filter_skipped} pre-filtered, " \
       "#{permits_with_alerts} had notifiable alerts, " \
       "#{enqueued_count} email(s) enqueued"
+    )
+    Sentry.logger.info(
+      "send_permit_alerts.completed permits_scanned=%{permits_scanned} pre_filter_skipped=%{pre_filter_skipped} permits_with_alerts=%{permits_with_alerts} emails_enqueued=%{emails_enqueued}",
+      permits_scanned: permits.size, pre_filter_skipped: pre_filter_skipped,
+      permits_with_alerts: permits_with_alerts, emails_enqueued: enqueued_count,
     )
   end
 

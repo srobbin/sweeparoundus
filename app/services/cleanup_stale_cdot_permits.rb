@@ -16,6 +16,11 @@ class CleanupStaleCdotPermits
       expired: expiration_cutoff, stale: sync_cutoff
     ).delete_all
 
+    Sentry.logger.info(
+      "cleanup_stale_permits.completed deleted_count=%{deleted_count}",
+      deleted_count: count, expiration_cutoff: expiration_cutoff.iso8601, sync_cutoff: sync_cutoff.iso8601,
+    )
+
     "SUCCESS: deleted #{count} stale permit(s) " \
       "(expired before #{expiration_cutoff.iso8601} AND not synced since #{sync_cutoff.iso8601})"
   rescue => e

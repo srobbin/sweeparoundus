@@ -43,6 +43,11 @@ class GeocodePermitSegmentJob < ApplicationJob
       segment_to_lat: to_result.lat,
       segment_to_lng: to_result.lng,
     )
+
+    Sentry.logger.info(
+      "geocode_permit_segment.completed permit_id=%{permit_id} unique_key=%{unique_key}",
+      permit_id: permit.id, unique_key: permit.unique_key,
+    )
   end
 
   def geocode_address(address)
@@ -56,6 +61,10 @@ class GeocodePermitSegmentJob < ApplicationJob
         "[GeocodePermitSegmentJob] Geocode failed",
         level: :warning,
         contexts: { geocode: { address: address, reason: service.error_reason } },
+      )
+      Sentry.logger.warn(
+        "geocode_permit_segment.geocode_failed address=%{address} reason=%{reason}",
+        address: address, reason: service.error_reason,
       )
     end
 
