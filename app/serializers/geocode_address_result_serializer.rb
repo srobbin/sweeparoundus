@@ -2,7 +2,7 @@
 # passed as a mailer param). Only lat and lng are persisted.
 class GeocodeAddressResultSerializer < ActiveJob::Serializers::ObjectSerializer
   def serialize(result)
-    super("lat" => result.lat, "lng" => result.lng)
+    super("lat" => result.lat.to_f, "lng" => result.lng.to_f)
   end
 
   def deserialize(hash)
