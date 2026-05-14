@@ -15,6 +15,11 @@ class SendPermitAlertsJob < ApplicationJob
     matches_by_alert_id = {}
     alert_ids_by_permit = {}
 
+    Sentry.set_context("job_params", {
+      permits_in_scope: permits.size,
+      permit_keys: permits.map(&:unique_key),
+    })
+
     permits.each do |permit|
       alert_ids_by_permit[permit.id] = []
 
@@ -45,19 +50,44 @@ class SendPermitAlertsJob < ApplicationJob
       )
     end
 
+    enqueued_count = 0
+
+    # Stamps and mailer enqueues share a transaction so a failure in either
+    # rolls back both — preventing permits from being marked "sent" without
+    # emails actually being enqueued. Rails 7.2 defers the Redis push until
+    # after commit (enqueue_after_transaction_commit: :always).
     ActiveRecord::Base.transaction do
       mark_permits_notified(permits, alert_ids_by_permit)
+
+      matches_by_alert_id.each_value do |bucket|
+        PermitMailer.with(alert: bucket[:alert], matches: bucket[:matches]).notify.deliver_later
+        enqueued_count += 1
+      end
     end
 
-    matches_by_alert_id.each_value do |bucket|
-      PermitMailer.with(alert: bucket[:alert], matches: bucket[:matches]).notify.deliver_later
+    summary = {
+      permits_scanned: permits.size,
+      pre_filter_skipped: pre_filter_skipped,
+      permits_with_alerts: permits_with_alerts,
+      emails_enqueued: enqueued_count,
+      alert_ids_notified: matches_by_alert_id.keys,
+    }
+
+    Sentry.set_context("job_result", summary)
+
+    if enqueued_count.zero? && permits_with_alerts.positive?
+      Sentry.capture_message(
+        "[SendPermitAlertsJob] Had notifiable matches but enqueued 0 emails",
+        level: :error,
+        contexts: { job_result: summary },
+      )
     end
 
     Rails.logger.info(
       "[SendPermitAlertsJob] SUCCESS: scanned #{permits.size} permit(s), " \
       "#{pre_filter_skipped} pre-filtered, " \
       "#{permits_with_alerts} had notifiable alerts, " \
-      "#{matches_by_alert_id.size} email(s) enqueued"
+      "#{enqueued_count} email(s) enqueued"
     )
   end
 
@@ -75,9 +105,13 @@ class SendPermitAlertsJob < ApplicationJob
                 .update_all(processed_alert_ids: [], notifications_sent_at: now, updated_at: now)
     end
 
-    with_alerts.each do |permit|
-      ids = alert_ids_by_permit.fetch(permit.id).uniq
-      permit.update_columns(processed_alert_ids: ids, notifications_sent_at: now, updated_at: now)
+    if with_alerts.any?
+      rows = with_alerts.map do |permit|
+        ids = alert_ids_by_permit.fetch(permit.id).uniq
+        { id: permit.id, unique_key: permit.unique_key, processed_alert_ids: ids, notifications_sent_at: now }
+      end
+
+      CdotPermit.upsert_all(rows, unique_by: :id, update_only: %i[processed_alert_ids notifications_sent_at])
     end
   end
 

@@ -280,6 +280,58 @@ RSpec.describe SendPermitAlertsJob do
       end
     end
 
+    context "when different permits match different alerts" do
+      let!(:permit_x) do
+        create_permit(unique_key: "7000001",
+                      application_start_date: chicago_tomorrow_start + 9.hours)
+      end
+      let!(:permit_y) do
+        create_permit(unique_key: "7000002",
+                      application_start_date: chicago_tomorrow_start + 9.hours)
+      end
+
+      let(:line_from) { GeocodeAddress::Result.new(lat: 41.94142, lng: -87.69870) }
+      let(:line_to)   { GeocodeAddress::Result.new(lat: 41.94284, lng: -87.69870) }
+
+      let(:alert_for_x) do
+        build_stubbed(:alert, :confirmed, area: area, email: "x@example.com",
+                      street_address: "100 Main", lat: 41.942, lng: -87.6987,
+                      permit_notifications: true)
+      end
+      let(:alert_for_y) do
+        build_stubbed(:alert, :confirmed, area: area, email: "y@example.com",
+                      street_address: "200 Main", lat: 41.943, lng: -87.6987,
+                      permit_notifications: true)
+      end
+
+      before do
+        allow(FindCdotPermitAffectedAlerts).to receive(:new) do |permit:|
+          affected = case permit
+                     when permit_x
+                       [FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_x, distance_feet: 50)]
+                     when permit_y
+                       [FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_y, distance_feet: 75)]
+                     end
+          instance_double(
+            FindCdotPermitAffectedAlerts,
+            call: affected,
+            line_from: line_from,
+            line_to: line_to,
+            pre_filter_skipped?: false,
+          )
+        end
+
+        allow(PermitMailer).to receive_message_chain(:with, :notify, :deliver_later)
+      end
+
+      it "stamps each permit with only its own matching alert IDs" do
+        described_class.new.perform
+
+        expect(permit_x.reload.processed_alert_ids).to eq([alert_for_x.id])
+        expect(permit_y.reload.processed_alert_ids).to eq([alert_for_y.id])
+      end
+    end
+
     context "when no affected alerts are notifiable" do
       let!(:permit) do
         create_permit(unique_key: "3000001",
