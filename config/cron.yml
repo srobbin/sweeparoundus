@@ -1,7 +1,3 @@
-send_alerts:
-  cron: "0 10 * * * America/Chicago"
-  class: "SendAlertsJob"
-
 sync_cdot_permits:
   cron: "0 4 * * * America/Chicago"
   class: "SyncCdotPermitsJob"
@@ -15,5 +11,9 @@ backfill_permit_segment_geocoding:
   class: "BackfillPermitSegmentGeocodingJob"
 
 send_permit_alerts:
-  cron: "30 12 * * * America/Chicago"
+  cron: "0 6 * * * America/Chicago"
   class: "SendPermitAlertsJob"
+
+send_alerts:
+  cron: "0 10 * * * America/Chicago"
+  class: "SendAlertsJob"
