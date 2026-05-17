@@ -16,7 +16,7 @@ class AddUniqueIndexOnAlertsSubscription < ActiveRecord::Migration[7.2]
       )
     SQL
 
-    add_index :alerts, [:email, :street_address],
+    add_index :alerts, [ :email, :street_address ],
       unique: true,
       name: "index_alerts_on_subscription_uniqueness"
   end

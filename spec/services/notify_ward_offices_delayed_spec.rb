@@ -11,7 +11,7 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
     allow(File).to receive(:exist?).with(csv_path).and_return(true)
   end
 
-  def csv_table(rows, headers: ["WARD", "ALDERMAN", "EMAIL"])
+  def csv_table(rows, headers: [ "WARD", "ALDERMAN", "EMAIL" ])
     CSV::Table.new(rows.map { |values| CSV::Row.new(headers, values) })
   end
 
@@ -22,8 +22,8 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
       before do
         allow(CSV).to receive(:read).with(csv_path, headers: true).and_return(
           csv_table([
-            ["1", "La Spata, Daniel", "Ward01@cityofchicago.org"],
-            ["2", "Hopkins, Brian", "office@aldermanhopkins.com"],
+            [ "1", "La Spata, Daniel", "Ward01@cityofchicago.org" ],
+            [ "2", "Hopkins, Brian", "office@aldermanhopkins.com" ]
           ])
         )
       end
@@ -47,8 +47,8 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
       before do
         allow(CSV).to receive(:read).with(csv_path, headers: true).and_return(
           csv_table([
-            ["1", "La Spata, Daniel", "Ward01@cityofchicago.org"],
-            ["2", "Hopkins, Brian", "office@aldermanhopkins.com"],
+            [ "1", "La Spata, Daniel", "Ward01@cityofchicago.org" ],
+            [ "2", "Hopkins, Brian", "office@aldermanhopkins.com" ]
           ])
         )
         allow(WardOfficeMailer).to receive(:with).and_return(mailer_dbl)
@@ -81,21 +81,21 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
 
       it 'marks notified offices in the CSV with DELAY_NOTIFIED' do
         subject
-        expect(csv_output).to include(["WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED"])
-        expect(csv_output).to include(["1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true"])
-        expect(csv_output).to include(["2", "Hopkins, Brian", "office@aldermanhopkins.com", "true"])
+        expect(csv_output).to include([ "WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED" ])
+        expect(csv_output).to include([ "1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true" ])
+        expect(csv_output).to include([ "2", "Hopkins, Brian", "office@aldermanhopkins.com", "true" ])
       end
     end
 
     context 'when a row has already been notified of delay' do
-      let(:headers) { ["WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED"] }
+      let(:headers) { [ "WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED" ] }
 
       before do
         allow(CSV).to receive(:read).with(csv_path, headers: true).and_return(
           csv_table(
             [
-              ["1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true"],
-              ["2", "Hopkins, Brian", "office@aldermanhopkins.com", nil],
+              [ "1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true" ],
+              [ "2", "Hopkins, Brian", "office@aldermanhopkins.com", nil ]
             ],
             headers: headers,
           )
@@ -136,8 +136,8 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
 
         it 'preserves existing DELAY_NOTIFIED flags and marks new ones' do
           subject
-          expect(csv_output).to include(["1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true"])
-          expect(csv_output).to include(["2", "Hopkins, Brian", "office@aldermanhopkins.com", "true"])
+          expect(csv_output).to include([ "1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true" ])
+          expect(csv_output).to include([ "2", "Hopkins, Brian", "office@aldermanhopkins.com", "true" ])
         end
       end
     end
@@ -149,10 +149,10 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
         allow(CSV).to receive(:read).with(csv_path, headers: true).and_return(
           csv_table(
             [
-              ["1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true"],
-              ["2", "Hopkins, Brian", "office@aldermanhopkins.com", "true"],
+              [ "1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true" ],
+              [ "2", "Hopkins, Brian", "office@aldermanhopkins.com", "true" ]
             ],
-            headers: ["WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED"],
+            headers: [ "WARD", "ALDERMAN", "EMAIL", "DELAY_NOTIFIED" ],
           )
         )
       end
@@ -178,8 +178,8 @@ RSpec.describe NotifyWardOfficesDelayed, type: :service do
       before do
         allow(CSV).to receive(:read).with(csv_path, headers: true).and_return(
           csv_table([
-            ["1", "La Spata, Daniel", "Ward01@cityofchicago.org"],
-            ["2", "Hopkins, Brian", ""],
+            [ "1", "La Spata, Daniel", "Ward01@cityofchicago.org" ],
+            [ "2", "Hopkins, Brian", "" ]
           ])
         )
       end

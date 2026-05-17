@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CarryOverExistingAlerts, type: :service do
-  subject { described_class.new(write: true).call}
+  subject { described_class.new(write: true).call }
   let!(:alert) { create(:alert, :confirmed, street_address: street_address) }
   let(:street_address) { '2741 N Central Park Ave, Chicago, IL 60647' }
 
@@ -10,7 +10,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
     stub_const("GoogleGeocoder::RETRY_BASE_DELAY", 0)
     stub_request(:get, /maps.googleapis.com/)
       .to_return(body: File.read(Rails.root.join('spec', 'fixtures', 'google_maps_response.json')))
-    allow(Area).to receive(:where).and_return([alert.area])
+    allow(Area).to receive(:where).and_return([ alert.area ])
   end
 
   context 'when alerts have valid addresses' do

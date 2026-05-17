@@ -1,5 +1,5 @@
 ActiveAdmin.register CdotPermit do
-  actions :all, except: [:new, :create, :destroy]
+  actions :all, except: [ :new, :create, :destroy ]
   config.sort_order = "application_start_date_desc"
 
   permit_params :application_status, :application_start_date, :application_end_date,

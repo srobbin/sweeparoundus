@@ -34,7 +34,7 @@ class SyncCdotPermits
     Errno::ETIMEDOUT,
     EOFError,
     SocketError,
-    OpenSSL::SSL::SSLError,
+    OpenSSL::SSL::SSLError
   ].freeze
 
   GEO_FACTORY = RGeo::Geographic.spherical_factory(srid: 4326)
@@ -77,7 +77,7 @@ class SyncCdotPermits
     "xcoordinate"                  => :x_coordinate,
     "ycoordinate"                  => :y_coordinate,
     "latitude"                     => :latitude,
-    "longitude"                    => :longitude,
+    "longitude"                    => :longitude
   }.freeze
 
   DATE_FIELDS = %i[
@@ -200,7 +200,7 @@ class SyncCdotPermits
       updated: updated,
       unchanged: unchanged,
       skipped: skipped,
-      last_unique_key: last_unique_key,
+      last_unique_key: last_unique_key
     })
     raise
   end
@@ -253,7 +253,7 @@ class SyncCdotPermits
 
   def retry_delay(error, retries)
     if error.is_a?(HttpError) && error.retry_after_seconds
-      [error.retry_after_seconds, MAX_RETRY_AFTER].min
+      [ error.retry_after_seconds, MAX_RETRY_AFTER ].min
     else
       RETRY_BASE_DELAY * (2**(retries - 1))
     end
@@ -265,7 +265,7 @@ class SyncCdotPermits
     return nil if value.blank?
 
     if value =~ /\A\s*\d+\s*\z/
-      [value.to_i, 0].max
+      [ value.to_i, 0 ].max
     else
       delta = (Time.httpdate(value) - Time.now).to_i
       delta.positive? ? delta : 0
@@ -283,7 +283,7 @@ class SyncCdotPermits
       "applicationstatus='Open'",
       "applicationexpiredate>='#{start_of_today}'",
       "applicationstartdate>='#{six_months_ago}'",
-      *REQUIRED_API_FIELDS.map { |f| "#{f} IS NOT NULL" },
+      *REQUIRED_API_FIELDS.map { |f| "#{f} IS NOT NULL" }
     ]
 
     if last_unique_key
@@ -342,5 +342,4 @@ class SyncCdotPermits
       GeocodePermitSegmentJob.set(wait: i * GEOCODE_JOB_STAGGER).perform_later(permit.id)
     end
   end
-
 end

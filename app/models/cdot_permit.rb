@@ -8,7 +8,7 @@ class CdotPermit < ApplicationRecord
   # Returns a 2-element array (from_address, to_address). Either entry may be
   # nil if the underlying fields are missing.
   def segment_addresses
-    [segment_address(street_number_from), segment_address(street_number_to)]
+    [ segment_address(street_number_from), segment_address(street_number_to) ]
   end
 
   # A short human-readable label for the construction segment, e.g.
@@ -26,7 +26,7 @@ class CdotPermit < ApplicationRecord
       end
     return nil if range.blank?
 
-    [range, direction, street_name, suffix].compact_blank.join(" ")
+    [ range, direction, street_name, suffix ].compact_blank.join(" ")
   end
 
   # Title-cased street name for prose, e.g. "California Ave". Drops the
@@ -37,7 +37,7 @@ class CdotPermit < ApplicationRecord
   def display_street
     return nil if street_name.blank?
 
-    [smart_titlecase(street_name), smart_titlecase(suffix).presence].compact.join(" ").presence
+    [ smart_titlecase(street_name), smart_titlecase(suffix).presence ].compact.join(" ").presence
   end
 
   def segment_geocoded?
@@ -91,8 +91,7 @@ class CdotPermit < ApplicationRecord
   def segment_address(number)
     return nil if number.blank? || direction.blank? || street_name.blank?
 
-    parts = [number, direction, street_name, suffix].compact_blank
+    parts = [ number, direction, street_name, suffix ].compact_blank
     "#{parts.join(' ')}, Chicago, IL"
   end
-
 end

@@ -43,14 +43,14 @@ RSpec.describe SyncCdotPermits, type: :service do
       "xcoordinate"                  => "1154233.0",
       "ycoordinate"                  => "1917079.0",
       "latitude"                     => "41.885",
-      "longitude"                    => "-87.706",
+      "longitude"                    => "-87.706"
     }.merge(overrides)
   end
 
   describe "#call" do
     context "single page of results" do
       before do
-        rows = [build_api_row("1000001"), build_api_row("1000002")]
+        rows = [ build_api_row("1000001"), build_api_row("1000002") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -115,8 +115,8 @@ RSpec.describe SyncCdotPermits, type: :service do
       before { stub_const("SyncCdotPermits::PAGE_SIZE", 3) }
 
       it "appends uniquekey cursor predicate on subsequent pages" do
-        page1 = [build_api_row("2000001"), build_api_row("2000002"), build_api_row("2000003")]
-        page2 = [build_api_row("3000001")]
+        page1 = [ build_api_row("2000001"), build_api_row("2000002"), build_api_row("2000003") ]
+        page2 = [ build_api_row("3000001") ]
 
         page1_stub = stub_request(:get, api_url_pattern)
           .with { |req| !req.uri.to_s.include?("uniquekey%3E") }
@@ -161,7 +161,7 @@ RSpec.describe SyncCdotPermits, type: :service do
         create(:cdot_permit, unique_key: "1000001", application_status: "Open",
                street_name: "CALIFORNIA", application_start_date: "2026-06-01")
 
-        rows = [build_api_row("1000001", "streetname" => "DAMEN")]
+        rows = [ build_api_row("1000001", "streetname" => "DAMEN") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -207,7 +207,7 @@ RSpec.describe SyncCdotPermits, type: :service do
 
           travel 1.hour
 
-          rows = [build_api_row("1000001")]
+          rows = [ build_api_row("1000001") ]
           stub_request(:get, api_url_pattern)
             .to_return(status: 200, body: rows.to_json,
                        headers: { "Content-Type" => "application/json" })
@@ -274,7 +274,7 @@ RSpec.describe SyncCdotPermits, type: :service do
       end
 
       it "retries on 5xx and succeeds if a later attempt passes" do
-        rows = [build_api_row("1000001")]
+        rows = [ build_api_row("1000001") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 503, body: "Unavailable")
           .then.to_return(status: 200, body: rows.to_json,
@@ -286,7 +286,7 @@ RSpec.describe SyncCdotPermits, type: :service do
       end
 
       it "retries on 429 rate-limit responses" do
-        rows = [build_api_row("1000001")]
+        rows = [ build_api_row("1000001") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 429, body: "Rate limited")
           .then.to_return(status: 200, body: rows.to_json,
@@ -379,7 +379,7 @@ RSpec.describe SyncCdotPermits, type: :service do
         rows = [
           build_api_row("1000001"),
           build_api_row("KEY' OR 1=1--"),
-          build_api_row("not-numeric"),
+          build_api_row("not-numeric")
         ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
@@ -398,7 +398,7 @@ RSpec.describe SyncCdotPermits, type: :service do
         # invalid cursor key on the last row to trigger the guard.
         stub_const("SyncCdotPermits::PAGE_SIZE", 2)
 
-        page1 = [build_api_row("1000001"), build_api_row("1000002", "uniquekey" => "BOGUS")]
+        page1 = [ build_api_row("1000001"), build_api_row("1000002", "uniquekey" => "BOGUS") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: page1.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -409,7 +409,7 @@ RSpec.describe SyncCdotPermits, type: :service do
 
     context "when latitude/longitude are missing" do
       it "sets location to nil" do
-        rows = [build_api_row("1000001", "latitude" => nil, "longitude" => nil)]
+        rows = [ build_api_row("1000001", "latitude" => nil, "longitude" => nil) ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -422,7 +422,7 @@ RSpec.describe SyncCdotPermits, type: :service do
 
     context "when latitude/longitude are non-numeric" do
       it "sets location to nil but preserves other attributes" do
-        rows = [build_api_row("1000001", "latitude" => "invalid", "longitude" => "bad")]
+        rows = [ build_api_row("1000001", "latitude" => "invalid", "longitude" => "bad") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -473,7 +473,7 @@ RSpec.describe SyncCdotPermits, type: :service do
           build_api_row("1000001"),
           build_api_row("1000002", "streetname" => ""),
           build_api_row("1000003", "direction" => "  "),
-          build_api_row("1000004", "streetnumberfrom" => nil),
+          build_api_row("1000004", "streetnumberfrom" => nil)
         ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
@@ -490,7 +490,7 @@ RSpec.describe SyncCdotPermits, type: :service do
         freeze_time do
           rows = [
             build_api_row("1000001"),
-            build_api_row("1000002", "streetname" => nil),
+            build_api_row("1000002", "streetname" => nil)
           ]
           stub_request(:get, api_url_pattern)
             .to_return(status: 200, body: rows.to_json,
@@ -509,8 +509,8 @@ RSpec.describe SyncCdotPermits, type: :service do
       it "updates an existing permit encountered on a later page" do
         create(:cdot_permit, unique_key: "3000001", street_name: "CALIFORNIA")
 
-        page1 = [build_api_row("2000001"), build_api_row("2000002")]
-        page2 = [build_api_row("3000001", "streetname" => "DAMEN")]
+        page1 = [ build_api_row("2000001"), build_api_row("2000002") ]
+        page2 = [ build_api_row("3000001", "streetname" => "DAMEN") ]
 
         stub_request(:get, api_url_pattern)
           .with { |req| !req.uri.to_s.include?("uniquekey%3E") }
@@ -533,7 +533,7 @@ RSpec.describe SyncCdotPermits, type: :service do
 
     context "segment geocoding enqueuing" do
       it "enqueues a geocode job for new permits" do
-        rows = [build_api_row("1000001"), build_api_row("1000002")]
+        rows = [ build_api_row("1000001"), build_api_row("1000002") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -550,7 +550,7 @@ RSpec.describe SyncCdotPermits, type: :service do
                segment_from_lat: 1.0, segment_from_lng: 2.0,
                segment_to_lat: 3.0, segment_to_lng: 4.0)
 
-        rows = [build_api_row("1000001", "streetname" => "DAMEN")]
+        rows = [ build_api_row("1000001", "streetname" => "DAMEN") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -586,7 +586,7 @@ RSpec.describe SyncCdotPermits, type: :service do
           segment_from_lat: 41.94142, segment_from_lng: -87.69870,
           segment_to_lat: 41.94284, segment_to_lng: -87.69870)
 
-        rows = [build_api_row("1000001")]
+        rows = [ build_api_row("1000001") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -604,7 +604,7 @@ RSpec.describe SyncCdotPermits, type: :service do
                segment_from_lat: nil, segment_from_lng: nil,
                segment_to_lat: nil, segment_to_lng: nil)
 
-        rows = [build_api_row("1000001", "detail" => "new detail")]
+        rows = [ build_api_row("1000001", "detail" => "new detail") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -617,9 +617,9 @@ RSpec.describe SyncCdotPermits, type: :service do
 
     context "date parsing edge cases" do
       it "sets date fields to nil when the API returns unparseable date strings" do
-        rows = [build_api_row("1000001",
+        rows = [ build_api_row("1000001",
           "applicationstartdate" => "not-a-date",
-          "applicationenddate"   => "garbage")]
+          "applicationenddate"   => "garbage") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
                      headers: { "Content-Type" => "application/json" })

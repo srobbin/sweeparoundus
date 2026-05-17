@@ -20,8 +20,8 @@ RSpec.describe WardOfficeMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq([ENV["DEFAULT_EMAIL"]])
-      expect(mail.to).to eq(["Ward01@cityofchicago.org"])
+      expect(mail.from).to eq([ ENV["DEFAULT_EMAIL"] ])
+      expect(mail.to).to eq([ "Ward01@cityofchicago.org" ])
       expect(mail.subject).to eq("Street sweeping reminder resource - #{Time.current.year} schedules live")
     end
 
@@ -69,8 +69,8 @@ RSpec.describe WardOfficeMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq([ENV["DEFAULT_EMAIL"]])
-      expect(mail.to).to eq(["Ward01@cityofchicago.org"])
+      expect(mail.from).to eq([ ENV["DEFAULT_EMAIL"] ])
+      expect(mail.to).to eq([ "Ward01@cityofchicago.org" ])
       expect(mail.subject).to eq("#{Time.current.year} Chicago street sweeping data delayed")
     end
 

@@ -7,7 +7,7 @@ class GeocodePermitSegmentJob < ApplicationJob
       "#{error.class}: #{error.message}"
     )
     Sentry.capture_exception(error, contexts: {
-      geocode_permit_segment: { cdot_permit_id: job.arguments.first },
+      geocode_permit_segment: { cdot_permit_id: job.arguments.first }
     })
   end
 

@@ -26,15 +26,15 @@ RSpec.describe SeedYearlyData, type: :model do
         expect(subject).to eq("TEST: 1 sweeps and 1 areas to be deleted; geojson and schedule files opened without error")
       end
 
-      context 'when an error occurs' do  
+      context 'when an error occurs' do
         before do
           allow_any_instance_of(described_class).to receive(:import_geojson_data).and_raise(StandardError.new('Uh oh'))
         end
-  
+
         it 'returns an error message' do
           expect(subject).to eq('TEST ERROR: Uh oh')
         end
-  
+
         it 'does not change the count of Sweep and Area' do
           expect { subject }.not_to change { Sweep.count }
           expect { subject }.not_to change { Area.count }
@@ -51,16 +51,16 @@ RSpec.describe SeedYearlyData, type: :model do
         allow_any_instance_of(described_class).to receive(:import_geojson_data)
         allow_any_instance_of(described_class).to receive(:import_schedule_data)
       end
-      
-      context 'when an error occurs' do  
+
+      context 'when an error occurs' do
         before do
           allow_any_instance_of(described_class).to receive(:import_geojson_data).and_raise(StandardError.new('Test error'))
         end
-  
+
         it 'returns an error message' do
           expect(subject).to eq('ERROR: Failed to seed yearly data - Test error')
         end
-  
+
         it 'does not change the count of Sweep and Area' do
           expect { subject }.not_to change { Sweep.count }
           expect { subject }.not_to change { Area.count }

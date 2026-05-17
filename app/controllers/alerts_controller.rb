@@ -3,8 +3,8 @@ class AlertsController < ApplicationController
   include SearchContext
 
   before_action :find_area
-  before_action :set_search_context, only: [:create]
-  before_action :find_alert, only: [:unsubscribe, :confirm]
+  before_action :set_search_context, only: [ :create ]
+  before_action :find_alert, only: [ :unsubscribe, :confirm ]
 
   def new
     @alert = @area.alerts.new
@@ -67,7 +67,7 @@ class AlertsController < ApplicationController
 
   def street_address
     session[:is_save_street_address_checked] = save_street_address?
-    return nil unless save_street_address?  
+    return nil unless save_street_address?
     session[:street_address]
   end
 

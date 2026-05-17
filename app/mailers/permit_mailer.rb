@@ -21,7 +21,7 @@ class PermitMailer < ApplicationMailer
     Sentry.set_context("permit_mailer", {
       alert_id: @alert.id,
       to: @email,
-      raw_matches_count: Array(params[:matches]).size,
+      raw_matches_count: Array(params[:matches]).size
     })
 
     @matches = Array(params[:matches]).map { |m| build_match(m) }
@@ -50,7 +50,7 @@ class PermitMailer < ApplicationMailer
         distance_feet: attrs[:distance_feet],
         line_from_class: attrs[:line_from].class.name,
         line_to_class: attrs[:line_to].class.name,
-        attrs_keys: attrs.keys.map(&:to_s),
+        attrs_keys: attrs.keys.map(&:to_s)
       },
     ))
 

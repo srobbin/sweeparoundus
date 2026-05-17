@@ -29,7 +29,7 @@ RSpec.describe PermitMailer, type: :mailer do
   let(:distance_feet) { 95 }
 
   let(:matches) do
-    [{ permit: permit, distance_feet: distance_feet, line_from: line_from, line_to: line_to }]
+    [ { permit: permit, distance_feet: distance_feet, line_from: line_from, line_to: line_to } ]
   end
 
   let(:html_body) do
@@ -52,7 +52,7 @@ RSpec.describe PermitMailer, type: :mailer do
 
   describe "#notify email" do
     it "has the right envelope" do
-      expect(mail.from).to eq(["info@wethesweeple.com"])
+      expect(mail.from).to eq([ "info@wethesweeple.com" ])
       expect(mail.to).to include(alert.email)
       expect(mail.subject).to eq("Temporary No Parking on California Ave")
     end
@@ -157,7 +157,7 @@ RSpec.describe PermitMailer, type: :mailer do
       let(:matches) do
         [
           { permit: permit, distance_feet: 95, line_from: line_from, line_to: line_to },
-          { permit: second_permit, distance_feet: 200, line_from: second_line_from, line_to: second_line_to },
+          { permit: second_permit, distance_feet: 200, line_from: second_line_from, line_to: second_line_to }
         ]
       end
 

@@ -50,12 +50,12 @@ class AlertStaticMap
   def extract_polygon_coords
     shape = @area.shape
     ring = case shape.geometry_type.type_name
-           when "Polygon"      then shape.exterior_ring
-           when "MultiPolygon" then shape.first&.exterior_ring
-           end
+    when "Polygon"      then shape.exterior_ring
+    when "MultiPolygon" then shape.first&.exterior_ring
+    end
     return [] unless ring
 
-    points = ring.points.map { |p| [p.y, p.x] } # [lat, lng]
+    points = ring.points.map { |p| [ p.y, p.x ] } # [lat, lng]
     downsample(points)
   end
 

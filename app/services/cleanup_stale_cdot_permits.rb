@@ -28,8 +28,8 @@ class CleanupStaleCdotPermits
     Sentry.capture_exception(e, contexts: {
       cleanup_stale_cdot_permits: {
         expiration_cutoff: expiration_cutoff.iso8601,
-        sync_cutoff: sync_cutoff.iso8601,
-      },
+        sync_cutoff: sync_cutoff.iso8601
+      }
     })
     raise
   end

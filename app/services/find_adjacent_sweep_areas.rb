@@ -50,7 +50,7 @@ class FindAdjacentSweepAreas
 
   def geometry_point_sql
     @geometry_point_sql ||= Area.sanitize_sql_array(
-      ["ST_MakePoint(?, ?)", @lng, @lat]
+      [ "ST_MakePoint(?, ?)", @lng, @lat ]
     )
   end
 

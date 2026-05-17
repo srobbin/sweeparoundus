@@ -16,7 +16,7 @@ class BackfillPermitSegmentGeocodingJob < ApplicationJob
   rescue StandardError => e
     Rails.logger.error("[BackfillPermitSegmentGeocodingJob] #{e.class}: #{e.message}")
     Sentry.capture_exception(e, contexts: {
-      backfill_permit_segment_geocoding: { enqueued_before_failure: count },
+      backfill_permit_segment_geocoding: { enqueued_before_failure: count }
     })
     raise
   end

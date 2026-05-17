@@ -24,7 +24,7 @@ RSpec.describe 'Zone file validation' do
         has_section = section.to_i > 0 || is_non_sweeping
         area_shape = object.geometry
 
-        unless [has_ward, has_section, area_shape].all?
+        unless [ has_ward, has_section, area_shape ].all?
           errors << { has_ward: has_ward, ward: ward, has_section: has_section, section: section, object: object }
         end
 

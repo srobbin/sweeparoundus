@@ -17,7 +17,7 @@ class SendPermitAlertsJob < ApplicationJob
 
     Sentry.set_context("job_params", {
       permits_in_scope: permits.size,
-      permit_keys: permits.map(&:unique_key),
+      permit_keys: permits.map(&:unique_key)
     })
 
     permits.each do |permit|
@@ -39,7 +39,7 @@ class SendPermitAlertsJob < ApplicationJob
           permit: permit,
           distance_feet: affected_alert.distance_feet,
           line_from: service.line_from,
-          line_to: service.line_to,
+          line_to: service.line_to
         }
       end
 
@@ -74,7 +74,7 @@ class SendPermitAlertsJob < ApplicationJob
       pre_filter_skipped: pre_filter_skipped,
       permits_with_alerts: permits_with_alerts,
       emails_enqueued: enqueued_count,
-      alert_ids_notified: matches_by_alert_id.keys,
+      alert_ids_notified: matches_by_alert_id.keys
     }
 
     Sentry.set_context("job_result", summary)

@@ -107,7 +107,7 @@ class FindCdotPermitAffectedAlerts
   end
 
   def query_alerts(line_wkt)
-    line_sql = Alert.sanitize_sql_array(["ST_GeographyFromText(?)", "SRID=4326;#{line_wkt}"])
+    line_sql = Alert.sanitize_sql_array([ "ST_GeographyFromText(?)", "SRID=4326;#{line_wkt}" ])
 
     candidate_alerts
       .where("ST_DWithin(alerts.location, #{line_sql}, ?)", PROXIMITY_THRESHOLD_METERS)

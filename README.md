@@ -62,6 +62,21 @@ docker compose run app /bin/bash
 docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
 ```
 
+### Linting
+
+This project uses [RuboCop](https://rubocop.org/) with the [rails-omakase](https://github.com/rails/rubocop-rails-omakase) style guide. A pre-commit hook runs RuboCop automatically on staged `.rb` files.
+
+```sh
+# Check all files
+docker compose run --rm --no-deps app bundle exec rubocop
+
+# Auto-fix correctable offenses
+docker compose run --rm --no-deps app bundle exec rubocop -a
+
+# Check specific files
+docker compose run --rm --no-deps app bundle exec rubocop app/models/area.rb
+```
+
 ### Emails
 
 In development, emails are captured and viewable at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener).

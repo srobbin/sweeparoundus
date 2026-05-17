@@ -40,7 +40,7 @@ class HomeController < ApplicationController
   end
 
   def sweeping_done_for_year?
-    is_month_in?([12])
+    is_month_in?([ 12 ])
   end
 
   def is_beginning_of_year?

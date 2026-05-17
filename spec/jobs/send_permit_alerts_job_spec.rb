@@ -123,7 +123,7 @@ RSpec.describe SendPermitAlertsJob do
             FindCdotPermitAffectedAlerts,
             call: [
               FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: eligible_alert, distance_feet: 100),
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: phone_only_alert, distance_feet: 100),
+              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: phone_only_alert, distance_feet: 100)
             ],
             line_from: line_from,
             line_to: line_to,
@@ -141,12 +141,12 @@ RSpec.describe SendPermitAlertsJob do
         expect(PermitMailer).to have_received(:with).once.with(
           hash_including(
             alert: eligible_alert,
-            matches: [hash_including(
+            matches: [ hash_including(
               permit: permit,
               distance_feet: 100,
               line_from: line_from,
               line_to: line_to,
-            )],
+            ) ],
           )
         )
       end
@@ -158,7 +158,7 @@ RSpec.describe SendPermitAlertsJob do
           described_class.new.perform
 
           permit.reload
-          expect(permit.processed_alert_ids).to eq([eligible_alert.id])
+          expect(permit.processed_alert_ids).to eq([ eligible_alert.id ])
           expect(permit.notifications_sent_at).to eq(Time.current)
         end
       end
@@ -192,7 +192,7 @@ RSpec.describe SendPermitAlertsJob do
         allow(FindCdotPermitAffectedAlerts).to receive(:new) do |**_|
           instance_double(
             FindCdotPermitAffectedAlerts,
-            call: [FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: persisted_alert, distance_feet: 100)],
+            call: [ FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: persisted_alert, distance_feet: 100) ],
             line_from: line_from,
             line_to: line_to,
             pre_filter_skipped?: false,
@@ -233,7 +233,7 @@ RSpec.describe SendPermitAlertsJob do
               FindCdotPermitAffectedAlerts::AffectedAlert.new(
                 alert: eligible_alert,
                 distance_feet: permit == permit_a ? 100 : 200,
-              ),
+              )
             ],
             line_from: line_from,
             line_to: line_to,
@@ -247,8 +247,8 @@ RSpec.describe SendPermitAlertsJob do
 
         described_class.new.perform
 
-        expect(permit_a.reload.processed_alert_ids).to eq([eligible_alert.id])
-        expect(permit_b.reload.processed_alert_ids).to eq([eligible_alert.id])
+        expect(permit_a.reload.processed_alert_ids).to eq([ eligible_alert.id ])
+        expect(permit_b.reload.processed_alert_ids).to eq([ eligible_alert.id ])
       end
 
       it "sends a single email with both permits in the matches list" do
@@ -307,11 +307,11 @@ RSpec.describe SendPermitAlertsJob do
       before do
         allow(FindCdotPermitAffectedAlerts).to receive(:new) do |permit:|
           affected = case permit
-                     when permit_x
-                       [FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_x, distance_feet: 50)]
-                     when permit_y
-                       [FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_y, distance_feet: 75)]
-                     end
+          when permit_x
+                       [ FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_x, distance_feet: 50) ]
+          when permit_y
+                       [ FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: alert_for_y, distance_feet: 75) ]
+          end
           instance_double(
             FindCdotPermitAffectedAlerts,
             call: affected,
@@ -327,8 +327,8 @@ RSpec.describe SendPermitAlertsJob do
       it "stamps each permit with only its own matching alert IDs" do
         described_class.new.perform
 
-        expect(permit_x.reload.processed_alert_ids).to eq([alert_for_x.id])
-        expect(permit_y.reload.processed_alert_ids).to eq([alert_for_y.id])
+        expect(permit_x.reload.processed_alert_ids).to eq([ alert_for_x.id ])
+        expect(permit_y.reload.processed_alert_ids).to eq([ alert_for_y.id ])
       end
     end
 
@@ -347,7 +347,7 @@ RSpec.describe SendPermitAlertsJob do
           instance_double(
             FindCdotPermitAffectedAlerts,
             call: [
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: email_blank_alert, distance_feet: 100),
+              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: email_blank_alert, distance_feet: 100)
             ],
             line_from: GeocodeAddress::Result.new(lat: 1, lng: 2),
             line_to: GeocodeAddress::Result.new(lat: 1, lng: 2),
@@ -405,7 +405,7 @@ RSpec.describe SendPermitAlertsJob do
       it "stamps pre-filtered permits with an empty processed_alert_ids and a timestamp" do
         described_class.new.perform
 
-        [permit_a, permit_b].each do |p|
+        [ permit_a, permit_b ].each do |p|
           p.reload
           expect(p.processed_alert_ids).to eq([])
           expect(p.notifications_sent_at).to be_present
@@ -443,7 +443,7 @@ RSpec.describe SendPermitAlertsJob do
           instance_double(
             FindCdotPermitAffectedAlerts,
             call: [
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: eligible_alert, distance_feet: 100),
+              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: eligible_alert, distance_feet: 100)
             ],
             line_from: line_from,
             line_to: line_to,
