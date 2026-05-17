@@ -85,6 +85,34 @@ RSpec.describe "Areas", type: :request do
         filename = "#{ENV["SITE_NAME"].gsub(" ", "")}_#{area.shortcode}.ics"
         expect(response.headers["Content-Disposition"]).to include(filename)
       end
+
+      it "includes an ETag header" do
+        get area_path(area, format: :ics)
+
+        expect(response.headers["ETag"]).to be_present
+      end
+
+      it "returns 304 Not Modified when the ETag matches" do
+        get area_path(area, format: :ics)
+        etag = response.headers["ETag"]
+
+        get area_path(area, format: :ics), headers: { "HTTP_IF_NONE_MATCH" => etag }
+
+        expect(response).to have_http_status(:not_modified)
+      end
+
+      it "returns 200 when the calendar data changes" do
+        get area_path(area, format: :ics)
+        etag = response.headers["ETag"]
+
+        create(:sweep, area: area, date_1: today + 30, date_2: nil, date_3: nil, date_4: nil)
+        Rack::Attack.cache.store.clear
+
+        get area_path(area, format: :ics), headers: { "HTTP_IF_NONE_MATCH" => etag }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["ETag"]).not_to eq(etag)
+      end
     end
 
     context "after searching for an address" do

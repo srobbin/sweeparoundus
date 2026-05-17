@@ -53,6 +53,38 @@ RSpec.describe Alert do
 
       expect(alert).to be_valid
     end
+
+    describe "email + street_address uniqueness" do
+      let!(:existing) do
+        create(:alert, :confirmed, email: "dupe@example.com", street_address: "123 Main St", area: area)
+      end
+
+      it "is invalid when email and street_address match an existing record" do
+        alert = Alert.new(email: "dupe@example.com", street_address: "123 Main St", area: area)
+
+        expect(alert).not_to be_valid
+        expect(alert.errors[:email]).to be_present
+      end
+
+      it "is valid when same email has a different street_address" do
+        alert = Alert.new(email: "dupe@example.com", street_address: "456 Oak Ave", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "is valid when different email has the same street_address" do
+        alert = Alert.new(email: "other@example.com", street_address: "123 Main St", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "allows multiple alerts with the same email and nil street_address" do
+        create(:alert, :confirmed, email: "nil-addr@example.com", street_address: nil, area: area)
+        alert = Alert.new(email: "nil-addr@example.com", street_address: nil, area: area)
+
+        expect(alert).to be_valid
+      end
+    end
   end
 
   describe "scopes" do

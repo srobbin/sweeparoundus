@@ -38,19 +38,17 @@ class SyncCdotPermits
   ].freeze
 
   GEO_FACTORY = RGeo::Geographic.spherical_factory(srid: 4326)
-  # CDOT uniquekeys are numeric strings (e.g. "1234567"). We require this
-  # both to safely interpolate the keyset cursor into the SoQL `$where`
-  # clause and to detect format drift from the API.
+  # CDOT uniquekeys are numeric strings. We require this both to safely
+  # interpolate the keyset cursor into the SoQL `$where` clause and to
+  # detect format drift from the API.
   #
   # NOTE on ordering: `uniquekey` is a TEXT column on the CDOT side, so
   # `$order=uniquekey` and `uniquekey>'<cursor>'` are both lexicographic.
-  # Today's keys appear to be uniform-width 7-digit strings, which means
-  # lexicographic and numeric order coincide. If CDOT ever ships
-  # variable-width keys (e.g. a mix of 7- and 8-digit), pagination stays
+  # Keys are variable-width (12–14 digits as of May 2026), so
+  # lexicographic and numeric order diverge. Pagination is still
   # self-consistent (filter and order are both string compares, so we
   # neither skip nor duplicate rows) but the "next page" cursor will
-  # jump around in apparent numeric order. The width-drift warning below
-  # surfaces that case in logs.
+  # jump around in apparent numeric order.
   VALID_UNIQUE_KEY = /\A\d+\z/
 
   FIELD_MAP = {
@@ -180,15 +178,8 @@ class SyncCdotPermits
     end
 
     if key_widths.size > 1
-      # See the VALID_UNIQUE_KEY note: pagination stays correct, but the
-      # cursor order won't match human/numeric expectations once widths
-      # diverge. Surface this so we notice the regression instead of
-      # debugging "skipped rows" reports that aren't actually skips.
-      Rails.logger.warn("[SyncCdotPermits] uniquekey widths drifted across pages: " \
-                        "#{key_widths.sort.inspect}. Lexicographic ordering will diverge " \
-                        "from numeric ordering; pagination remains self-consistent.")
-      Sentry.logger.warn("sync_cdot_permits.key_width_drift widths=%{widths}",
-        widths: key_widths.sort.inspect)
+      Rails.logger.info("[SyncCdotPermits] uniquekey widths across pages: " \
+                        "#{key_widths.sort.inspect} (expected; pagination is self-consistent)")
     end
 
     message = "SUCCESS: created=#{created} updated=#{updated} unchanged=#{unchanged} " \

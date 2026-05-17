@@ -607,4 +607,52 @@ RSpec.describe "Subscriptions", type: :request do
       end
     end
   end
+
+  describe "multiple alerts for the same email" do
+    let(:token) { encode_manage_jwt(email) }
+    let!(:alert_a) { create(:alert, :confirmed, :with_address, email: email, area: area, street_address: "100 N State St") }
+    let!(:alert_b) { create(:alert, :confirmed, :with_address, email: email, area: area, street_address: "200 W Madison St") }
+    let!(:alert_c) { create(:alert, :unconfirmed, :with_address, email: email, area: area, street_address: "300 S Wacker Dr") }
+
+    it "shows all alerts for the email on the manage page" do
+      get manage_subscriptions_path, params: { t: token }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("100 N State St")
+      expect(response.body).to include("200 W Madison St")
+      expect(response.body).to include("300 S Wacker Dr")
+    end
+
+    it "destroying one alert does not affect the others" do
+      expect {
+        delete destroy_subscription_path(alert_a, t: token)
+      }.to change(Alert, :count).by(-1)
+
+      expect(Alert.exists?(alert_b.id)).to be true
+      expect(Alert.exists?(alert_c.id)).to be true
+    end
+
+    it "confirming one alert does not affect the others" do
+      patch confirm_subscription_path(alert_c, t: token)
+
+      expect(alert_c.reload.confirmed).to be true
+      expect(alert_a.reload.confirmed).to be true
+      expect(alert_b.reload.confirmed).to be true
+    end
+
+    it "updating permit_notifications on one alert does not affect the others" do
+      patch update_subscription_path(alert_a, t: token), params: { permit_notifications: "0" }
+
+      expect(alert_a.reload.permit_notifications).to be false
+      expect(alert_b.reload.permit_notifications).to be true
+    end
+
+    it "does not allow actions on alerts belonging to a different email" do
+      other_alert = create(:alert, :confirmed, :with_address, email: "other@example.com", area: area)
+
+      delete destroy_subscription_path(other_alert, t: token)
+
+      expect(Alert.exists?(other_alert.id)).to be true
+    end
+  end
 end

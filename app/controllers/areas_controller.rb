@@ -9,8 +9,12 @@ class AreasController < ApplicationController
     respond_to do |format|
       format.html
       format.ics do
-        Sentry.metrics.count("ics_calendar.downloaded", value: 1, attributes: { area: @area.shortcode })
-        send_data calendar, filename: "#{ENV["SITE_NAME"].gsub(" ", "")}_#{@area.shortcode}.ics"
+        cal_data = calendar
+        # Calendar apps poll on a fixed interval; ETag returns 304 when nothing changed.
+        if stale?(etag: Digest::MD5.hexdigest(cal_data))
+          Sentry.metrics.count("ics_calendar.downloaded", value: 1, attributes: { area: @area.shortcode })
+          send_data cal_data, filename: "#{ENV["SITE_NAME"].gsub(" ", "")}_#{@area.shortcode}.ics"
+        end
       end
     end
   end

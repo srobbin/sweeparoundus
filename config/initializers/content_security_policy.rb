@@ -18,6 +18,7 @@ Rails.application.configure do
                        "https://*.googleapis.com",
                        "https://*.gstatic.com",
                        "https://www.google-analytics.com",
+                       "https://*.googletagmanager.com",
                        "https://img.buymeacoffee.com"
     policy.object_src  :none
     policy.script_src  :self, :strict_dynamic
