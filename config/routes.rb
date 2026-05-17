@@ -14,20 +14,20 @@ Rails.application.routes.draw do
   # API
   namespace :api do
     namespace :v1 do
-      resources :sweeps, only: [:index]
+      resources :sweeps, only: [ :index ]
     end
   end
 
   # Resources
-  resources :areas, only: [:show] do
-    resources :alerts, only: [:create] do
+  resources :areas, only: [ :show ] do
+    resources :alerts, only: [ :create ] do
       collection do
         get "unsubscribe", to: "alerts#unsubscribe"
         get "confirm", to: "alerts#confirm"
       end
     end
   end
-  resources :search, only: [:index]
+  resources :search, only: [ :index ]
 
   # Subscription management
   get "subscriptions", to: "subscriptions#new"
@@ -39,9 +39,9 @@ Rails.application.routes.draw do
   delete "subscriptions/:id", to: "subscriptions#destroy", as: :destroy_subscription
 
   # Static pages
-  get "about", to: 'about#show'
-  get "faq", to: 'faq#show'
-  get "privacy_policy", to: 'privacy_policy#show'
+  get "about", to: "about#show"
+  get "faq", to: "faq#show"
+  get "privacy_policy", to: "privacy_policy#show"
 
   # CSP violation reports (browsers POST here when CSP is in report-only mode)
   post "csp-violation-report", to: "csp_reports#create"

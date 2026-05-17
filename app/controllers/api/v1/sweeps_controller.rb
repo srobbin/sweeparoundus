@@ -48,7 +48,7 @@ module Api
       end
 
       def serialize_sweep(sweep)
-        dates = [sweep.date_1, sweep.date_2, sweep.date_3, sweep.date_4].compact
+        dates = [ sweep.date_1, sweep.date_2, sweep.date_3, sweep.date_4 ].compact
 
         {
           dates: dates.map(&:iso8601),

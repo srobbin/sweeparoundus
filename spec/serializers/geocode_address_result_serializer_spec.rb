@@ -21,7 +21,7 @@ RSpec.describe GeocodeAddressResultSerializer do
 
   describe "round-tripping through ActiveJob::Arguments" do
     it "preserves lat and lng across serialize/deserialize" do
-      serialized = ActiveJob::Arguments.serialize([result])
+      serialized = ActiveJob::Arguments.serialize([ result ])
       deserialized = ActiveJob::Arguments.deserialize(serialized)
 
       expect(deserialized.first).to be_a(GeocodeAddress::Result)
@@ -31,7 +31,7 @@ RSpec.describe GeocodeAddressResultSerializer do
 
     it "round-trips when passed inside a hash mailer-param" do
       params = { line_from: result, line_to: result }
-      serialized = ActiveJob::Arguments.serialize([params])
+      serialized = ActiveJob::Arguments.serialize([ params ])
       deserialized = ActiveJob::Arguments.deserialize(serialized).first
 
       expect(deserialized[:line_from]).to be_a(GeocodeAddress::Result)

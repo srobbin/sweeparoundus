@@ -50,11 +50,11 @@ RSpec.describe ApplicationPolicy do
   describe ApplicationPolicy::Scope do
     it "resolves to all records" do
       scope = double(:scope)
-      allow(scope).to receive(:all).and_return([:record])
+      allow(scope).to receive(:all).and_return([ :record ])
 
       resolved = described_class.new(user, scope).resolve
 
-      expect(resolved).to eq([:record])
+      expect(resolved).to eq([ :record ])
     end
   end
 end

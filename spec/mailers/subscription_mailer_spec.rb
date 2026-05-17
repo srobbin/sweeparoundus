@@ -21,9 +21,9 @@ RSpec.describe SubscriptionMailer, type: :mailer do
     end
 
     it "has the right attributes" do
-      expect(mail.from).to eq([ENV["DEFAULT_EMAIL"]])
+      expect(mail.from).to eq([ ENV["DEFAULT_EMAIL"] ])
       expect(mail.subject).to eq("Manage your #{ENV["SITE_NAME"]} subscriptions")
-      expect(mail.to).to eq([email])
+      expect(mail.to).to eq([ email ])
     end
 
     it "includes the manage link in the HTML body" do

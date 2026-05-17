@@ -21,7 +21,7 @@ gem "sendgrid-ruby", "~> 6.7"
 gem "puma", "~> 6.6"
 gem "pundit", "~> 2.1"
 gem "rack-attack", "~> 6.7"
-gem 'redis', '~> 5.0', '>= 5.0.8'
+gem "redis", "~> 5.0", ">= 5.0.8"
 gem "rgeo-geojson", "~> 2.2"
 gem "sassc", "~> 2.4"
 gem "sentry-rails", "~> 6.5"
@@ -30,12 +30,12 @@ gem "sentry-sidekiq", "~> 6.5"
 gem "scout_apm", "~> 6.2"
 gem "scout_apm_logging", "~> 2.1"
 gem "stackprof", "~> 0.2"
-gem 'sidekiq', '~> 7.3'
+gem "sidekiq", "~> 7.3"
 gem "sidekiq-cron", "~> 2.0"
 gem "rails_icons", "~> 1.8"
 gem "sprockets-rails", "~> 3.5"
 gem "tailwindcss-rails", "~> 2.7"
-gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem "tzinfo-data", platforms: [ :mingw, :mswin, :x64_mingw, :jruby ]
 
 gem "stimulus-rails", "~> 1.3"
 gem "turbo-rails", "~> 2.0"
@@ -45,13 +45,14 @@ gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
 group :development, :test do
-  gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
+  gem "byebug", platforms: [ :mri, :mingw, :x64_mingw ]
   gem "factory_bot_rails", "~> 6.2"
   gem "faker", "~> 3.2"
   gem "rspec-rails", "~> 7.1"
 end
 
 group :development do
+  gem "rubocop-rails-omakase", require: false
   gem "foreman", "~> 0.90.0"
   gem "letter_opener_web", "~> 3.0"
   gem "listen", "~> 3.9"

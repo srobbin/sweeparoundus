@@ -6,7 +6,7 @@ class ApplicationMailer < ActionMailer::Base
       mailer: self.class.name,
       action: action_name,
       to: message.to,
-      params: params&.transform_values { |v| v.try(:id) || v.class.name },
+      params: params&.transform_values { |v| v.try(:id) || v.class.name }
     })
     Sentry.capture_exception(exception)
     raise

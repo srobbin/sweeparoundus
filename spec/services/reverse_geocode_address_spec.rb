@@ -24,7 +24,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
           .to_return(body: {
             status: "OK",
-            results: [{ formatted_address: "3300 N California Ave, Chicago, IL 60618, USA" }]
+            results: [ { formatted_address: "3300 N California Ave, Chicago, IL 60618, USA" } ]
           }.to_json)
       end
 
@@ -110,7 +110,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
       it "retries and recovers if a later attempt succeeds" do
         stub_request(:get, /maps.googleapis.com/)
           .to_return(body: { status: "OVER_QUERY_LIMIT", results: [] }.to_json).then
-          .to_return(body: { status: "OK", results: [{ formatted_address: "Recovered" }] }.to_json)
+          .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
         expect(subject.call).to eq("Recovered")
       end

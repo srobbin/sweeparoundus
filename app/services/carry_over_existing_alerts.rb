@@ -48,7 +48,7 @@ class CarryOverExistingAlerts
 
   def get_address_coords(alert)
     if alert.lat.present? && alert.lng.present?
-      return [alert.lat, alert.lng]
+      return [ alert.lat, alert.lng ]
     end
 
     geocode_address(alert)
@@ -59,7 +59,7 @@ class CarryOverExistingAlerts
     result = geocoder.call
 
     if result
-      [result.lat, result.lng]
+      [ result.lat, result.lng ]
     else
       add_to_failures(alert, geocoder.error_reason || "geocode_failed")
       nil

@@ -1,8 +1,8 @@
 class SubscriptionsController < ApplicationController
   include JwtHelper
 
-  before_action :authenticate_manage_token, only: [:show, :create, :update, :confirm, :destroy]
-  before_action :set_alerts, only: [:show]
+  before_action :authenticate_manage_token, only: [ :show, :create, :update, :confirm, :destroy ]
+  before_action :set_alerts, only: [ :show ]
 
   def new
   end

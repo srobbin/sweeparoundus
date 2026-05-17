@@ -39,7 +39,7 @@ class SeedYearlyData
   private
 
   def dry_run_message
-    deletions = ["#{Sweep.count} sweeps"]
+    deletions = [ "#{Sweep.count} sweeps" ]
     deletions << "#{Area.count} areas" unless skip_geojson
     files = skip_geojson ? "schedule file" : "geojson and schedule files"
     "TEST: #{deletions.join(' and ')} to be deleted; #{files} opened without error"
@@ -70,9 +70,9 @@ class SeedYearlyData
         ward_number = object.properties["ward"].to_i
         area_number = object.properties["section"].to_i
         area_shape = object.geometry
-    
-        next unless [write, ward_number, area_number, area_shape].all?
-    
+
+        next unless [ write, ward_number, area_number, area_shape ].all?
+
         puts "Ward #{"%02d" % ward_number}, Area #{"%02d" % area_number}"
         area = Area.find_or_initialize_by(number: area_number, ward: ward_number)
         area.update!(shape: area_shape, shortcode: "W#{ward_number}A#{area_number}")
@@ -83,10 +83,10 @@ class SeedYearlyData
   def import_schedule_data
     puts "Importing Schedule"
     CSV.foreach("db/data/Street_Sweeping_Schedule_-_#{year}.csv", headers: true).each do |row|
-      puts row.to_s
+      puts row
       area = Area.find_by(number: row["SECTION"], ward: row["WARD"])
       month = row["MONTH NUMBER"].strip
-      dates = row["DATES"].split(",").reject{ |d| d.strip.blank? }.map do |day|
+      dates = row["DATES"].split(",").reject { |d| d.strip.blank? }.map do |day|
         Date.new(Date.current.year, month.to_i, day.to_i)
       end.uniq.sort
 
@@ -95,7 +95,7 @@ class SeedYearlyData
       dates.each_with_index do |date, index|
         clusters[cluster_index] ||= []
         last_date = clusters[cluster_index].last
-        
+
         if last_date && date > last_date + 3.days
           cluster_index += 1
           clusters[cluster_index] ||= []

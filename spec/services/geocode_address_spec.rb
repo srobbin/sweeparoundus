@@ -23,7 +23,7 @@ RSpec.describe GeocodeAddress, type: :service do
         stub_request(:get, /maps.googleapis.com/)
           .to_return(body: {
             status: "OK",
-            results: [{ geometry: { location: { lat: 41.94142, lng: -87.69870 } } }]
+            results: [ { geometry: { location: { lat: 41.94142, lng: -87.69870 } } } ]
           }.to_json)
       end
 
@@ -71,7 +71,7 @@ RSpec.describe GeocodeAddress, type: :service do
     context "when the API returns OK but with no usable geometry" do
       before do
         stub_request(:get, /maps.googleapis.com/)
-          .to_return(body: { status: "OK", results: [{ geometry: { location: {} } }] }.to_json)
+          .to_return(body: { status: "OK", results: [ { geometry: { location: {} } } ] }.to_json)
       end
 
       it "returns nil with the OK_NO_USABLE_RESULT error_reason" do
@@ -123,7 +123,7 @@ RSpec.describe GeocodeAddress, type: :service do
           .to_return(body: { status: "OVER_QUERY_LIMIT", results: [] }.to_json).then
           .to_return(body: {
             status: "OK",
-            results: [{ geometry: { location: { lat: 41.94142, lng: -87.69870 } } }]
+            results: [ { geometry: { location: { lat: 41.94142, lng: -87.69870 } } } ]
           }.to_json)
 
         result = subject.call
@@ -135,7 +135,7 @@ RSpec.describe GeocodeAddress, type: :service do
           .to_return(status: 503, body: "Unavailable").then
           .to_return(body: {
             status: "OK",
-            results: [{ geometry: { location: { lat: 41.94142, lng: -87.69870 } } }]
+            results: [ { geometry: { location: { lat: 41.94142, lng: -87.69870 } } } ]
           }.to_json)
 
         expect(subject.call.lat).to eq(41.94142)

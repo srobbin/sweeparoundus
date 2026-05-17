@@ -48,7 +48,7 @@ RSpec.describe GoogleGeocoder, type: :service do
   describe "successful response" do
     before do
       stub_request(:get, /maps.googleapis.com/)
-        .to_return(body: { status: "OK", results: [{ formatted_address: "1 Main St" }] }.to_json)
+        .to_return(body: { status: "OK", results: [ { formatted_address: "1 Main St" } ] }.to_json)
     end
 
     it "returns the parsed value" do
@@ -110,7 +110,7 @@ RSpec.describe GoogleGeocoder, type: :service do
   describe "OK with unparseable result" do
     before do
       stub_request(:get, /maps.googleapis.com/)
-        .to_return(body: { status: "OK", results: [{ formatted_address: nil }] }.to_json)
+        .to_return(body: { status: "OK", results: [ { formatted_address: nil } ] }.to_json)
     end
 
     it "returns nil with a distinct error_reason" do
@@ -137,7 +137,7 @@ RSpec.describe GoogleGeocoder, type: :service do
         it "returns the parsed result if a retry succeeds" do
           stub_request(:get, /maps.googleapis.com/)
             .to_return(body: { status: status, results: [] }.to_json).then
-            .to_return(body: { status: "OK", results: [{ formatted_address: "Recovered" }] }.to_json)
+            .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
           expect(subject.call).to eq("Recovered")
           expect(subject.error_reason).to be_nil
@@ -176,7 +176,7 @@ RSpec.describe GoogleGeocoder, type: :service do
   describe "HTTP errors" do
     before { allow(Rails.logger).to receive(:warn) }
 
-    [500, 502, 503, 504, 429].each do |code|
+    [ 500, 502, 503, 504, 429 ].each do |code|
       context "HTTP #{code}" do
         it "retries and eventually surfaces an http_status error_reason" do
           stub_request(:get, /maps.googleapis.com/).to_return(status: code, body: "boom")
@@ -192,12 +192,12 @@ RSpec.describe GoogleGeocoder, type: :service do
     it "recovers when an early 5xx is followed by a 200" do
       stub_request(:get, /maps.googleapis.com/)
         .to_return(status: 503, body: "Unavailable").then
-        .to_return(body: { status: "OK", results: [{ formatted_address: "Recovered" }] }.to_json)
+        .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
       expect(subject.call).to eq("Recovered")
     end
 
-    [400, 401, 403, 404].each do |code|
+    [ 400, 401, 403, 404 ].each do |code|
       context "HTTP #{code}" do
         it "does not retry and surfaces an http_status error_reason" do
           stub_request(:get, /maps.googleapis.com/).to_return(status: code, body: "no")
@@ -213,7 +213,7 @@ RSpec.describe GoogleGeocoder, type: :service do
   describe "network exceptions" do
     before { allow(Rails.logger).to receive(:warn) }
 
-    [Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET].each do |error_class|
+    [ Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET ].each do |error_class|
       context error_class.name do
         it "retries and eventually surfaces an http_error reason" do
           stub_request(:get, /maps.googleapis.com/).to_raise(error_class.new("boom"))
@@ -245,7 +245,7 @@ RSpec.describe GoogleGeocoder, type: :service do
 
     it "appends the key as a query param" do
       stub_request(:get, /maps.googleapis.com/)
-        .to_return(body: { status: "OK", results: [{ formatted_address: "X" }] }.to_json)
+        .to_return(body: { status: "OK", results: [ { formatted_address: "X" } ] }.to_json)
 
       subject.call
 
@@ -259,7 +259,7 @@ RSpec.describe GoogleGeocoder, type: :service do
       memory_cache.write("test_geocoder:Anywhere", { address: "stale-format" })
 
       stub_request(:get, /maps.googleapis.com/)
-        .to_return(body: { status: "OK", results: [{ formatted_address: "Fresh" }] }.to_json)
+        .to_return(body: { status: "OK", results: [ { formatted_address: "Fresh" } ] }.to_json)
 
       expect(subject.call).to eq("Fresh")
     end

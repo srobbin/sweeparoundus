@@ -13,7 +13,7 @@ RSpec.describe AlertMailer, type: :mailer do
   let(:text_body) do
     mail.body.parts.find { |p| p.content_type.match 'text/plain' }.body.raw_source
   end
-  
+
   describe '#annual_schedule_live email' do
     let!(:alert) { create :alert, :with_address, area: area }
     let(:mail) do
@@ -24,7 +24,7 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq("#{Time.current.year} street sweeping schedule is now live")
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
@@ -53,7 +53,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(text_body).to include(manage_subscriptions_url.to_s)
     end
   end
-  
+
   describe '#confirm email' do
     let!(:alert) { create :alert, :unconfirmed, :with_address, area: area }
     let(:mail) do
@@ -64,7 +64,7 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq('Please confirm your subscription to Ward 28, Sweep Area 7')
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
@@ -98,7 +98,7 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq('Street sweeping alert for Ward 28, Sweep Area 7')
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
@@ -147,7 +147,7 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq("#{Time.current.year} Chicago street sweeping alerts are delayed")
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')
@@ -189,7 +189,7 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'has the right attributes' do
-      expect(mail.from).to eq(['info@wethesweeple.com'])
+      expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq('Your street sweeping alert subscription has been canceled')
       expect(mail.to).to include(alert.email)
       expect(html_body).to include('Hello,')

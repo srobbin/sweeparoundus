@@ -44,11 +44,11 @@ class GoogleGeocoder
     value, transient = fetch_with_retries
     ttl = if value
             CACHE_TTL
-          elsif transient
+    elsif transient
             ERROR_CACHE_TTL
-          else
+    else
             NIL_CACHE_TTL
-          end
+    end
     Rails.cache.write(cache_key, { value: value, error_reason: @error_reason }, expires_in: ttl)
     value
   end
@@ -82,7 +82,7 @@ class GoogleGeocoder
   TRANSIENT_NETWORK_ERRORS = [
     Net::OpenTimeout,
     Net::ReadTimeout,
-    Errno::ECONNRESET,
+    Errno::ECONNRESET
   ].freeze
 
   def fetch_with_retries
@@ -98,16 +98,16 @@ class GoogleGeocoder
       @error_reason = exhausted_retry_reason(e)
       log_warn("#{e.class}: #{e.message} (after #{retries} retries)")
       Sentry.capture_exception(e, level: :warning, contexts: {
-        google_geocoder: { class: self.class.name, identifier: log_identifier, retries: retries },
+        google_geocoder: { class: self.class.name, identifier: log_identifier, retries: retries }
       })
-      [nil, true]
+      [ nil, true ]
     rescue StandardError => e
       @error_reason = "http_error: #{e.message}"
       log_warn("#{e.class}: #{e.message}")
       Sentry.capture_exception(e, level: :warning, contexts: {
-        google_geocoder: { class: self.class.name, identifier: log_identifier },
+        google_geocoder: { class: self.class.name, identifier: log_identifier }
       })
-      [nil, true]
+      [ nil, true ]
     end
   end
 
@@ -130,7 +130,7 @@ class GoogleGeocoder
       log_warn("HTTP #{response.code}")
       Sentry.capture_message("[#{self.class.name}] HTTP #{response.code}", level: :warning,
         contexts: { google_geocoder: { identifier: log_identifier } })
-      return [nil, true]
+      return [ nil, true ]
     end
 
     json = JSON.parse(response.body)
@@ -155,14 +155,14 @@ class GoogleGeocoder
     when "OK"
       parsed = parse_success(json)
       if parsed
-        [parsed, false]
+        [ parsed, false ]
       else
         @error_reason = "geocode_status: OK_NO_USABLE_RESULT"
-        [nil, false]
+        [ nil, false ]
       end
     when "ZERO_RESULTS"
       @error_reason = "geocode_status: ZERO_RESULTS"
-      [nil, false]
+      [ nil, false ]
     when *RETRYABLE_API_STATUSES
       raise TransientApiError, "geocode_status: #{json["status"]}"
     else
@@ -170,7 +170,7 @@ class GoogleGeocoder
       log_warn("Unexpected status=#{json["status"]}")
       Sentry.capture_message("[#{self.class.name}] Unexpected status=#{json["status"]}", level: :warning,
         contexts: { google_geocoder: { identifier: log_identifier, status: json["status"] } })
-      [nil, true]
+      [ nil, true ]
     end
   end
 

@@ -68,7 +68,7 @@ class AreaDecorator < ApplicationDecorator
 
     avg_segment = path.length.to_f / encoded.size
     max_points = (MAX_PATH_CHARS / avg_segment).floor
-    max_points = [max_points, 4].max
+    max_points = [ max_points, 4 ].max
     step = (encoded.size - 1).to_f / (max_points - 1)
     (0...max_points).map { |i| encoded[(i * step).round] }.join
   end

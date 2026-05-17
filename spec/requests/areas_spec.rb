@@ -141,12 +141,12 @@ RSpec.describe "Areas", type: :request do
         end
         let(:neighbor_area) { create(:area, ward: 33, number: 14, shortcode: "W33A14", slug: "ward-33-sweep-area-14", shape: neighbor_shape) }
         let(:stubbed_neighbors) do
-          [FindAdjacentSweepAreas::Neighbor.new(
+          [ FindAdjacentSweepAreas::Neighbor.new(
             area: neighbor_area.decorate,
             distance_feet: 42,
             direction: "E",
             nearest_address: "3300 N California Ave, Chicago, IL 60618"
-          )]
+          ) ]
         end
 
         it "renders the searched address, neighbors partial, search marker, and save-address checkbox" do

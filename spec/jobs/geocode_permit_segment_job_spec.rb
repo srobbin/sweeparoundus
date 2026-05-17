@@ -18,9 +18,9 @@ RSpec.describe GeocodePermitSegmentJob, type: :job do
       before do
         allow(GeocodeAddress).to receive(:new) do |address:|
           result = case address
-                   when /\A3300\b/ then endpoint_a
-                   when /\A3350\b/ then endpoint_b
-                   end
+          when /\A3300\b/ then endpoint_a
+          when /\A3350\b/ then endpoint_b
+          end
           instance_double(GeocodeAddress, call: result, error_reason: nil)
         end
       end

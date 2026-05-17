@@ -1,12 +1,12 @@
 class AlertMailer < ApplicationMailer
   before_action :set_alert_and_area
   before_action :set_email
-  before_action :set_street_address, only: [:reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed]
-  before_action :set_formatted_address_area, only: [:confirm]
-  before_action :set_sweep_dates, only: [:reminder]
-  before_action :set_mailer_urls, only: [:confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed]
-  before_action :set_manage_url, only: [:reminder, :annual_schedule_live, :sweeping_data_delayed]
-  before_action :set_static_map_url, only: [:reminder, :confirm]
+  before_action :set_street_address, only: [ :reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed ]
+  before_action :set_formatted_address_area, only: [ :confirm ]
+  before_action :set_sweep_dates, only: [ :reminder ]
+  before_action :set_mailer_urls, only: [ :confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed ]
+  before_action :set_manage_url, only: [ :reminder, :annual_schedule_live, :sweeping_data_delayed ]
+  before_action :set_static_map_url, only: [ :reminder, :confirm ]
 
   def reminder
     mail(
@@ -68,7 +68,7 @@ class AlertMailer < ApplicationMailer
       @sweep.date_1,
       @sweep.date_2,
       @sweep.date_3,
-      @sweep.date_4,
+      @sweep.date_4
     ].compact.map { |d| d.strftime("%B %-d") }
   end
 

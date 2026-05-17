@@ -7,7 +7,7 @@ class RegeocodeAlertJob < ApplicationJob
       "#{error.class}: #{error.message}"
     )
     Sentry.capture_exception(error, contexts: {
-      regeocode_alert: { alert_id: job.arguments.first },
+      regeocode_alert: { alert_id: job.arguments.first }
     })
   end
 

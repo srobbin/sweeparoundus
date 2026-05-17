@@ -62,7 +62,7 @@ RSpec.describe 'Schedule file validation' do
       if seen[key]
         seen[key] << line
       else
-        seen[key] = [line]
+        seen[key] = [ line ]
       end
     end
 
@@ -86,7 +86,7 @@ RSpec.describe 'Schedule file validation' do
       if seen[key]
         seen[key] << line
       else
-        seen[key] = [line]
+        seen[key] = [ line ]
       end
     end
 
@@ -131,7 +131,7 @@ RSpec.describe 'Schedule file validation' do
       missing = expected - unique
       missing.each do |section|
         errors << "Ward %02d is missing section %02d (sections range from %02d to %02d)" %
-          [ward, section, unique.first, unique.last]
+          [ ward, section, unique.first, unique.last ]
       end
     end
 
