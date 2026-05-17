@@ -40,6 +40,15 @@ RSpec.describe NotifyDelayedSweepingData, type: :service do
         expect(AlertMailer).not_to have_received(:with).with(alert: alert_unconfirmed)
       end
 
+      context 'with a phone-only confirmed alert' do
+        let!(:phone_only_alert) { Alert.create!(phone: "3125551234", confirmed: true, area: area) }
+
+        it 'excludes phone-only alerts (no email to send to)' do
+          subject
+          expect(AlertMailer).not_to have_received(:with).with(alert: phone_only_alert)
+        end
+      end
+
       it 'calls sweeping_data_delayed and deliver_later for each' do
         subject
         expect(alert_mailer_dbl).to have_received(:sweeping_data_delayed).twice
