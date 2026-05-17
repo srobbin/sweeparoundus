@@ -115,5 +115,14 @@ RSpec.describe CdotPermit do
       permit = build(:cdot_permit, direction: "S", street_name: "MARTIN LUTHER KING", suffix: "DR")
       expect(permit.display_street).to eq("Martin Luther King Dr")
     end
+
+    it "keeps ordinal suffixes attached to numbered streets" do
+      expect(build(:cdot_permit, street_name: "60TH", suffix: "ST").display_street).to eq("60th St")
+      expect(build(:cdot_permit, street_name: "83RD", suffix: "ST").display_street).to eq("83rd St")
+      expect(build(:cdot_permit, street_name: "18TH", suffix: "ST").display_street).to eq("18th St")
+      expect(build(:cdot_permit, street_name: "113TH", suffix: "PL").display_street).to eq("113th Pl")
+      expect(build(:cdot_permit, street_name: "1ST", suffix: "AVE").display_street).to eq("1st Ave")
+      expect(build(:cdot_permit, street_name: "2ND", suffix: "ST").display_street).to eq("2nd St")
+    end
   end
 end

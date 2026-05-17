@@ -31,10 +31,13 @@ class CdotPermit < ApplicationRecord
 
   # Title-cased street name for prose, e.g. "California Ave". Drops the
   # directional prefix and down-cases CDOT's all-caps. Returns nil if blank.
+  #
+  # Uses a custom downcase instead of titleize because titleize splits on
+  # digit-letter boundaries, turning "60TH" into "60 Th".
   def display_street
     return nil if street_name.blank?
 
-    [street_name.titleize, suffix&.titleize.presence].compact.join(" ").presence
+    [smart_titlecase(street_name), smart_titlecase(suffix).presence].compact.join(" ").presence
   end
 
   def segment_geocoded?
@@ -78,6 +81,12 @@ class CdotPermit < ApplicationRecord
   end
 
   private
+
+  def smart_titlecase(str)
+    return "" if str.blank?
+
+    str.split(" ").map { |word| word.downcase.sub(/\A\p{L}/, &:upcase) }.join(" ")
+  end
 
   def segment_address(number)
     return nil if number.blank? || direction.blank? || street_name.blank?
