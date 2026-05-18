@@ -104,77 +104,80 @@ class SyncCdotPermits
     last_unique_key = nil
     key_widths = Set.new
 
-    loop do
-      rows = fetch_page(last_unique_key)
-      pages += 1
+    with_persistent_connection do |http|
+      loop do
+        rows = fetch_page(http, last_unique_key)
+        pages += 1
 
-      break if rows.empty?
+        break if rows.empty?
 
-      # Defense in depth: the $where clause already requires these fields, but
-      # if the API ever sends an empty string (which is_not_null doesn't catch)
-      # we still want to skip the row. Same for malformed uniquekeys.
-      usable_rows, unusable_rows = rows.partition { |row| row_usable?(row) }
-      if unusable_rows.any?
-        skipped += unusable_rows.size
-        Rails.logger.warn("[SyncCdotPermits] Skipped #{unusable_rows.size} row(s) " \
-                          "with missing required fields or unexpected uniquekey format")
-        Sentry.logger.warn("sync_cdot_permits.unusable_rows skipped_count=%{skipped_count} page=%{page}",
-          skipped_count: unusable_rows.size, page: pages)
-      end
+        # Defense in depth: the $where clause already requires these fields, but
+        # if the API ever sends an empty string (which is_not_null doesn't catch)
+        # we still want to skip the row. Same for malformed uniquekeys.
+        usable_rows, unusable_rows = rows.partition { |row| row_usable?(row) }
+        if unusable_rows.any?
+          skipped += unusable_rows.size
+          Rails.logger.warn("[SyncCdotPermits] Skipped #{unusable_rows.size} row(s) " \
+                            "with missing required fields or unexpected uniquekey format")
+          Sentry.logger.warn("sync_cdot_permits.unusable_rows skipped_count=%{skipped_count} page=%{page}",
+            skipped_count: unusable_rows.size, page: pages)
+        end
 
-      usable_rows.each { |row| key_widths << row["uniquekey"].length }
+        usable_rows.each { |row| key_widths << row["uniquekey"].length }
 
-      if usable_rows.any?
-        sync_time = Time.current
-        needs_geocoding = []
+        if usable_rows.any?
+          sync_time = Time.current
 
-        CdotPermit.transaction do
           existing = CdotPermit.where(unique_key: usable_rows.map { |r| r["uniquekey"] })
                                .index_by(&:unique_key)
 
+          upsert_batch = []
           unchanged_keys = []
+          geocode_keys = []
 
           usable_rows.each do |row|
             attrs = map_attributes(row)
             key = attrs[:unique_key]
-            permit = existing[key] || CdotPermit.new(unique_key: key)
-            permit.assign_attributes(attrs.except(:unique_key))
+            permit = existing[key]
 
-            if permit.new_record?
-              permit.data_synced_at = sync_time
-              permit.save!
-              needs_geocoding << permit
+            if permit.nil?
+              upsert_batch << attrs.merge(data_synced_at: sync_time)
+              geocode_keys << key
               created += 1
-            elsif permit.changed?
-              address_changed = permit.segment_address_changed?(permit.changes)
-              permit.data_synced_at = sync_time
-              permit.save!
-              needs_geocoding << permit if address_changed || !permit.segment_geocoded?
-              updated += 1
             else
-              unchanged_keys << key
+              permit.assign_attributes(attrs.except(:unique_key))
+              if permit.changed?
+                address_changed = permit.segment_address_changed?(permit.changes)
+                geocode_keys << key if address_changed || !permit.segment_geocoded?
+                upsert_batch << attrs.merge(data_synced_at: sync_time)
+                updated += 1
+              else
+                unchanged_keys << key
+              end
             end
           end
+
+          CdotPermit.upsert_all(upsert_batch, unique_by: :unique_key) if upsert_batch.any?
 
           if unchanged_keys.any?
             CdotPermit.where(unique_key: unchanged_keys)
                        .update_all(data_synced_at: sync_time)
             unchanged += unchanged_keys.size
           end
+
+          if geocode_keys.any?
+            enqueue_geocoding(CdotPermit.where(unique_key: geocode_keys).to_a)
+          end
         end
 
-        enqueue_geocoding(needs_geocoding)
-      end
+        break if rows.size < PAGE_SIZE
 
-      break if rows.size < PAGE_SIZE
-
-      next_cursor = rows.last["uniquekey"]
-      unless next_cursor.is_a?(String) && next_cursor.match?(VALID_UNIQUE_KEY)
-        # Cannot safely advance the keyset cursor; refuse to continue rather
-        # than risk re-fetching the same page in a loop or skipping rows.
-        raise "Cannot advance pagination cursor: last uniquekey #{next_cursor.inspect} is missing or malformed"
+        next_cursor = rows.last["uniquekey"]
+        unless next_cursor.is_a?(String) && next_cursor.match?(VALID_UNIQUE_KEY)
+          raise "Cannot advance pagination cursor: last uniquekey #{next_cursor.inspect} is missing or malformed"
+        end
+        last_unique_key = next_cursor
       end
-      last_unique_key = next_cursor
     end
 
     if key_widths.size > 1
@@ -212,7 +215,25 @@ class SyncCdotPermits
     row["uniquekey"].to_s.match?(VALID_UNIQUE_KEY)
   end
 
-  def fetch_page(last_unique_key)
+  def with_persistent_connection
+    base_uri = URI(BASE_URL)
+    @http = Net::HTTP.new(base_uri.host, base_uri.port)
+    @http.use_ssl = true
+    @http.open_timeout = OPEN_TIMEOUT
+    @http.read_timeout = READ_TIMEOUT
+    @http.start
+
+    yield @http
+  ensure
+    @http.finish if @http&.started?
+  end
+
+  def reconnect!
+    @http.finish if @http.started?
+    @http.start
+  end
+
+  def fetch_page(http, last_unique_key)
     uri = build_uri(last_unique_key)
     headers = {}
     token = ENV["CHICAGO_DATA_PORTAL_APP_TOKEN"]
@@ -220,10 +241,7 @@ class SyncCdotPermits
 
     retries = 0
     begin
-      response = Net::HTTP.start(uri.host, uri.port, use_ssl: true,
-                                 open_timeout: OPEN_TIMEOUT, read_timeout: READ_TIMEOUT) do |http|
-        http.get(uri.request_uri, headers)
-      end
+      response = http.get(uri.request_uri, headers)
 
       unless response.is_a?(Net::HTTPSuccess)
         raise HttpError.new(
@@ -238,6 +256,7 @@ class SyncCdotPermits
       raise unless retries < MAX_RETRIES && retryable?(e)
 
       retries += 1
+      reconnect!
       delay = retry_delay(e, retries)
       Rails.logger.warn("[SyncCdotPermits] Retry #{retries}/#{MAX_RETRIES} after #{e.class}: #{e.message} (sleeping #{delay}s)")
       sleep(delay)

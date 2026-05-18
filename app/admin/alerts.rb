@@ -1,5 +1,5 @@
 ActiveAdmin.register Alert do
-  permit_params :area_id, :email, :phone, :confirmed, :street_address
+  permit_params :area_id, :email, :phone, :confirmed, :street_address, :permit_notifications
   actions :all, except: [ :show ]
   config.sort_order = "created_at_desc"
 
@@ -21,6 +21,7 @@ ActiveAdmin.register Alert do
       alert.street_address && alert.street_address[0..-19]
     end
     column :confirmed
+    column :permit_notifications
     column :updated_at
     actions
   end
