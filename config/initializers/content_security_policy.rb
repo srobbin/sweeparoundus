@@ -43,8 +43,12 @@ end
 # Active Admin uses Sprockets + Arbre which don't propagate CSP nonces onto
 # their <script> tags.  Admin pages are behind authentication so we can safely
 # drop strict-dynamic there and fall back to 'self' + 'unsafe-inline'.
+# This must also cover ActiveAdmin's Devise controllers (login, password
+# reset, etc.) since they inherit from DeviseController, not BaseController.
 Rails.application.config.after_initialize do
-  ActiveAdmin::BaseController.content_security_policy do |policy|
-    policy.script_src :self, :unsafe_inline
-  end
+  relaxed_script_src = ->(policy) { policy.script_src :self, :unsafe_inline }
+
+  ActiveAdmin::BaseController.content_security_policy(&relaxed_script_src)
+  ActiveAdmin::Devise::SessionsController.content_security_policy(&relaxed_script_src)
+  ActiveAdmin::Devise::PasswordsController.content_security_policy(&relaxed_script_src)
 end

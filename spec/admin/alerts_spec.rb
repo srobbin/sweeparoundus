@@ -60,6 +60,16 @@ RSpec.describe "Admin Alerts", type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it "displays the permit_notifications column" do
+      create(:alert, :confirmed, area: area, permit_notifications: false)
+      create(:alert, :confirmed, area: area, permit_notifications: true)
+
+      get sau_admin_alerts_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Permit Notifications")
+    end
   end
 
   describe "scopes" do
