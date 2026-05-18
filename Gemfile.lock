@@ -313,10 +313,13 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
+    pg_query (6.2.2)
+      google-protobuf (>= 3.25.3)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    prosopite (2.2.0)
     psych (5.3.1)
       date
       stringio
@@ -576,6 +579,8 @@ DEPENDENCIES
   observer (~> 0.1)
   ostruct (~> 0.6)
   pg (~> 1.1)
+  pg_query
+  prosopite
   puma (~> 6.6)
   pundit (~> 2.1)
   rack-attack (~> 6.7)
