@@ -18,10 +18,12 @@ class AreaDecorator < ApplicationDecorator
   MAX_SIMPLIFY_TOLERANCE = 0.001
 
   def next_sweep
-    dates = 1.upto(4).map do |n|
-      next unless object.next_sweep.present?
-      object.next_sweep.send("date_#{n}").try(:strftime, "%B %-d")
-    end.compact.join(" / ")
+    sweep = object.next_sweep
+    return "No sweeps scheduled in the near future." unless sweep
+
+    dates = 1.upto(4).filter_map do |n|
+      sweep.send("date_#{n}")&.strftime("%B %-d")
+    end.join(" / ")
 
     dates.present? ? dates : "No sweeps scheduled in the near future."
   end

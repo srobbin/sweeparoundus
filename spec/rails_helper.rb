@@ -58,6 +58,17 @@ RSpec.configure do |config|
   # https://rspec.info/features/6-0/rspec-rails
   config.infer_spec_type_from_file_location!
 
+  config.before(:each) do
+    # .reload and RSpec's include matcher trigger repeated queries
+    # that are verification patterns, not real N+1s.
+    Prosopite.allow_stack_paths = [ "reload", "rspec" ]
+    Prosopite.scan
+  end
+
+  config.after(:each) do
+    Prosopite.finish
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
