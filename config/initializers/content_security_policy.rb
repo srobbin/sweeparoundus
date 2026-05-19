@@ -28,7 +28,8 @@ Rails.application.configure do
                        "https://*.googleapis.com",
                        "https://*.google-analytics.com",
                        "https://*.analytics.google.com",
-                       "https://*.googletagmanager.com"
+                       "https://*.googletagmanager.com",
+                       "https://www.google.com"
     policy.frame_src   :none
     policy.base_uri    :self
     policy.form_action :self
