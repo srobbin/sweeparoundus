@@ -16,6 +16,9 @@ module Sweeparoundus
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    require_relative "../app/middleware/scanner_blocker"
+    config.middleware.insert_before Rails::Rack::Logger, ScannerBlocker
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
