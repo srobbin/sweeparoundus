@@ -7,9 +7,9 @@ class AreaDecorator < ApplicationDecorator
     path = cached_map_path
     marker = show_marker ? marker_param : ""
 
-    url = "https://maps.googleapis.com/maps/api/staticmap?size=600x600#{marker}&path=color:0x00000000|weight:5|fillcolor:0xAA000033#{path}&sensor=false&key=#{ENV["GOOGLE_MAPS_FRONTEND_API_KEY"]}"
+    url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400#{marker}&path=color:0x00000000|weight:5|fillcolor:0xAA000033#{path}&sensor=false&key=#{ENV["GOOGLE_MAPS_FRONTEND_API_KEY"]}"
 
-    image_tag url, alt: "Sweep area map for #{object.name}"
+    image_tag url, alt: "Sweep area map for #{object.name}", style: "width:100%; height:auto;"
   end
 
   # Largest tolerance we'll ever try. ~0.001° lng at Chicago latitude is
