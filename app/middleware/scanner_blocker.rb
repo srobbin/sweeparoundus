@@ -29,7 +29,8 @@ class ScannerBlocker
     .conf .cfg .ini .env .tar .gz .zip
   ].freeze
 
-  NOT_FOUND = [ 404, { "content-type" => "text/plain", "connection" => "close" }, [ "Not Found" ] ].each(&:freeze).freeze
+  NOT_FOUND_HEADERS = { "content-type" => "text/plain", "connection" => "close" }.freeze
+  NOT_FOUND_BODY = [ "Not Found" ].freeze
 
   def initialize(app)
     @app = app
@@ -38,7 +39,7 @@ class ScannerBlocker
   def call(env)
     path = env[Rack::PATH_INFO].to_s.downcase
 
-    return NOT_FOUND if blocked_path?(path) || blocked_extension?(path)
+    return [ 404, NOT_FOUND_HEADERS.dup, NOT_FOUND_BODY ] if blocked_path?(path) || blocked_extension?(path)
 
     @app.call(env)
   end

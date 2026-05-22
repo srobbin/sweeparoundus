@@ -89,6 +89,16 @@ RSpec.describe Alert do
         expect(alert.errors[:email]).to include("domain does not appear to accept email")
       end
 
+      it "sets a valid positive timeout on the resolver" do
+        dns = Resolv::DNS.new
+        allow(Resolv::DNS).to receive(:open).and_yield(dns)
+        allow(dns).to receive(:getresources).and_return([])
+
+        alert = Alert.new(email: "user@nodns.example", area: area)
+
+        expect { alert.valid? }.not_to raise_error
+      end
+
       it "does not block signups when DNS lookup fails" do
         allow(Resolv::DNS).to receive(:open).and_raise(Resolv::ResolvError)
 
