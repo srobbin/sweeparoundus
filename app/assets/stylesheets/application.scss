@@ -1,3 +1,7 @@
+input[type="checkbox"]:not(:disabled) {
+  cursor: pointer;
+}
+
 html,
 body {
   height: 100%;
