@@ -43,7 +43,7 @@ class Alert < ApplicationRecord
   def email_domain_has_mx_record
     domain = email.split("@").last
     Resolv::DNS.open do |dns|
-      dns.timeouts = [ 2, 0 ]
+      dns.timeouts = 2
       return if dns.getresources(domain, Resolv::DNS::Resource::IN::MX).any?
       return if dns.getresources(domain, Resolv::DNS::Resource::IN::A).any?
     end
