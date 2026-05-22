@@ -2,14 +2,28 @@
 
 <p>Hello,</p>
 
-<p>
-  You are receiving this email because we have received a request to subscribe
-  <strong><%= @email %></strong> to Chicago street sweeping alerts for <strong><%= @formatted_address_area %></strong>.
-  Alerts will be sent out one day prior to a scheduled street sweeping.
-</p>
+<% if @neighbor_areas.any? %>
+  <p>
+    You are receiving this email because we have received a request to subscribe
+    <strong><%= @email %></strong> to Chicago street sweeping alerts for the following areas:
+  </p>
+  <ul>
+    <li><strong><%= @formatted_address_area %></strong></li>
+    <% @neighbor_areas.each do |neighbor_area| %>
+      <li><strong><%= neighbor_area.name %></strong></li>
+    <% end %>
+  </ul>
+  <p>Alerts will be sent out one day prior to a scheduled street sweeping.</p>
+<% else %>
+  <p>
+    You are receiving this email because we have received a request to subscribe
+    <strong><%= @email %></strong> to Chicago street sweeping alerts for <strong><%= @formatted_address_area %></strong>.
+    Alerts will be sent out one day prior to a scheduled street sweeping.
+  </p>
+<% end %>
 
 <p>
-  <%= link_to "Confirm your subscription",
+  <%= link_to "Confirm your subscription#{'s' if @neighbor_areas.any?}",
         @confirmation_url,
         style: "display: inline-block; padding: 12px 20px; background-color: #1d4ed8; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 10pt;" %>
 </p>
@@ -26,4 +40,4 @@
   </p>
 <% end %>
 
-<%= render "shared/email_footer", disclaimer: true, coffee_link: false %>
+<%= render "shared/email_footer", disclaimer: true %>

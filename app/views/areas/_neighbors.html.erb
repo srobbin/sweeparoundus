@@ -1,25 +1,38 @@
-<div class="mt-8 border border-gray-200 bg-white rounded-lg p-5">
+<% neighbor_colors = %w[#2563eb #16a34a #9333ea] %>
+<div class="border border-gray-200 bg-white rounded-lg p-5">
   <h2 class="flex items-center mb-2 text-lg font-semibold text-gray-900">
     <%= icon "checkerboard", class: "h-5 w-5 text-gray-400", aria: { hidden: true } %>
     <span class="ml-2">Adjacent Sweep Areas</span>
   </h2>
-  <p class="text-sm text-gray-600 mb-4">Your address is near the edge of a sweep zone. Consider signing up for alerts in the adjacent sweep zone(s):</p>
+  <p class="text-sm text-gray-600 mb-4">Your address is near the edge of a sweep zone. Select any areas you'd like included in your alerts, then subscribe below (only applies to email alerts).</p>
 
-  <div class="space-y-3">
-    <% @neighbors.each do |neighbor| %>
-      <div class="bg-white border border-gray-200 rounded-md p-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <%= link_to neighbor.area.name, area_path(neighbor.area, from_neighbor: 1), class: "text-blue-600 hover:text-blue-800 font-medium", target: "_blank", rel: "noopener noreferrer", data: { controller: "tracking", action: "click->tracking#track", tracking_event_value: "adjacent_area_click", tracking_params_value: { area: neighbor.area.shortcode, direction: neighbor.direction, distance_feet: neighbor.distance_feet }.to_json } %>
-            <span class="text-xs text-gray-400 ml-1"><%= neighbor.area.shortcode %></span>
+  <div class="divide-y divide-gray-200">
+    <% @neighbors.each_with_index do |neighbor, idx| %>
+      <% color = neighbor_colors[idx % neighbor_colors.size] %>
+      <div class="py-3 first:pt-0 last:pb-0" data-neighbor-card>
+        <div class="flex items-start gap-3">
+          <input type="checkbox"
+                 data-action="change->area-map#toggle"
+                 data-neighbor-id="<%= neighbor.area.id %>"
+                 data-coordinates="<%= neighbor.area.map_coordinates_json %>"
+                 data-color="<%= color %>"
+                 class="mt-1 h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-offset-0"
+                 style="accent-color: <%= color %>;" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <div>
+                <%= link_to neighbor.area.name, area_path(neighbor.area, from_neighbor: 1), class: "text-blue-600 hover:text-blue-800 font-medium", target: "_blank", rel: "noopener noreferrer", data: { controller: "tracking", action: "click->tracking#track", tracking_event_value: "adjacent_area_click", tracking_params_value: { area: neighbor.area.shortcode, direction: neighbor.direction, distance_feet: neighbor.distance_feet }.to_json } %>
+              </div>
+              <span class="text-xs text-gray-500">&asymp; <%= neighbor.distance_feet %> ft <%= neighbor.direction %></span>
+            </div>
+            <p class="text-sm text-gray-700 mt-1">Next sweeps: <%= neighbor.area.next_sweep %></p>
           </div>
-          <span class="text-xs text-gray-500">&asymp; <%= neighbor.distance_feet %> ft <%= neighbor.direction %></span>
         </div>
-        <% if neighbor.nearest_address.present? %>
-          <p class="text-sm text-gray-500 italic mt-1">Near <%= neighbor.nearest_address %></p>
-        <% end %>
-        <p class="text-sm text-gray-700 mt-1">Next sweeps: <%= neighbor.area.next_sweep %></p>
       </div>
     <% end %>
   </div>
+
+  <p class="text-xs text-gray-400 mt-4">
+    Because sweep areas change annually, subscriptions to notifications for adjacent areas will be deleted prior to the <%= (Date.current.year + 1).to_s %> sweep season.
+  </p>
 </div>

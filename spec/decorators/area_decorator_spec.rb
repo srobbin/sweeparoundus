@@ -134,6 +134,32 @@ RSpec.describe AreaDecorator do
     end
   end
 
+  describe "#map_coordinates_json" do
+    it "returns a JSON array of [lat, lng] pairs from the simplified polygon" do
+      json = decorated_area.map_coordinates_json
+      coords = JSON.parse(json)
+
+      expect(coords).to be_an(Array)
+      expect(coords).not_to be_empty
+      expect(coords.first).to match([ a_value_between(41.0, 42.0), a_value_between(-88.0, -87.0) ])
+    end
+
+    it "returns lat/lng order (not lng/lat)" do
+      coords = JSON.parse(decorated_area.map_coordinates_json)
+      lat, lng = coords.first
+
+      expect(lat).to be > 0
+      expect(lng).to be < 0
+    end
+
+    it "returns an empty JSON array when the shape has no usable polygon" do
+      empty_multi = RGeo::Geos.factory(srid: 0).parse_wkt("MULTIPOLYGON EMPTY")
+      allow(area).to receive(:shape).and_return(empty_multi)
+
+      expect(decorated_area.map_coordinates_json).to eq("[]")
+    end
+  end
+
   describe "#next_sweep" do
     context "with an upcoming sweep with multiple dates" do
       before do

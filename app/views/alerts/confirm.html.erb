@@ -1,9 +1,9 @@
 <div class="flex flex-1 flex-col items-center justify-center max-w-6xl mx-auto px-4 text-center">
   <div class="my-8">
-    <%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 w-96 mx-auto" %>
+    <%= link_to root_path do %><%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 w-96 mx-auto" %><% end %>
     <div class="text-xl mt-2">
       <% if @alert %>
-        Thank you for confirming your subscription.
+        Thank you for confirming your <%= @neighbor_alert_ids.present? ? "subscriptions" : "subscription" %>.
       <% else %>
         I'm sorry, we could not find your subscription.
       <% end %>

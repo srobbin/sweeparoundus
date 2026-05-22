@@ -12,19 +12,20 @@ class AlertsController < ApplicationController
 
   def create
     email = params[:email].strip.downcase
-    # Identity for the unique index is (email, street_address); lat/lng
-    # are written as attributes only — including them in the lookup makes
-    # re-subscribes with slightly different float precision miss the
-    # existing row and trip the unique index.
-    @alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
-    if street_address
-      @alert.lat = session[:search_lat]
-      @alert.lng = session[:search_lng]
-    end
+
+    @alert = build_primary_alert(email)
 
     if @alert.save
-      flash.now[:notice] = "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
-      AlertMailer.with(alert: @alert).confirm.deliver_later
+      @neighbor_alerts = create_neighbor_alerts(email)
+
+      AlertMailer.with(alert: @alert, neighbor_alerts: @neighbor_alerts).confirm.deliver_later
+
+      area_count = 1 + @neighbor_alerts.size
+      flash.now[:notice] = if area_count > 1
+        "Please check your inbox to confirm your #{area_count} subscriptions. You won't receive alerts at #{email} unless you confirm."
+      else
+        "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
+      end
     else
       flash.now[:alert] = "Invalid email"
     end
@@ -40,7 +41,10 @@ class AlertsController < ApplicationController
   end
 
   def confirm
-    @alert.try(:update, { confirmed: true })
+    if @alert
+      @alert.update(confirmed: true)
+      confirm_neighbor_alerts
+    end
   end
 
   private
@@ -57,12 +61,44 @@ class AlertsController < ApplicationController
     email = decoded_params["sub"]
     address = decoded_params["street_address"]
     @alert = Alert.find_by(area: @area, email: email, street_address: address)
+    @neighbor_alert_ids = Array(decoded_params["neighbor_alert_ids"])
   rescue JWT::DecodeError, JSON::ParserError
     render_invalid_link
   end
 
   def render_invalid_link
     render "alerts/invalid_link", status: :bad_request
+  end
+
+  def confirm_neighbor_alerts
+    return if @neighbor_alert_ids.blank?
+
+    Alert.where(id: @neighbor_alert_ids, email: @alert.email, confirmed: false)
+         .update_all(confirmed: true)
+  end
+
+  def build_primary_alert(email)
+    alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
+    if street_address
+      alert.lat = session[:search_lat]
+      alert.lng = session[:search_lng]
+    end
+    alert
+  end
+
+  def create_neighbor_alerts(email)
+    ids = Array(params[:neighbor_area_ids]).compact_blank
+    return [] if ids.empty?
+
+    Area.where(id: ids).filter_map do |neighbor_area|
+      alert = neighbor_area.alerts.find_or_initialize_by(email: email, street_address: nil)
+      if alert.save
+        alert
+      else
+        Rails.logger.warn("[AlertsController] Neighbor alert save failed for area #{neighbor_area.id}: #{alert.errors.full_messages.join(', ')}")
+        nil
+      end
+    end
   end
 
   def street_address

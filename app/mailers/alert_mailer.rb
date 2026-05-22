@@ -16,10 +16,12 @@ class AlertMailer < ApplicationMailer
   end
 
   def confirm
-    mail(
-      to: @email,
-      subject: "Please confirm your subscription to #{@area.name}",
-    )
+    subject = if @neighbor_areas.any?
+      "Please confirm your #{1 + @neighbor_areas.size} street sweeping subscriptions"
+    else
+      "Please confirm your subscription to #{@area.name}"
+    end
+    mail(to: @email, subject: subject)
   end
 
   def annual_schedule_live
@@ -48,6 +50,8 @@ class AlertMailer < ApplicationMailer
   def set_alert_and_area
     @alert = params[:alert]
     @area = @alert.area
+    @neighbor_alerts = Array(params[:neighbor_alerts])
+    @neighbor_areas = @neighbor_alerts.map(&:area)
   end
 
   def set_email
@@ -73,7 +77,8 @@ class AlertMailer < ApplicationMailer
   end
 
   def set_mailer_urls
-    token = encode_jwt(@email, @street_address)
+    neighbor_ids = @neighbor_alerts.map { |a| a.id.to_s }.presence
+    token = encode_jwt(@email, @street_address, neighbor_alert_ids: neighbor_ids)
     @confirmation_url = confirm_area_alerts_url(@area, t: token)
     @unsubscribe_url = unsubscribe_area_alerts_url(@area, t: token)
   end

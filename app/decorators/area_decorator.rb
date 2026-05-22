@@ -17,6 +17,14 @@ class AreaDecorator < ApplicationDecorator
   # detail; doubling past this can collapse the polygon to nothing.
   MAX_SIMPLIFY_TOLERANCE = 0.001
 
+  def map_coordinates_json
+    poly = simplified_shape || polygon_from(object.shape)
+    return "[]" unless poly
+
+    points = poly.exterior_ring.points
+    points.map { |pt| [ pt.y, pt.x ] }.to_json
+  end
+
   def next_sweep
     sweep = object.next_sweep
     return "No sweeps scheduled in the near future." unless sweep

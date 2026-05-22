@@ -11,9 +11,9 @@
             <%= @area.name %>
           </h1>
           <% if @searched_address.present? %>
-            <p class="text-sm text-gray-500 mt-1"><%= @searched_address %></p>
+            <p class="text-sm text-gray-500 mt-1.5"><%= @searched_address %></p>
           <% elsif @adjacent_to_address.present? %>
-            <p class="text-sm text-gray-500 mt-1">Adjacent sweep area (<%= @adjacent_to_address %>)</p>
+            <p class="text-sm text-gray-500 mt-1.5">Adjacent sweep area (<%= @adjacent_to_address %>)</p>
           <% end %>
         </div>
 
@@ -25,18 +25,42 @@
         </div>
       </div>
 
-      <div class="lg:grid grid-cols-2 gap-8">
-        <div class="rounded-lg overflow-hidden">
-          <%= @area.map_image(show_marker: @show_search_marker) %>
+      <%
+        grid_data = {}
+        if @neighbors.present?
+          grid_data = {
+            controller: "area-map",
+            action: "turbo:submit-end->area-map#lockNeighbors",
+            area_map_coordinates_value: @area.map_coordinates_json,
+            area_map_center_value: [session[:search_lat].to_f, session[:search_lng].to_f].to_json
+          }
+        end
+      %>
+      <%= tag.div class: "flex flex-col lg:grid grid-cols-2 gap-8", data: grid_data do %>
+        <div class="rounded-lg overflow-hidden order-1 lg:col-start-1 lg:row-start-1">
+          <% if @neighbors.present? %>
+            <div data-area-map-target="map" style="width:100%; height:400px;"></div>
+          <% else %>
+            <%= @area.map_image(show_marker: @show_search_marker) %>
+          <% end %>
         </div>
 
-        <aside class="flex-1 my-6 lg:my-0 max-w-xl">
-          <!-- Subscribe -->
+        <aside class="flex-1 my-6 lg:my-0 max-w-xl space-y-4 order-2 lg:col-start-2 lg:row-start-1 lg:row-span-2">
+          <% if @neighbors.present? %>
+            <%= render "neighbors" %>
+          <% end %>
           <%= render "subscribe" %>
-          <%= render "schedule" %>
-          <%= render "neighbors" if @neighbors.present? %>
+          <% unless @neighbors.present? %>
+            <%= render "schedule" %>
+          <% end %>
         </aside>
-      </div>
+
+        <% if @neighbors.present? %>
+          <div class="order-3 lg:col-start-1 lg:row-start-2">
+            <%= render "schedule" %>
+          </div>
+        <% end %>
+      <% end %>
 
       <div class="my-8 border-l-4 border-gray-300 pl-4 py-2 text-sm text-gray-500">
         <p>
