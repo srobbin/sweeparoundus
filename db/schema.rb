@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_12_040000) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_21_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
@@ -43,6 +43,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_12_040000) do
     t.boolean "permit_notifications", default: true, null: false
     t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}
     t.index ["area_id"], name: "index_alerts_on_area_id"
+    t.index ["email", "area_id"], name: "index_alerts_on_email_area_without_address", unique: true, where: "(street_address IS NULL)"
     t.index ["email", "street_address"], name: "index_alerts_on_subscription_uniqueness", unique: true
     t.index ["email"], name: "index_alerts_on_email"
     t.index ["location"], name: "index_alerts_on_location", using: :gist

@@ -54,6 +54,73 @@ RSpec.describe Alert do
       expect(alert).to be_valid
     end
 
+    describe "email domain MX validation" do
+      it "is valid when the domain has MX records" do
+        alert = Alert.new(email: "user@gmail.com", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "is valid when the domain has no MX but has A records" do
+        dns = instance_double(Resolv::DNS)
+        allow(Resolv::DNS).to receive(:open).and_yield(dns)
+        allow(dns).to receive(:timeouts=)
+        allow(dns).to receive(:getresources)
+          .with("example.com", Resolv::DNS::Resource::IN::MX)
+          .and_return([])
+        allow(dns).to receive(:getresources)
+          .with("example.com", Resolv::DNS::Resource::IN::A)
+          .and_return([ instance_double(Resolv::DNS::Resource::IN::A) ])
+
+        alert = Alert.new(email: "user@example.com", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "is invalid when the domain has no MX or A records" do
+        dns = instance_double(Resolv::DNS)
+        allow(Resolv::DNS).to receive(:open).and_yield(dns)
+        allow(dns).to receive(:timeouts=)
+        allow(dns).to receive(:getresources).and_return([])
+
+        alert = Alert.new(email: "opera1651@gmail.como", area: area)
+
+        expect(alert).not_to be_valid
+        expect(alert.errors[:email]).to include("domain does not appear to accept email")
+      end
+
+      it "does not block signups when DNS lookup fails" do
+        allow(Resolv::DNS).to receive(:open).and_raise(Resolv::ResolvError)
+
+        alert = Alert.new(email: "user@flaky-dns.com", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "does not block signups when DNS lookup times out" do
+        allow(Resolv::DNS).to receive(:open).and_raise(Resolv::ResolvTimeout)
+
+        alert = Alert.new(email: "user@slow-dns.com", area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "skips MX validation when email format is already invalid" do
+        alert = Alert.new(email: "not-an-email", area: area)
+
+        expect(Resolv::DNS).not_to receive(:open)
+        alert.valid?
+        expect(alert.errors[:email]).to be_present
+      end
+
+      it "skips MX validation when phone is present and email is nil" do
+        alert = Alert.new(phone: "3125551234", email: nil, area: area)
+
+        expect(Resolv::DNS).not_to receive(:open)
+        expect(alert).to be_valid
+      end
+    end
+
     describe "email + street_address uniqueness" do
       let!(:existing) do
         create(:alert, :confirmed, email: "dupe@example.com", street_address: "123 Main St", area: area)
@@ -78,9 +145,18 @@ RSpec.describe Alert do
         expect(alert).to be_valid
       end
 
-      it "allows multiple alerts with the same email and nil street_address" do
+      it "prevents duplicate alerts with the same email, nil street_address, and same area" do
         create(:alert, :confirmed, email: "nil-addr@example.com", street_address: nil, area: area)
         alert = Alert.new(email: "nil-addr@example.com", street_address: nil, area: area)
+
+        expect(alert).not_to be_valid
+        expect(alert.errors[:email]).to include("has already been taken")
+      end
+
+      it "allows same email with nil street_address across different areas" do
+        create(:alert, :confirmed, email: "nil-addr@example.com", street_address: nil, area: area)
+        other_area = create(:area, number: 99, ward: 99, slug: "ward-99-sweep-area-99", shortcode: "W99A99")
+        alert = Alert.new(email: "nil-addr@example.com", street_address: nil, area: other_area)
 
         expect(alert).to be_valid
       end

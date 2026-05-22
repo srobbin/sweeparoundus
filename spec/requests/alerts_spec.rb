@@ -35,7 +35,7 @@ RSpec.describe "Alerts", type: :request do
 
         post area_alerts_path(area), params: { email: valid_email }
 
-        expect(AlertMailer).to have_received(:with).with(alert: Alert.last)
+        expect(AlertMailer).to have_received(:with).with(alert: Alert.last, neighbor_alerts: [])
         expect(mailer_dbl).to have_received(:confirm)
         expect(mailer_dbl).to have_received(:deliver_later)
       end

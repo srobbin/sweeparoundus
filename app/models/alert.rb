@@ -11,7 +11,9 @@ class Alert < ApplicationRecord
 
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, unless: -> { self.phone.present? }
   validates :email, uniqueness: { scope: :street_address }, if: -> { email.present? && street_address.present? }
+  validates :email, uniqueness: { scope: :area_id }, if: -> { email.present? && street_address.nil? }
   validate :email_or_phone
+  validate :email_domain_has_mx_record, on: :create, if: -> { email.present? && errors[:email].empty? }
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
@@ -36,6 +38,18 @@ class Alert < ApplicationRecord
     return if self.email.present? || self.phone.present?
 
     errors.add(:base, "You must specify either an email or phone number.")
+  end
+
+  def email_domain_has_mx_record
+    domain = email.split("@").last
+    Resolv::DNS.open do |dns|
+      dns.timeouts = [ 2, 0 ]
+      return if dns.getresources(domain, Resolv::DNS::Resource::IN::MX).any?
+      return if dns.getresources(domain, Resolv::DNS::Resource::IN::A).any?
+    end
+    errors.add(:email, "domain does not appear to accept email")
+  rescue Resolv::ResolvError, Resolv::ResolvTimeout => e
+    Rails.logger.warn("[Alert] MX check failed for #{domain}: #{e.class}: #{e.message}")
   end
 
   def update_location_from_coords

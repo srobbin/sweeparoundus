@@ -1,6 +1,7 @@
 module JwtHelper
-  def encode_jwt(email, street_address)
+  def encode_jwt(email, street_address, neighbor_alert_ids: nil)
     payload = { sub: email, street_address: street_address }
+    payload[:neighbor_alert_ids] = neighbor_alert_ids if neighbor_alert_ids.present?
     JWT.encode payload, ENV["SECRET_KEY_JWT"], "HS256"
   end
 

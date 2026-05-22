@@ -149,7 +149,7 @@ RSpec.describe "Areas", type: :request do
           ) ]
         end
 
-        it "renders the searched address, neighbors partial, search marker, and save-address checkbox" do
+        it "renders the searched address, neighbors partial, interactive map, and save-address checkbox" do
           get area_path(area)
 
           expect(response).to have_http_status(:ok)
@@ -157,7 +157,8 @@ RSpec.describe "Areas", type: :request do
           expect(response.body).to include("Adjacent Sweep Areas")
           expect(response.body).to include("Ward 33, Sweep Area 14")
           expect(response.body).to include("42 ft E")
-          expect(response.body).to include("&amp;markers=|#{search_lat},#{search_lng}|")
+          expect(response.body).to include('data-controller="area-map"')
+          expect(response.body).to include("data-area-map-center-value=\"[#{search_lat},#{search_lng}]\"")
           expect(response.body).to include("Save my street address")
           expect(response.body).not_to include("subscription to notifications for this adjacent area")
         end
