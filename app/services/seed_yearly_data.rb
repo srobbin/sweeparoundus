@@ -82,31 +82,11 @@ class SeedYearlyData
 
   def import_schedule_data
     puts "Importing Schedule"
-    CSV.foreach("db/data/Street_Sweeping_Schedule_-_#{year}.csv", headers: true).each do |row|
-      puts row
-      area = Area.find_by(number: row["SECTION"], ward: row["WARD"])
-      month = row["MONTH NUMBER"].strip
-      dates = row["DATES"].split(",").reject { |d| d.strip.blank? }.map do |day|
-        Date.new(Date.current.year, month.to_i, day.to_i)
-      end.uniq.sort
+    area_dates = collect_area_dates
+    return unless write
 
-      clusters = []
-      cluster_index = 0
-      dates.each_with_index do |date, index|
-        clusters[cluster_index] ||= []
-        last_date = clusters[cluster_index].last
-
-        if last_date && date > last_date + 3.days
-          cluster_index += 1
-          clusters[cluster_index] ||= []
-        end
-
-        clusters[cluster_index] << date
-      end
-
-      next unless write
-
-      clusters.each do |cluster|
+    area_dates.each do |area, dates|
+      cluster_dates(dates).each do |cluster|
         Sweep.find_or_create_by!(
           area: area,
           date_1: cluster[0],
@@ -116,5 +96,47 @@ class SeedYearlyData
         )
       end
     end
+  end
+
+  # Build an `area -> [Date, ...]` map by reading every row of the schedule
+  # CSV. We aggregate dates per area across all months before clustering so
+  # that month-boundary pairs (e.g. Jun 30 + Jul 1) cluster together instead
+  # of being persisted as two separate single-date Sweep records.
+  def collect_area_dates
+    map = Hash.new { |h, k| h[k] = [] }
+
+    CSV.foreach("db/data/Street_Sweeping_Schedule_-_#{year}.csv", headers: true) do |row|
+      area = Area.find_by(number: row["SECTION"], ward: row["WARD"])
+      next unless area
+
+      month = row["MONTH NUMBER"].strip
+      row["DATES"].split(",").each do |day|
+        day = day.strip
+        next if day.blank?
+
+        map[area] << Date.new(Date.current.year, month.to_i, day.to_i)
+      end
+    end
+
+    map.transform_values { |dates| dates.uniq.sort }
+  end
+
+  # Group a sorted list of dates into clusters where each subsequent date is
+  # within 3 days of the previous one in the same cluster. Operates purely on
+  # the date list, so it doesn't care about month boundaries.
+  def cluster_dates(dates)
+    clusters = []
+    current = nil
+
+    dates.each do |date|
+      if current.nil? || date > current.last + 3.days
+        current = [ date ]
+        clusters << current
+      else
+        current << date
+      end
+    end
+
+    clusters
   end
 end

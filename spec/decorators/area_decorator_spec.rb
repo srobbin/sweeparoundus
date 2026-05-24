@@ -200,4 +200,37 @@ RSpec.describe AreaDecorator do
       end
     end
   end
+
+  describe "#max_cluster_size" do
+    it "returns 2 when the area has no sweeps" do
+      expect(decorated_area.max_cluster_size).to eq(2)
+    end
+
+    it "returns 2 for the common case of two-date pairs" do
+      create(:sweep, area: area, date_1: today + 1, date_2: today + 2, date_3: nil, date_4: nil)
+      create(:sweep, area: area, date_1: today + 8, date_2: today + 9, date_3: nil, date_4: nil)
+
+      expect(decorated_area.max_cluster_size).to eq(2)
+    end
+
+    it "returns 4 when at least one cluster fills all four columns" do
+      create(:sweep, area: area, date_1: today + 1, date_2: today + 2, date_3: nil, date_4: nil)
+      create(:sweep, area: area, date_1: today + 8, date_2: today + 9, date_3: today + 10, date_4: today + 11)
+
+      expect(decorated_area.max_cluster_size).to eq(4)
+    end
+
+    it "returns 2 (not 1) when the only sweep is a singleton, to keep a sensible default table width" do
+      create(:sweep, area: area, date_1: today + 1, date_2: nil, date_3: nil, date_4: nil)
+
+      expect(decorated_area.max_cluster_size).to eq(2)
+    end
+
+    it "reflects the largest cluster, not the most recent one" do
+      create(:sweep, area: area, date_1: today + 1, date_2: today + 2, date_3: today + 3, date_4: nil)
+      create(:sweep, area: area, date_1: today + 8, date_2: today + 9, date_3: nil, date_4: nil)
+
+      expect(decorated_area.max_cluster_size).to eq(3)
+    end
+  end
 end

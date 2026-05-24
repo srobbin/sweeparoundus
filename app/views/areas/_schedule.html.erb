@@ -1,23 +1,62 @@
-<% past_sweep_class = "px-4 py-3 whitespace-nowrap text-sm text-gray-300" %>
-<% upcoming_sweep_class = "px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" %>
+<%
+  max_cols = @area.max_cluster_size
+  past_cell_class = "px-4 py-3 whitespace-nowrap text-sm text-gray-400"
+  upcoming_cell_class = "px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
+
+  classified = @area.sweeps.filter_map do |sweep|
+    dates = 1.upto(max_cols).filter_map { |n| sweep.object.send("date_#{n}") }
+    next if dates.empty?
+    [ dates, dates.max < Date.current ]
+  end
+
+  upcoming_rows = classified.reject { |_, past| past }
+  past_rows = classified.select { |_, past| past }
+%>
 <div class="border border-gray-200 rounded-lg p-5">
   <h2 class="flex items-center mb-3 text-lg font-semibold text-gray-900">
     <%= icon "calendar-blank", class: "h-5 w-5 text-gray-500", aria: { hidden: true } %>
     <span class="ml-2">Sweep Schedule</span>
   </h2>
-  <div class="rounded-lg overflow-hidden border border-gray-200">
-    <table class="min-w-full divide-y divide-gray-200">
-      <tbody class="divide-y divide-gray-100">
-        <% @area.sweeps.each do |sweep| %>
-          <% is_past = [sweep.date_1, sweep.date_2, sweep.date_3, sweep.date_4].all? { |date| date == "—" || Date.parse(date) < Date.today } %>
-          <tr class="<%= cycle("bg-white", "bg-gray-50") %>">
-            <td class="<%= is_past ? past_sweep_class : upcoming_sweep_class %>"><%= sweep.date_1 %></td>
-            <td class="<%= is_past ? past_sweep_class : upcoming_sweep_class %>"><%= sweep.date_2 %></td>
-            <td class="<%= is_past ? past_sweep_class : upcoming_sweep_class %>"><%= sweep.date_3 %></td>
-            <td class="<%= is_past ? past_sweep_class : upcoming_sweep_class %>"><%= sweep.date_4 %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+
+  <% if classified.empty? %>
+    <p class="text-sm text-gray-500">No sweeps scheduled.</p>
+  <% else %>
+    <% if upcoming_rows.any? %>
+      <div class="rounded-lg border border-gray-200 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-100">
+            <% upcoming_rows.each do |dates, _| %>
+              <tr class="<%= cycle("bg-white", "bg-gray-50", name: "upcoming") %>">
+                <% dates.each do |date| %>
+                  <td class="<%= upcoming_cell_class %>"><%= date.strftime("%a, %b %-d") %></td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <% if past_rows.any? %>
+      <details class="group <%= 'mt-3' if upcoming_rows.any? %>" <%= "open" if upcoming_rows.empty? %>>
+        <summary class="cursor-pointer list-none inline-flex items-center gap-1 py-2 text-sm text-gray-500 hover:text-gray-700 select-none">
+          <%= icon "caret-down", class: "h-4 w-4 shrink-0 transition-transform group-open:rotate-180", aria: { hidden: true } %>
+          <span>Past sweeps (<%= past_rows.size %>)</span>
+        </summary>
+        <div class="mt-2 rounded-lg border border-gray-200 overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <tbody class="divide-y divide-gray-100">
+              <% past_rows.each do |dates, _| %>
+                <tr class="<%= cycle("bg-white", "bg-gray-50", name: "past") %>">
+                  <% dates.each do |date| %>
+                    <td class="<%= past_cell_class %>"><%= date.strftime("%a, %b %-d") %></td>
+                  <% end %>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    <% end %>
+  <% end %>
 </div>

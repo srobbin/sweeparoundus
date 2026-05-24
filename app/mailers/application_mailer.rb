@@ -1,5 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
   include JwtHelper
+  helper ApplicationHelper
 
   rescue_from StandardError do |exception|
     Sentry.set_context("mailer", {

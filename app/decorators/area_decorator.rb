@@ -36,6 +36,19 @@ class AreaDecorator < ApplicationDecorator
     dates.present? ? dates : "No sweeps scheduled in the near future."
   end
 
+  # Largest cluster size present in this area's sweep schedule. Used by the
+  # schedule partial to decide how many columns to render: ~99% of areas top
+  # out at 2, but a handful of dense Lincoln Park / Bridgeport areas use 4.
+  # Floored at 2 so areas with no sweeps (or only singletons) still render a
+  # sensible table width.
+  def max_cluster_size
+    size = object.sweeps.map do |sweep|
+      1.upto(4).count { |n| sweep.send("date_#{n}").present? }
+    end.max
+
+    [ size.to_i, 2 ].max
+  end
+
   private
 
   def marker_param

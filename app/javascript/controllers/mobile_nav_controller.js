@@ -25,9 +25,9 @@ export default class extends Controller {
     }
 
     if (isOpen) {
-      this.#closeNavPanel();
-      const input = this.panelTarget.querySelector('input[name="address"]');
-      if (input) input.focus();
+      this.#closeSearchPanel();
+      const firstLink = this.panelTarget.querySelector('a');
+      if (firstLink) firstLink.focus();
     }
   }
 
@@ -41,7 +41,6 @@ export default class extends Controller {
     if (this.panelTarget.classList.contains('hidden')) return;
     if (this.panelTarget.contains(event.target)) return;
     if (this.hasButtonTarget && this.buttonTarget.contains(event.target)) return;
-    if (this.#isPlacesDropdownTarget(event.target)) return;
     this.close();
   }
 
@@ -52,24 +51,10 @@ export default class extends Controller {
     if (this.hasButtonTarget) this.buttonTarget.focus();
   }
 
-  // The Google Places autocomplete renders its suggestion dropdown outside
-  // our panel (either as a portal or inside the gmp-place-autocomplete
-  // element itself). Treat clicks on any of those as "inside" so the panel
-  // doesn't snap closed mid-selection.
-  #isPlacesDropdownTarget(target) {
-    if (!target || !target.closest) return false;
-    return Boolean(
-      target.closest('gmp-place-autocomplete') ||
-      target.closest('.pac-container') ||
-      target.closest('[role="listbox"]') ||
-      target.closest('[role="option"]')
-    );
-  }
-
-  #closeNavPanel() {
-    const navPanel = document.querySelector('[data-mobile-nav-target="panel"]');
-    const navButton = document.querySelector('[data-mobile-nav-target="button"]');
-    if (navPanel) navPanel.classList.add('hidden');
-    if (navButton) navButton.setAttribute('aria-expanded', 'false');
+  #closeSearchPanel() {
+    const searchPanel = document.querySelector('[data-mobile-search-target="panel"]');
+    const searchButton = document.querySelector('[data-mobile-search-target="button"]');
+    if (searchPanel) searchPanel.classList.add('hidden');
+    if (searchButton) searchButton.setAttribute('aria-expanded', 'false');
   }
 }

@@ -1,16 +1,25 @@
-<header class="bg-gray-100" data-controller="mobile-search">
+<header class="bg-gray-100/95 backdrop-blur sticky top-0 z-40 lg:static lg:bg-gray-100 lg:backdrop-blur-none" data-controller="mobile-search mobile-nav">
   <div class="flex items-center max-w-6xl mx-auto py-2 px-4">
     <div class="flex-1">
-      <%= link_to image_tag("logo.png", class: "w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
+      <%= link_to image_tag("logo.png", class: "h-9 w-auto lg:h-auto lg:w-96", alt: "#{ENV["SITE_NAME"]} logo"), root_path %>
     </div>
     <button type="button"
-            class="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+            class="lg:hidden p-2.5 text-gray-500 hover:text-gray-700"
             data-action="mobile-search#toggle"
             data-mobile-search-target="button"
             aria-label="Search"
             aria-controls="mobile-search-panel"
             aria-expanded="false">
       <%= icon "magnifying-glass", class: "h-6 w-6", aria: { hidden: true } %>
+    </button>
+    <button type="button"
+            class="lg:hidden p-2.5 text-gray-500 hover:text-gray-700"
+            data-action="mobile-nav#toggle"
+            data-mobile-nav-target="button"
+            aria-label="Menu"
+            aria-controls="mobile-nav-panel"
+            aria-expanded="false">
+      <%= icon "list", class: "h-6 w-6", aria: { hidden: true } %>
     </button>
     <div class="hidden lg:block">
       <%= render "search/form", variant: :secondary %>
@@ -19,4 +28,12 @@
   <div id="mobile-search-panel" class="hidden px-4 pb-3 lg:hidden" data-mobile-search-target="panel">
     <%= render "search/form", variant: :secondary %>
   </div>
+  <nav id="mobile-nav-panel" class="hidden px-4 pb-3 lg:hidden" data-mobile-nav-target="panel" aria-label="Site">
+    <div class="flex flex-col border-t border-gray-200 pt-2">
+      <%= link_to "About", about_path, class: "block px-3 py-2.5 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200" %>
+      <%= link_to "FAQ", faq_path, class: "block px-3 py-2.5 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200" %>
+      <%= link_to "Manage Subscriptions", subscriptions_path, class: "block px-3 py-2.5 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200" %>
+      <%= link_to "Privacy Policy", privacy_policy_path, class: "block px-3 py-2.5 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200" %>
+    </div>
+  </nav>
 </header>
