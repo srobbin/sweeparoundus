@@ -1,4 +1,10 @@
 module ApplicationHelper
+  DEFAULT_COFFEE_LINK_URL = "https://www.buymeacoffee.com/wethesweeple"
+
+  def coffee_link_url
+    ENV["COFFEE_LINK_URL"].presence || DEFAULT_COFFEE_LINK_URL
+  end
+
   def title
     site_name = ENV["SITE_NAME"]
     site_description = t(:site_description)

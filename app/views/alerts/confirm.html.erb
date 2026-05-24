@@ -1,6 +1,6 @@
 <div class="flex flex-1 flex-col items-center justify-center max-w-6xl mx-auto px-4 text-center">
   <div class="my-8">
-    <%= link_to root_path do %><%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 w-96 mx-auto" %><% end %>
+    <%= link_to root_path do %><%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 mx-auto max-w-[280px] sm:max-w-md" %><% end %>
     <div class="text-xl mt-2">
       <% if @alert %>
         Thank you for confirming your <%= @neighbor_alert_ids.present? ? "subscriptions" : "subscription" %>.
@@ -9,7 +9,7 @@
       <% end %>
     </div>
     <div class="flex justify-center mt-7">
-      <a href="https://www.buymeacoffee.com/wethesweeple" target="_blank" rel="noopener noreferrer"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=☕&slug=wethesweeple&button_colour=b3ddf2&font_colour=000000&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" alt="Buy us a coffee" /></a>
+      <%= render "shared/buy_us_a_coffee_button" %>
     </div>
   </div>
 </div>

@@ -8,7 +8,7 @@
       <p class="text-sm text-gray-600 mb-3">
         Click <strong>Confirm</strong> on each subscription below to start receiving alerts.
       </p>
-      <div id="pending-list" class="space-y-3">
+      <div id="pending-list" class="space-y-4">
         <% pending.each do |alert| %>
           <%= render "subscription", alert: alert, token: token %>
         <% end %>
@@ -18,7 +18,7 @@
 
   <section id="active-subscriptions" aria-labelledby="active-heading">
     <h2 id="active-heading" class="text-base font-semibold text-gray-900 mb-2 <%= 'sr-only' unless pending.any? %>">Active subscriptions</h2>
-    <div id="active-list" class="space-y-3">
+    <div id="active-list" class="space-y-4">
       <% if active.any? %>
         <% active.each do |alert| %>
           <%= render "subscription", alert: alert, token: token %>
