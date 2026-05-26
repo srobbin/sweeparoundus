@@ -22,6 +22,7 @@ ActiveAdmin.register Alert do
     end
     column :confirmed
     column :permit_notifications
+    column :created_at
     column :updated_at
     actions
   end
@@ -29,4 +30,16 @@ ActiveAdmin.register Alert do
   scope :all
   scope :confirmed
   scope :unconfirmed
+
+  form do |f|
+    f.inputs do
+      f.input :area
+      f.input :email
+      f.input :phone
+      f.input :street_address
+      f.input :confirmed
+      f.input :permit_notifications
+    end
+    f.actions
+  end
 end
