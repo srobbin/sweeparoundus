@@ -85,6 +85,18 @@ RSpec.describe NotifyWardOffices, type: :service do
         expect(csv_output).to include([ "1", "La Spata, Daniel", "Ward01@cityofchicago.org", "true" ])
         expect(csv_output).to include([ "2", "Hopkins, Brian", "office@aldermanhopkins.com", "true" ])
       end
+
+      context 'when a delivery fails' do
+        before do
+          allow(Sentry).to receive(:capture_exception)
+          allow(mailer_dbl).to receive(:deliver_later).and_raise(StandardError, "mail error")
+        end
+
+        it 'reports to Sentry and continues' do
+          expect(subject).to eq("SUCCESS: 0 ward office(s) notified")
+          expect(Sentry).to have_received(:capture_exception).twice
+        end
+      end
     end
 
     context 'when a row has already been notified' do

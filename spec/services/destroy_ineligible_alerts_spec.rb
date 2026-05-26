@@ -58,6 +58,25 @@ RSpec.describe DestroyIneligibleAlerts, type: :service do
         result = subject
         expect(result).to eq(expected_result)
       end
+
+      context 'when destruction fails' do
+        let(:service) { described_class.new(write: true) }
+
+        before do
+          allow(Sentry).to receive(:capture_exception)
+          allow(service.alerts_to_destroy).to receive(:destroy_all).and_raise(StandardError, "db error")
+        end
+
+        it 'reports to Sentry and returns an error string' do
+          result = service.call
+
+          expect(Sentry).to have_received(:capture_exception).with(
+            instance_of(StandardError),
+            hash_including(contexts: hash_including(:destroy_ineligible_alerts))
+          )
+          expect(result).to eq("ERROR: Failed to delete alerts - db error")
+        end
+      end
     end
   end
 end

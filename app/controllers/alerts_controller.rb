@@ -41,10 +41,19 @@ class AlertsController < ApplicationController
   end
 
   def confirm
-    if @alert
-      @alert.update(confirmed: true)
-      confirm_neighbor_alerts
+    return unless @alert
+
+    unless @alert.update(confirmed: true)
+      Sentry.set_context("confirm_alert", {
+        alert_id: @alert.id,
+        area_id: @area.id,
+        errors: @alert.errors.full_messages
+      })
+      Sentry.capture_message("Alert confirmation update failed", level: :warning)
+      return
     end
+
+    confirm_neighbor_alerts
   end
 
   private
@@ -62,6 +71,16 @@ class AlertsController < ApplicationController
     address = decoded_params["street_address"]
     @alert = Alert.find_by(area: @area, email: email, street_address: address)
     @neighbor_alert_ids = Array(decoded_params["neighbor_alert_ids"])
+
+    unless @alert
+      Sentry.set_context("find_alert", {
+        area_id: @area.id,
+        email: email,
+        jwt_street_address: address,
+        action: params[:action]
+      })
+      Sentry.capture_message("Valid JWT but alert not found", level: :warning)
+    end
   rescue JWT::DecodeError, JSON::ParserError
     render_invalid_link
   end
@@ -73,8 +92,28 @@ class AlertsController < ApplicationController
   def confirm_neighbor_alerts
     return if @neighbor_alert_ids.blank?
 
-    Alert.where(id: @neighbor_alert_ids, email: @alert.email, confirmed: false)
-         .update_all(confirmed: true)
+    neighbors = Alert.where(id: @neighbor_alert_ids, email: @alert.email)
+
+    if neighbors.none?
+      Sentry.set_context("confirm_neighbor_alerts", {
+        alert_id: @alert.id,
+        neighbor_alert_ids: @neighbor_alert_ids
+      })
+      Sentry.capture_message("Neighbor alert IDs from JWT not found", level: :warning)
+      return
+    end
+
+    pending_count = neighbors.where(confirmed: false).count
+    updated_count = neighbors.where(confirmed: false).update_all(confirmed: true)
+
+    return unless pending_count.positive? && updated_count.zero?
+
+    Sentry.set_context("confirm_neighbor_alerts", {
+      alert_id: @alert.id,
+      neighbor_alert_ids: @neighbor_alert_ids,
+      pending_count: pending_count
+    })
+    Sentry.capture_message("Failed to confirm neighbor alerts", level: :warning)
   end
 
   def build_primary_alert(email)

@@ -235,11 +235,77 @@ RSpec.describe "Alerts", type: :request do
     context "with a token for a non-existent alert" do
       let(:token) { encode_jwt("nobody@example.com", nil) }
 
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+      end
+
       it "renders the page without an error" do
         get confirm_area_alerts_path(area), params: { t: token }
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("could not find your subscription")
+      end
+
+      it "reports to Sentry" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "Valid JWT but alert not found",
+          level: :warning
+        )
+      end
+    end
+
+    context "when confirmation update fails" do
+      let(:token) { encode_jwt(alert.email, alert.street_address) }
+
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+        allow_any_instance_of(Alert).to receive(:update).with(confirmed: true) do |instance|
+          instance.errors.add(:base, "update blocked")
+          false
+        end
+      end
+
+      it "does not confirm the alert" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(alert.reload.confirmed).to be false
+      end
+
+      it "reports to Sentry" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "Alert confirmation update failed",
+          level: :warning
+        )
+      end
+    end
+
+    context "with neighbor alert IDs that do not exist" do
+      let(:token) { encode_jwt(alert.email, alert.street_address, neighbor_alert_ids: [ "999999" ]) }
+
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+      end
+
+      it "still confirms the primary alert" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(alert.reload.confirmed).to be true
+      end
+
+      it "reports missing neighbors to Sentry" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "Neighbor alert IDs from JWT not found",
+          level: :warning
+        )
       end
     end
 

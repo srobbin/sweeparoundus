@@ -17,6 +17,9 @@ class DestroyIneligibleAlerts
       destroyed_objects = alerts_to_destroy.destroy_all
       "SUCCESS: #{destroyed_objects.count} alerts (unconfirmed or without street address) deleted"
     rescue => e
+      Sentry.capture_exception(e, contexts: {
+        destroy_ineligible_alerts: { alert_count: alerts_to_destroy.count }
+      })
       "ERROR: Failed to delete alerts - #{e.message}"
     end
   end

@@ -34,6 +34,9 @@ class NotifyWardOfficesDelayed
         notified << office
       rescue => e
         puts "FAILED Ward #{office[:ward]} (#{office[:email]}): #{e.message}"
+        Sentry.capture_exception(e, level: :warning, contexts: {
+          ward_office: { ward: office[:ward], email: office[:email], year: year, mailer: "sweeping_data_delayed" }
+        })
       end
     end
 
