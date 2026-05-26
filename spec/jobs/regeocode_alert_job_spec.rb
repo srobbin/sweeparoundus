@@ -10,6 +10,10 @@ RSpec.describe RegeocodeAlertJob, type: :job do
   let(:geocoded_lat) { 41.920 }
   let(:geocoded_lng) { -87.692 }
 
+  before do
+    allow(Sentry).to receive(:capture_message)
+  end
+
   describe "#perform" do
     context "when geocoding succeeds and the area lookup returns a result" do
       before do
@@ -49,6 +53,15 @@ RSpec.describe RegeocodeAlertJob, type: :job do
         expect(alert.lng.to_f).to be_within(0.0001).of(geocoded_lng)
         expect(alert.area).to eq(original_area)
       end
+
+      it "reports missing area to Sentry" do
+        described_class.perform_now(alert.id)
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "[RegeocodeAlertJob] area not found",
+          hash_including(level: :warning)
+        )
+      end
     end
 
     context "when geocoding returns nil" do
@@ -67,6 +80,15 @@ RSpec.describe RegeocodeAlertJob, type: :job do
         alert.reload
         expect(alert.lat).to eq(original_lat)
         expect(alert.lng).to eq(original_lng)
+      end
+
+      it "reports to Sentry" do
+        described_class.perform_now(alert.id)
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "[RegeocodeAlertJob] geocode failed",
+          hash_including(level: :warning)
+        )
       end
     end
 
