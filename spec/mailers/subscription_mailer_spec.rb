@@ -27,14 +27,14 @@ RSpec.describe SubscriptionMailer, type: :mailer do
     end
 
     it "includes the manage link, button, and 1-hour notice in the HTML body" do
-      expect(html_body).to include("Here's your link to manage your subscriptions.")
+      expect(html_body).to include("Here's a link to manage your subscriptions.")
       expect(html_body).to include("Manage my subscriptions")
       expect(html_body).to include(manage_subscriptions_url)
       expect(html_body).to include("expire in 1 hour")
     end
 
     it "includes the manage link, label, and 1-hour notice in the text body" do
-      expect(text_body).to include("Here's your link to manage your subscriptions.")
+      expect(text_body).to include("Here's a link to manage your subscriptions.")
       expect(text_body).to include("Manage my subscriptions")
       expect(text_body).to include(manage_subscriptions_url)
       expect(text_body).to include("expire in 1 hour")
@@ -45,11 +45,11 @@ RSpec.describe SubscriptionMailer, type: :mailer do
       expect(text_body).to include("Requested for: #{email}")
     end
 
-    it "includes the coffee block with the manage_link variant in both bodies" do
+    it "includes the coffee block in both bodies" do
       expect(html_body).to include("Buy us a coffee")
-      expect(html_body).to include("coffee helps keep these alerts free")
+      expect(html_body).to include("Enjoying this free service?")
       expect(text_body).to include("Buy us a coffee")
-      expect(text_body).to include("coffee helps keep these alerts free")
+      expect(text_body).to include("Enjoying this free service?")
     end
 
     it "embeds a valid JWT that decodes back to the correct email" do

@@ -7,6 +7,7 @@ class AlertStaticMap
   BASE_URL = "https://maps.googleapis.com/maps/api/staticmap".freeze
   SIZE = "480x320".freeze
   WIDTH = 480
+  HEIGHT = 320
   SCALE = 2
   MAP_TYPE = "roadmap".freeze
 

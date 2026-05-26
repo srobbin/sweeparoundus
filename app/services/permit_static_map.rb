@@ -9,6 +9,7 @@ class PermitStaticMap
   # stacked in a single email.
   SIZE = "480x320".freeze
   WIDTH = 480
+  HEIGHT = 320
   SCALE = 2 # retina-quality so the image still looks crisp at SIZE px wide
   MAP_TYPE = "roadmap".freeze
 

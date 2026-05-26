@@ -70,6 +70,11 @@ RSpec.describe WardOfficeMailer, type: :mailer do
       expect(html_body).to include("Buy us a coffee")
     end
 
+    it 'includes the reply prompt' do
+      expect(html_body).to include("Questions? Just reply to this email.")
+      expect(text_body).to include("Questions? Just reply to this email.")
+    end
+
     it 'includes the correct content in the text body' do
       expect(text_body).to include("Dear Alderperson La Spata")
       expect(text_body).to include("Ward 1")

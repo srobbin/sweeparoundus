@@ -14,20 +14,19 @@
     coffee_link:    Defaults to true. Pass false to suppress the coffee
                     donation block (e.g. on confirmation emails where
                     it would be noise).
-    coffee_context: Symbol passed through to shared/_coffee_block so
-                    per-mailer copy variants can be picked.
 %>
 <% signoff         = local_assigns.fetch(:signoff, "Cheers,") %>
 <% disclaimer      = local_assigns.fetch(:disclaimer, false) %>
 <% manage_url      = local_assigns[:manage_url] %>
 <% unsubscribe_url = local_assigns[:unsubscribe_url] %>
 <% coffee_link     = local_assigns.fetch(:coffee_link, true) %>
-<% coffee_context  = local_assigns.fetch(:coffee_context, :generic) %>
 
-<p style="margin-top: 1.5em;">
-  <%= signoff %><br />
-  <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
-</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 2em;">
+  <tr><td class="dm-footer-rule" style="border-top: 1px solid #e5e7eb; padding-top: 1.25em;">
+    <%= signoff %><br />
+    <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
+  </td></tr>
+</table>
 
 <% if disclaimer %>
   <p style="font-size: 8pt; font-style: italic; color: #9ca3af; line-height: 1.45;">
@@ -44,5 +43,5 @@
 <% end %>
 
 <% if coffee_link %>
-  <%= render "shared/coffee_block", coffee_context: coffee_context %>
+  <%= render "shared/coffee_block" %>
 <% end %>

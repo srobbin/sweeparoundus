@@ -16,7 +16,7 @@ class PermitMailer < ApplicationMailer
   def notify
     @alert = params[:alert]
     @email = @alert.email
-    @street_address = @alert.street_address
+    @street_address = @alert.street_address&.sub(/,\s*Chicago,\s*IL,\s*USA\s*\z/i, "")
 
     Sentry.set_context("permit_mailer", {
       alert_id: @alert.id,
@@ -81,7 +81,7 @@ class PermitMailer < ApplicationMailer
   end
 
   def format_date(time)
-    time.strftime("%A, %B %-d")
+    time.strftime("%a, %b %-d")
   end
 
   # Lists affected street names; falls back to the subscriber's address

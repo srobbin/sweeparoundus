@@ -1,12 +1,16 @@
 <% if @neighbor_areas.any? -%>
-Hi! Someone—hopefully you—asked to receive Chicago street sweeping alerts at <%= @email %> for these areas:
+Confirm your sweeping alerts
+
+We received a request to subscribe <%= @email %> to street sweeping alerts for these areas:
 
 - <%= @formatted_address_area %>
 <% @neighbor_areas.each do |neighbor_area| -%>
 - <%= neighbor_area.name %>
 <% end -%>
 <% else -%>
-Hi! Someone—hopefully you—asked to receive Chicago street sweeping alerts at <%= @email %> for <%= @formatted_address_area %>.
+Confirm your sweeping alert
+
+We received a request to subscribe <%= @email %> to street sweeping alerts for <%= @formatted_address_area %>.
 <% end %>
 Confirm your subscription<%= 's' if @neighbor_areas.any? %>: <%= @confirmation_url %>
 

@@ -2,9 +2,9 @@
 When: <%= match.permit_dates %>
 <% end -%>
 <% if match.segment_label.present? -%>
-Where: <%= match.segment_label %><% if match.distance_feet %> (about <%= match.distance_feet %> ft from your address)<% end %>
+Where: <%= match.segment_label %><% if match.distance_feet %> (~<%= match.distance_feet %> ft from your address)<% end %>
 <% elsif match.distance_feet -%>
-Distance: about <%= match.distance_feet %> ft from your address
+Distance: ~<%= match.distance_feet %> ft from your address
 <% end -%>
 <% if match.work_type_description.present? -%>
 Reason: <%= match.work_type_description %>
