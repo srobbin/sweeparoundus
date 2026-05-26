@@ -5,7 +5,7 @@ ruby "3.4.7"
 
 gem "rails", "~> 7.2.3.1"
 gem "pg", "~> 1.1"
-gem "jbuilder", "~> 2.7"
+gem "jbuilder", "~> 2.15"
 
 gem "activeadmin", "~> 3.5"
 gem "activerecord-postgis-adapter", "~> 10.0"
