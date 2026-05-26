@@ -51,10 +51,10 @@ RSpec.describe PermitMailer, type: :mailer do
   end
 
   describe "#notify email" do
-    it "has the right envelope" do
+    it "has the right envelope, with the earliest start date prefixing the subject" do
       expect(mail.from).to eq([ "info@wethesweeple.com" ])
       expect(mail.to).to include(alert.email)
-      expect(mail.subject).to eq("Temporary No Parking on California Ave")
+      expect(mail.subject).to eq("Fri May 8: Temporary No Parking on California Ave")
     end
 
     it "includes the segment label, distance, dates, and work info in the HTML body" do
@@ -64,6 +64,23 @@ RSpec.describe PermitMailer, type: :mailer do
       expect(html_body).to include("Saturday, May 9")
       expect(html_body).to include("Dumpster")
       expect(html_body).to include("Building renovation")
+    end
+
+    it "labels the rows using 'When', 'Where', and 'Reason'" do
+      expect(html_body).to include("When")
+      expect(html_body).to include("Where")
+      expect(html_body).to include("Reason")
+      expect(html_body).not_to include(">Work type<")
+    end
+
+    it "renders the warning callout body" do
+      expect(html_body).to include("check your block before parking")
+      expect(html_body).to include("ticketed or towed")
+    end
+
+    it "renders the experimental-feature notice with an opt-out link" do
+      expect(html_body).to include("This is an experimental feature.")
+      expect(html_body).to include("Opt out anytime.")
     end
 
     it "embeds the static map image with the alert + line endpoints" do
@@ -78,12 +95,17 @@ RSpec.describe PermitMailer, type: :mailer do
       expect(html_body).not_to include(unsubscribe_area_alerts_url(area))
     end
 
+    it "includes the coffee block with the permit variant" do
+      expect(html_body).to include("Buy us a coffee")
+      expect(html_body).to include("Loved this heads-up?")
+    end
+
     it "includes the disclaimer" do
       expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
     end
 
     it "renders matching content in the text body" do
-      expect(text_body).to include("temporary \"No Parking\" signs may be going up")
+      expect(text_body).to include("Temporary \"No Parking\" signs may be going up")
       expect(text_body).to include("3300-3350 N CALIFORNIA AVE")
       expect(text_body).to include("about 95 ft from your address")
       expect(text_body).to include("Friday, May 8")
@@ -103,6 +125,14 @@ RSpec.describe PermitMailer, type: :mailer do
     it "uses Arial 10pt typography in the HTML layout" do
       expect(html_body).to include("Arial, Helvetica, sans-serif")
       expect(html_body).to include("10pt")
+    end
+
+    context "when no permit has an application_start_date" do
+      before { permit.update!(application_start_date: nil, application_end_date: nil) }
+
+      it "omits the date prefix from the subject" do
+        expect(mail.subject).to eq("Temporary No Parking on California Ave")
+      end
     end
 
     context "when the permit's start and end fall on the same day" do
@@ -161,8 +191,8 @@ RSpec.describe PermitMailer, type: :mailer do
         ]
       end
 
-      it "joins unique street names in the subject" do
-        expect(mail.subject).to eq("Temporary No Parking on California Ave, Ashland Ave")
+      it "joins unique street names in the subject with the earliest start date prefix" do
+        expect(mail.subject).to eq("Fri May 8: Temporary No Parking on California Ave, Ashland Ave")
       end
 
       it "renders all permits in the HTML body" do
@@ -185,10 +215,12 @@ RSpec.describe PermitMailer, type: :mailer do
       it "deduplicates the subject when multiple permits hit the same street" do
         matches[1][:permit] = create(:cdot_permit,
           unique_key: "5000100",
+          application_start_date: Time.zone.local(2026, 5, 8, 9, 0, 0),
+          application_end_date: Time.zone.local(2026, 5, 8, 17, 0, 0),
           street_number_from: 3500, street_number_to: 3550,
           direction: "N", street_name: "CALIFORNIA", suffix: "AVE")
 
-        expect(mail.subject).to eq("Temporary No Parking on California Ave")
+        expect(mail.subject).to eq("Fri May 8: Temporary No Parking on California Ave")
       end
     end
   end

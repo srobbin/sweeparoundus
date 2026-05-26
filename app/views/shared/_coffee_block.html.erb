@@ -1,0 +1,35 @@
+<%#
+  Standalone "Buy us a coffee" donation block. Lives in its own
+  partial (rather than baked into the legal footer) so the visual
+  card reads as a distinct ask, not legal boilerplate.
+
+  Locals:
+    coffee_context: Symbol controlling the lead-in copy. Falls back
+                    to the generic line if the key isn't recognized.
+                    Supported keys:
+                      :generic, :reminder, :permit,
+                      :annual_schedule_live, :manage_link
+%>
+<% coffee_context = local_assigns.fetch(:coffee_context, :generic).to_sym %>
+<% copy = {
+  generic:              "Enjoying this free service?",
+  reminder:             "If we just saved you a parking ticket, consider buying us a coffee.",
+  permit:               "Loved this heads-up? Coffee helps keep these alerts running.",
+  annual_schedule_live: "Enjoying this free service?",,
+  manage_link:          "While you're here—coffee helps keep these alerts free.",
+}[coffee_context] || "Enjoying this free service?" %>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 28px;">
+  <tr>
+    <td style="background-color: #fff8e6; border: 1px solid #f1c97b; border-radius: 8px; padding: 16px 18px; font-size: 10.5pt; color: #4a3a16;">
+      <%= image_tag "email/coffee.png",
+            alt: "",
+            width: 20,
+            height: 20,
+            style: "vertical-align: middle; margin-right: 6px; display: inline-block;" %>
+      <strong><%= copy %></strong>
+      <%= link_to "Buy us a coffee &rarr;".html_safe, coffee_link_url,
+            style: "color: #1a7fa8; font-weight: bold; text-decoration: underline; margin-left: 4px; white-space: nowrap;" %>
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,3 @@
+<% label = local_assigns.fetch(:label, "Sweep dates") -%>
+<% dates = local_assigns.fetch(:dates) -%>
+<%= label %>: <%= dates.to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %>

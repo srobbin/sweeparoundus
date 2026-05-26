@@ -1,0 +1,24 @@
+<%#
+  Header "chip" used at the top of address-bound mailers (reminder,
+  permit, annual_schedule_live). Renders the address (when present)
+  plus a link to the area page; falls back to the linked area name
+  alone when the alert has no street_address.
+
+  Locals:
+    street_address: String or nil.
+    area:           Area record (required).
+%>
+<% street_address = local_assigns[:street_address] %>
+<% area           = local_assigns.fetch(:area) %>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 1.25em;">
+  <tr>
+    <td style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 14px; background-color: #f9fafb; font-size: 10pt; color: #374151;">
+      <% if street_address.present? %>
+        <strong><%= street_address %></strong> &middot; <%= link_to area.name, area %>
+      <% else %>
+        <strong><%= link_to area.name, area %></strong>
+      <% end %>
+    </td>
+  </tr>
+</table>

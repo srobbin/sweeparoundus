@@ -1,11 +1,9 @@
 <% content_for :preheader do %>Confirm your subscription to street sweeping alerts for <%= @formatted_address_area %>.<% end %>
 
-<p>Hello,</p>
-
 <% if @neighbor_areas.any? %>
   <p>
-    You are receiving this email because we have received a request to subscribe
-    <strong><%= @email %></strong> to Chicago street sweeping alerts for the following areas:
+    Hi! Someone&mdash;hopefully you&mdash;asked to receive Chicago street
+    sweeping alerts at <strong><%= @email %></strong> for these areas:
   </p>
   <ul>
     <li><strong><%= @formatted_address_area %></strong></li>
@@ -13,20 +11,13 @@
       <li><strong><%= neighbor_area.name %></strong></li>
     <% end %>
   </ul>
-  <p>Alerts will be sent out one day prior to a scheduled street sweeping.</p>
 <% else %>
   <p>
-    You are receiving this email because we have received a request to subscribe
-    <strong><%= @email %></strong> to Chicago street sweeping alerts for <strong><%= @formatted_address_area %></strong>.
-    Alerts will be sent out one day prior to a scheduled street sweeping.
+    Hi! Someone&mdash;hopefully you&mdash;asked to receive Chicago street
+    sweeping alerts at <strong><%= @email %></strong> for
+    <strong><%= @formatted_address_area %></strong>.
   </p>
 <% end %>
-
-<p>
-  <%= link_to "Confirm your subscription#{'s' if @neighbor_areas.any?}",
-        @confirmation_url,
-        style: "display: inline-block; padding: 12px 20px; background-color: #1d4ed8; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 10pt;" %>
-</p>
 
 <% if @static_map_url %>
   <p style="margin-bottom: 0;">
@@ -35,9 +26,23 @@
           width: AlertStaticMap::WIDTH,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
-  <p style="font-size: 12px; color: #555; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address. The shaded area is the sweep zone.
+  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
+    The blue <strong>H</strong> marker is your address; the shaded area is the sweep zone.
   </p>
 <% end %>
 
-<%= render "shared/email_footer", disclaimer: true %>
+<p style="margin-top: 1.5em;">
+  <%= render "shared/button",
+        label: "Confirm your subscription#{'s' if @neighbor_areas.any?}",
+        url: @confirmation_url %>
+</p>
+
+<p>
+  We'll email you the day before each sweep. No spam, no account needed.
+</p>
+
+<p style="font-size: 9pt; color: #6b7280;">
+  Didn't request this? You can ignore this email and nothing will happen.
+</p>
+
+<%= render "shared/email_footer", disclaimer: true, coffee_link: false %>

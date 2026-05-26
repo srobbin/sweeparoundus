@@ -1,18 +1,12 @@
 <% content_for :preheader do %>Heads up: street sweeping for <%= @street_address || @area.name %> begins tomorrow.<% end %>
 
-<p>Hello,</p>
+<%= render "shared/address_chip", street_address: @street_address, area: @area %>
 
-<% if @street_address %>
-  <p>This is a reminder that street sweeping for <%= @street_address %> (<%= link_to @area.name, @area %>) will begin tomorrow.</p>
-<% else %>
-  <p>This is a reminder that street sweeping for <%= link_to @area.name, @area %> will begin tomorrow.</p>
-<% end %>
+<p style="font-size: 13pt; font-weight: bold; margin: 0 0 1em;">
+  Street sweeping starts tomorrow morning.
+</p>
 
-<ul>
-  <% @dates.each do |date| %>
-    <li><%= date %></li>
-  <% end %>
-</ul>
+<%= render "shared/date_callout", dates: @dates %>
 
 <% if @static_map_url %>
   <p style="margin-bottom: 0;">
@@ -21,9 +15,13 @@
           width: AlertStaticMap::WIDTH,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
-  <p style="font-size: 12px; color: #555; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address. The shaded area is your sweep zone.
+  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
+    The blue <strong>H</strong> marker is your address; the shaded area is your sweep zone.
   </p>
 <% end %>
 
-<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>
+<%= render "shared/email_footer",
+      disclaimer: true,
+      manage_url: @manage_url,
+      unsubscribe_url: @unsubscribe_url,
+      coffee_context: :reminder %>

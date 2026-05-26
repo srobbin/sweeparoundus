@@ -11,40 +11,38 @@
     disclaimer:     true to render ApplicationMailer::DISCLAIMER.
     manage_url:     URL to manage subscriptions; renders link if present.
     unsubscribe_url: URL to one-click unsubscribe; renders link if present.
-    coffee_link:    Defaults to true. Pass false to suppress the
-                    "Buy us a coffee" footer (e.g. on confirmation /
-                    transactional emails where it's noise).
+    coffee_link:    Defaults to true. Pass false to suppress the coffee
+                    donation block (e.g. on confirmation emails where
+                    it would be noise).
+    coffee_context: Symbol passed through to shared/_coffee_block so
+                    per-mailer copy variants can be picked.
 %>
-<% signoff      = local_assigns.fetch(:signoff, "Cheers,") %>
-<% disclaimer   = local_assigns.fetch(:disclaimer, false) %>
-<% manage_url   = local_assigns[:manage_url] %>
+<% signoff         = local_assigns.fetch(:signoff, "Cheers,") %>
+<% disclaimer      = local_assigns.fetch(:disclaimer, false) %>
+<% manage_url      = local_assigns[:manage_url] %>
 <% unsubscribe_url = local_assigns[:unsubscribe_url] %>
-<% coffee_link  = local_assigns.fetch(:coffee_link, true) %>
+<% coffee_link     = local_assigns.fetch(:coffee_link, true) %>
+<% coffee_context  = local_assigns.fetch(:coffee_context, :generic) %>
 
-<p>
+<p style="margin-top: 1.5em;">
   <%= signoff %><br />
   <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %>
 </p>
 
 <% if disclaimer %>
-  <p style="font-size: 9pt; color: #6b7280;"><%= ApplicationMailer::DISCLAIMER %></p>
+  <p style="font-size: 8pt; font-style: italic; color: #9ca3af; line-height: 1.45;">
+    <%= ApplicationMailer::DISCLAIMER %>
+  </p>
 <% end %>
 
 <% if manage_url || unsubscribe_url %>
-  <p>
-    <% if manage_url %><%= link_to "Manage subscriptions", manage_url %><% end %><%
-    if manage_url && unsubscribe_url %> | <% end %><%
-    if unsubscribe_url %><%= link_to "Unsubscribe", unsubscribe_url %><% end %>
+  <p style="font-size: 9pt; color: #6b7280;">
+    <% if manage_url %><%= link_to "Manage subscriptions", manage_url, style: "color: #6b7280;" %><% end %><%
+    if manage_url && unsubscribe_url %> &nbsp;&middot;&nbsp; <% end %><%
+    if unsubscribe_url %><%= link_to "Unsubscribe", unsubscribe_url, style: "color: #6b7280;" %><% end %>
   </p>
 <% end %>
 
 <% if coffee_link %>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 1.5em; border-top: 1px solid #e5e7eb; padding-top: 1em;">
-    <tr>
-      <td style="background-color: #eef9fc; border: 1px solid #a1dced; border-radius: 6px; padding: 12px 16px; font-size: 10pt;">
-        ☕ Enjoying this free service?
-        <%= link_to "Buy us a coffee!", coffee_link_url, style: "color: #1a7fa8; font-weight: bold; text-decoration: underline;" %>
-      </td>
-    </tr>
-  </table>
+  <%= render "shared/coffee_block", coffee_context: coffee_context %>
 <% end %>

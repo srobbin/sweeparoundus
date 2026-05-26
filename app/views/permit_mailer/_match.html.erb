@@ -1,24 +1,65 @@
-<ul>
-  <% if match.segment_label.present? %>
-    <li>
-      <strong>Where:</strong> <%= match.segment_label %><% if match.distance_feet %> (about <%= match.distance_feet %> ft from your address)<% end %>
-    </li>
-  <% elsif match.distance_feet %>
-    <li><strong>Distance:</strong> about <%= match.distance_feet %> ft from your address</li>
+<%#
+  Per-permit details rendered as a two-column "definition list" table
+  for email-client safety. Labels live in a narrow muted column on the
+  left; values are bold on the right. The date row is highlighted
+  because it's the most actionable field.
+%>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 1em;">
+  <% if match.permit_dates %>
+    <tr>
+      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px; white-space: nowrap;">
+        When
+      </td>
+      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+        <strong><%= match.permit_dates %></strong>
+      </td>
+    </tr>
   <% end %>
 
-  <% if match.permit_dates %>
-    <li><strong>When:</strong> <%= match.permit_dates %></li>
+  <% if match.segment_label.present? %>
+    <tr>
+      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+        Where
+      </td>
+      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+        <strong><%= match.segment_label %></strong><% if match.distance_feet %>
+          <span style="color: #6b7280;">(about <%= match.distance_feet %> ft from your address)</span>
+        <% end %>
+      </td>
+    </tr>
+  <% elsif match.distance_feet %>
+    <tr>
+      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+        Distance
+      </td>
+      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+        about <%= match.distance_feet %> ft from your address
+      </td>
+    </tr>
   <% end %>
 
   <% if match.work_type_description.present? %>
-    <li><strong>Work type:</strong> <%= match.work_type_description %></li>
+    <tr>
+      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+        Reason
+      </td>
+      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+        <%= match.work_type_description %>
+      </td>
+    </tr>
   <% end %>
 
   <% if match.application_description.present? %>
-    <li><strong>Description:</strong> <%= match.application_description %></li>
+    <tr>
+      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+        Description
+      </td>
+      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+        <%= match.application_description %>
+      </td>
+    </tr>
   <% end %>
-</ul>
+</table>
 
 <% if match.static_map_url %>
   <p style="margin-bottom: 0;">
@@ -27,7 +68,7 @@
           width: PermitStaticMap::WIDTH,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
-  <p style="font-size: 12px; color: #555; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address. The red line connects the two ends (<strong>A</strong> and <strong>B</strong>) of the permit's posted area.
+  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
+    The blue <strong>H</strong> marker is your address; the red line connects the two ends (<strong>A</strong> and <strong>B</strong>) of the permit's posted area.
   </p>
 <% end %>

@@ -1,0 +1,7 @@
+<% street_address = local_assigns[:street_address] -%>
+<% area           = local_assigns.fetch(:area) -%>
+<% if street_address.present? -%>
+<%= street_address %> | <%= area.name %> (<%= area_url(area) %>)
+<% else -%>
+<%= area.name %> (<%= area_url(area) %>)
+<% end -%>

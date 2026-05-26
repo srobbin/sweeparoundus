@@ -131,7 +131,7 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
 | 429    | Rate limit exceeded          | `{"error": "Rate limit exceeded. Try again later."}`          |
 
 
-**Rate limiting** — API requests are throttled to 60 per hour per IP. Throttled responses include a `Retry-After` header.
+**Rate limiting**: API requests are throttled to 60 per hour per IP. Throttled responses include a `Retry-After` header.
 
 ### Annual maintenance
 
@@ -166,7 +166,8 @@ If the City publishes a corrected `Street_Sweeping_Schedule_-_202X.csv` mid-seas
 - Run rspec test suite.
 - Merge into main and deploy.
 - Temporarily enable 'Maintenance Mode' on Heroku.
-- Re-seed the schedule only — `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
+- Re-seed the schedule only; `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s, skip_geojson: true).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s, skip_geojson: true).call`
 - Disable 'Maintenance Mode' on Heroku.
+

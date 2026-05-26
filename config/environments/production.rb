@@ -73,6 +73,9 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.default_url_options = { host: ENV["SITE_URL"] }
+  # Mailers need absolute URLs for any image_tag assets (e.g. the coffee
+  # icon in shared/_coffee_block); ENV["SITE_URL"] already includes scheme.
+  config.action_mailer.asset_host = ENV["SITE_URL"]
 
   # SendGrid
   config.action_mailer.delivery_method = :smtp

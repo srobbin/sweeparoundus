@@ -1,10 +1,10 @@
-Hello,
+<%= render "shared/address_chip", street_address: @street_address, area: @area -%>
 
-<% if @street_address %>
-This is a reminder that street sweeping for <%= @street_address %> (<%= @area.name %>) will begin tomorrow.
-<% else %>
-This is a reminder that street sweeping for <%= @area.name %> will begin tomorrow.
-<% end %>
+Street sweeping starts tomorrow morning.
 
-<%= @dates.join(" / ") %>
-<%= render "shared/email_footer", disclaimer: true, manage_url: @manage_url, unsubscribe_url: @unsubscribe_url %>
+<%= render "shared/date_callout", dates: @dates %>
+<%= render "shared/email_footer",
+      disclaimer: true,
+      manage_url: @manage_url,
+      unsubscribe_url: @unsubscribe_url,
+      coffee_context: :reminder %>
