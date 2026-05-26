@@ -1,9 +1,13 @@
 <% content_for :preheader do %>Confirm your subscription to street sweeping alerts for <%= @formatted_address_area %>.<% end %>
 
+<p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.5em;">
+  Confirm your sweeping alert<%= 's' if @neighbor_areas.any? %>
+</p>
+
 <% if @neighbor_areas.any? %>
   <p>
-    Hi! Someone&mdash;hopefully you&mdash;asked to receive Chicago street
-    sweeping alerts at <strong><%= @email %></strong> for these areas:
+    We received a request to subscribe <strong><%= @email %></strong>
+    to street sweeping alerts for these areas:
   </p>
   <ul>
     <li><strong><%= @formatted_address_area %></strong></li>
@@ -13,21 +17,8 @@
   </ul>
 <% else %>
   <p>
-    Hi! Someone&mdash;hopefully you&mdash;asked to receive Chicago street
-    sweeping alerts at <strong><%= @email %></strong> for
-    <strong><%= @formatted_address_area %></strong>.
-  </p>
-<% end %>
-
-<% if @static_map_url %>
-  <p style="margin-bottom: 0;">
-    <%= image_tag @static_map_url,
-          alt: "Map showing the sweep area for #{@formatted_address_area}",
-          width: AlertStaticMap::WIDTH,
-          style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
-  </p>
-  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address; the shaded area is the sweep zone.
+    We received a request to subscribe <strong><%= @email %></strong>
+    to street sweeping alerts for <strong><%= @formatted_address_area %></strong>.
   </p>
 <% end %>
 
@@ -40,6 +31,19 @@
 <p>
   We'll email you the day before each sweep. No spam, no account needed.
 </p>
+
+<% if @static_map_url %>
+  <p style="margin-bottom: 0;">
+    <%= image_tag @static_map_url,
+          alt: "Map showing the sweep area for #{@formatted_address_area}",
+          width: AlertStaticMap::WIDTH,
+          height: AlertStaticMap::HEIGHT,
+          style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
+  </p>
+  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
+    The blue <strong>H</strong> marker is your address; the shaded area is the sweep zone.
+  </p>
+<% end %>
 
 <p style="font-size: 9pt; color: #6b7280;">
   Didn't request this? You can ignore this email and nothing will happen.

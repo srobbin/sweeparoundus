@@ -2,17 +2,20 @@
 
 <%= render "shared/address_chip", street_address: @street_address, area: @area %>
 
-<p style="font-size: 13pt; font-weight: bold; margin: 0 0 1em;">
-  Street sweeping starts tomorrow morning.
+<p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.25em;">
+  Street sweeping starts tomorrow.
 </p>
 
-<%= render "shared/date_callout", dates: @dates %>
+<p style="margin-top: 0;">
+  <%= @dates.to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %>
+</p>
 
 <% if @static_map_url %>
   <p style="margin-bottom: 0;">
     <%= image_tag @static_map_url,
           alt: "Map showing the sweep area for #{@street_address || @area.name}",
           width: AlertStaticMap::WIDTH,
+          height: AlertStaticMap::HEIGHT,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
   <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
@@ -23,5 +26,4 @@
 <%= render "shared/email_footer",
       disclaimer: true,
       manage_url: @manage_url,
-      unsubscribe_url: @unsubscribe_url,
-      coffee_context: :reminder %>
+      unsubscribe_url: @unsubscribe_url %>

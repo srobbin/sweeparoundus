@@ -1,7 +1,7 @@
 <% content_for :preheader do %>This link expires in 1 hour. Use it to manage your <%= ENV["SITE_NAME"] %> alert subscriptions.<% end %>
 
 <p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.5em;">
-  Here's your link to manage your subscriptions.
+  Here's a link to manage your subscriptions.
 </p>
 
 <p style="font-size: 9pt; color: #6b7280; margin-top: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
@@ -19,4 +19,4 @@
   this, you can safely ignore this email.
 </p>
 
-<%= render "shared/email_footer", coffee_context: :manage_link %>
+<%= render "shared/email_footer", coffee_link: true %>

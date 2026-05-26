@@ -6,7 +6,7 @@
 <% if @matches.size > 1 %>
   <p style="font-size: 12pt; font-weight: bold; margin: 0 0 1em;">
     Temporary &ldquo;No Parking&rdquo; signs may be going up near your address
-    for <%= @matches.size %> upcoming City of Chicago permits.
+    for <%= @matches.size %> upcoming CDOT permits.
   </p>
 
   <% @matches.each_with_index do |match, i| %>
@@ -24,7 +24,7 @@
 <% else %>
   <p style="font-size: 12pt; font-weight: bold; margin: 0 0 1em;">
     Temporary &ldquo;No Parking&rdquo; signs may be going up near your address
-    for an upcoming City of Chicago permit.
+    for an upcoming CDOT permit.
   </p>
 
   <%= render "match", match: @matches.first %>
@@ -40,5 +40,4 @@
 
 <%= render "shared/email_footer",
       disclaimer: true,
-      manage_url: @manage_url,
-      coffee_context: :permit %>
+      manage_url: @manage_url %>

@@ -7,7 +7,6 @@
 <% manage_url      = local_assigns[:manage_url] -%>
 <% unsubscribe_url = local_assigns[:unsubscribe_url] -%>
 <% coffee_link     = local_assigns.fetch(:coffee_link, true) -%>
-<% coffee_context  = local_assigns.fetch(:coffee_context, :generic) -%>
 
 <%= signoff %>
 <%= ENV["SITE_NAME"] %> (<%= ENV["SITE_URL"] %>)
@@ -23,5 +22,5 @@ Manage subscriptions: <%= manage_url %>
 Unsubscribe: <%= unsubscribe_url %>
 <% end -%>
 <% if coffee_link -%>
-<%= render "shared/coffee_block", coffee_context: coffee_context %>
+<%= render "shared/coffee_block" %>
 <% end -%>

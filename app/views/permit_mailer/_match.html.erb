@@ -7,10 +7,10 @@
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 1em;">
   <% if match.permit_dates %>
     <tr>
-      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px; white-space: nowrap;">
+      <td style="padding: 2px 10px 2px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 70px; white-space: nowrap;">
         When
       </td>
-      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+      <td style="padding: 2px 0; font-size: 10pt; vertical-align: top;">
         <strong><%= match.permit_dates %></strong>
       </td>
     </tr>
@@ -18,32 +18,32 @@
 
   <% if match.segment_label.present? %>
     <tr>
-      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+      <td style="padding: 2px 10px 2px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 70px;">
         Where
       </td>
-      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+      <td style="padding: 2px 0; font-size: 10pt; vertical-align: top;">
         <strong><%= match.segment_label %></strong><% if match.distance_feet %>
-          <span style="color: #6b7280;">(about <%= match.distance_feet %> ft from your address)</span>
+          <span style="color: #6b7280;">(~<%= match.distance_feet %> ft from your address)</span>
         <% end %>
       </td>
     </tr>
   <% elsif match.distance_feet %>
     <tr>
-      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+      <td style="padding: 2px 10px 2px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 70px;">
         Distance
       </td>
-      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
-        about <%= match.distance_feet %> ft from your address
+      <td style="padding: 2px 0; font-size: 10pt; vertical-align: top;">
+        ~<%= match.distance_feet %> ft from your address
       </td>
     </tr>
   <% end %>
 
   <% if match.work_type_description.present? %>
     <tr>
-      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+      <td style="padding: 2px 10px 2px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 70px;">
         Reason
       </td>
-      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+      <td style="padding: 2px 0; font-size: 10pt; vertical-align: top;">
         <%= match.work_type_description %>
       </td>
     </tr>
@@ -51,10 +51,10 @@
 
   <% if match.application_description.present? %>
     <tr>
-      <td style="padding: 4px 12px 4px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 90px;">
+      <td style="padding: 2px 10px 2px 0; color: #6b7280; font-size: 10pt; vertical-align: top; width: 70px;">
         Description
       </td>
-      <td style="padding: 4px 0; font-size: 10pt; vertical-align: top;">
+      <td style="padding: 2px 0; font-size: 10pt; vertical-align: top;">
         <%= match.application_description %>
       </td>
     </tr>
@@ -66,6 +66,7 @@
     <%= image_tag match.static_map_url,
           alt: "Map showing the permit area near #{@street_address}",
           width: PermitStaticMap::WIDTH,
+          height: PermitStaticMap::HEIGHT,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
   <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">

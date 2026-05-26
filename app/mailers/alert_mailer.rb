@@ -55,7 +55,7 @@ class AlertMailer < ApplicationMailer
   end
 
   def set_street_address
-    @street_address = @alert.street_address
+    @street_address = @alert.street_address&.sub(/,\s*Chicago,\s*IL,\s*USA\s*\z/i, "")
   end
 
   def set_formatted_address_area

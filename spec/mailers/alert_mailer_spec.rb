@@ -55,9 +55,9 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(text_body).to include(manage_subscriptions_url.to_s)
     end
 
-    it 'includes the coffee block in the HTML body with the annual variant' do
+    it 'includes the coffee block in the HTML body' do
       expect(html_body).to include('Buy us a coffee')
-      expect(html_body).to include('Want to chip in?')
+      expect(html_body).to include('Enjoying this free service?')
     end
 
     context 'when no sweeps exist yet for the year' do
@@ -84,9 +84,8 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq("Confirm your #{ENV["SITE_NAME"]} alerts for #{alert.street_address}")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include('Hi! Someone')
-      expect(html_body).to include('hopefully you')
-      expect(html_body).to include('asked to receive Chicago street')
+      expect(html_body).to include('Confirm your sweeping alert')
+      expect(html_body).to include('We received a request to subscribe')
       expect(html_body).to include(alert.email)
       expect(html_body).to include("<strong>#{alert.street_address} (#{area.name})</strong>")
       expect(html_body).to include('Confirm your subscription')
@@ -144,8 +143,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(mail.to).to include(alert.email)
       expect(html_body).to include(alert.street_address)
       expect(html_body).to include(area_url(area))
-      expect(html_body).to include('Street sweeping starts tomorrow morning.')
-      expect(html_body).to include('Sweep dates:')
+      expect(html_body).to include('Street sweeping starts tomorrow.')
       expect(html_body).to include(sweep.date_1.strftime('%A, %B %-d'))
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
@@ -169,9 +167,9 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(text_body).to include(manage_subscriptions_url.to_s)
     end
 
-    it 'includes the coffee block with the reminder variant' do
+    it 'includes the coffee block' do
       expect(html_body).to include('Buy us a coffee')
-      expect(html_body).to include('If we just saved you a parking ticket')
+      expect(html_body).to include('Enjoying this free service?')
     end
 
     context 'when alert has no street address' do

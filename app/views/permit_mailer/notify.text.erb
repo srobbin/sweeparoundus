@@ -1,14 +1,14 @@
 <%= render "shared/address_chip", street_address: @street_address, area: @alert.area -%>
 
 <% if @matches.size > 1 -%>
-Temporary "No Parking" signs may be going up near your address for <%= @matches.size %> upcoming City of Chicago permits.
+Temporary "No Parking" signs may be going up near your address for <%= @matches.size %> upcoming CDOT permits.
 
 <% @matches.each_with_index do |match, i| -%>
 -- Permit <%= i + 1 %> of <%= @matches.size %> --
 <%= render "match", match: match %>
 <% end -%>
 <% else -%>
-Temporary "No Parking" signs may be going up near your address for an upcoming City of Chicago permit.
+Temporary "No Parking" signs may be going up near your address for an upcoming CDOT permit.
 
 <%= render "match", match: @matches.first %>
 <% end -%>
@@ -17,5 +17,4 @@ Signs may already be posted, so check your block before parking. If signs are up
 This is an experimental feature. Opt out anytime: <%= @manage_url %>
 <%= render "shared/email_footer",
       disclaimer: true,
-      manage_url: @manage_url,
-      coffee_context: :permit %>
+      manage_url: @manage_url %>

@@ -59,9 +59,9 @@ RSpec.describe PermitMailer, type: :mailer do
 
     it "includes the segment label, distance, dates, and work info in the HTML body" do
       expect(html_body).to include("3300-3350 N CALIFORNIA AVE")
-      expect(html_body).to include("about 95 ft from your address")
-      expect(html_body).to include("Friday, May 8")
-      expect(html_body).to include("Saturday, May 9")
+      expect(html_body).to include("~95 ft from your address")
+      expect(html_body).to include("Fri, May 8")
+      expect(html_body).to include("Sat, May 9")
       expect(html_body).to include("Dumpster")
       expect(html_body).to include("Building renovation")
     end
@@ -95,9 +95,9 @@ RSpec.describe PermitMailer, type: :mailer do
       expect(html_body).not_to include(unsubscribe_area_alerts_url(area))
     end
 
-    it "includes the coffee block with the permit variant" do
+    it "includes the coffee block" do
       expect(html_body).to include("Buy us a coffee")
-      expect(html_body).to include("Loved this heads-up?")
+      expect(html_body).to include("Enjoying this free service?")
     end
 
     it "includes the disclaimer" do
@@ -107,8 +107,8 @@ RSpec.describe PermitMailer, type: :mailer do
     it "renders matching content in the text body" do
       expect(text_body).to include("Temporary \"No Parking\" signs may be going up")
       expect(text_body).to include("3300-3350 N CALIFORNIA AVE")
-      expect(text_body).to include("about 95 ft from your address")
-      expect(text_body).to include("Friday, May 8")
+      expect(text_body).to include("~95 ft from your address")
+      expect(text_body).to include("Fri, May 8")
       expect(text_body).to include("Manage subscriptions:")
       expect(text_body).not_to include("Unsubscribe:")
     end
@@ -147,7 +147,7 @@ RSpec.describe PermitMailer, type: :mailer do
       end
 
       it "renders a single date instead of a range" do
-        expect(html_body).to include("Friday, May 8")
+        expect(html_body).to include("Fri, May 8")
         expect(html_body).not_to include("–")
       end
     end
@@ -209,7 +209,7 @@ RSpec.describe PermitMailer, type: :mailer do
         expect(text_body).to include("1500-1550 N ASHLAND AVE")
         expect(text_body).to include("Permit 1 of 2")
         expect(text_body).to include("Permit 2 of 2")
-        expect(text_body).to include("for 2 upcoming City of Chicago permits")
+        expect(text_body).to include("for 2 upcoming CDOT permits")
       end
 
       it "deduplicates the subject when multiple permits hit the same street" do

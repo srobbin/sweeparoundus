@@ -1,10 +1,9 @@
 <%= render "shared/address_chip", street_address: @street_address, area: @area -%>
 
-Street sweeping starts tomorrow morning.
+Street sweeping starts tomorrow.
 
-<%= render "shared/date_callout", dates: @dates %>
+<%= @dates.to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %>
 <%= render "shared/email_footer",
       disclaimer: true,
       manage_url: @manage_url,
-      unsubscribe_url: @unsubscribe_url,
-      coffee_context: :reminder %>
+      unsubscribe_url: @unsubscribe_url %>
