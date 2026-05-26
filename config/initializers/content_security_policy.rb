@@ -38,7 +38,7 @@ Rails.application.configure do
 
   config.content_security_policy_nonce_generator = ->(request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src]
-  config.content_security_policy_report_only = true
+  config.content_security_policy_report_only = false
 end
 
 # Active Admin uses Sprockets + Arbre which don't propagate CSP nonces onto
