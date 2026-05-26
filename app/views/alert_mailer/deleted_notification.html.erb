@@ -1,13 +1,23 @@
 <% content_for :preheader do %>Your subscription for <%= @area.name %> has been canceled. You can re-subscribe anytime.<% end %>
 
-<p>Hello,</p>
-
-<p>
-  We've just updated the Chicago street sweeping schedules for the <%= Time.current.year %> season, and wanted to let you know that your subscription for <strong><%= @area.name %></strong> has been canceled. (This is because your subscription was unconfirmed and/or did not have a specific street address, and because the City's sweeping areas often change from year to year.)
+<p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.75em;">
+  Your <%= ENV["SITE_NAME"] %> subscription for <%= @area.name %> has been canceled.
 </p>
 
 <p>
-  If you'd like to continue receiving alerts for this (or another) area, <%= link_to "please visit our website and re-subscribe", ENV["SITE_URL"] %>.
+  Each year, the City of Chicago redraws its sweeping areas, so we have to
+  cancel subscriptions that weren't fully confirmed or didn't have a street
+  address. Yours was one of those.
+</p>
+
+<p style="margin-top: 1.5em;">
+  <%= render "shared/button",
+        label: "Re-subscribe",
+        url: ENV["SITE_URL"] %>
+</p>
+
+<p style="font-size: 9pt; color: #6b7280; margin-top: 0.75em;">
+  Day-before reminders &middot; Map of your sweep zone &middot; Always free
 </p>
 
 <%= render "shared/email_footer" %>

@@ -1,18 +1,16 @@
-Hello,
-
 <% if @neighbor_areas.any? -%>
-You are receiving this email because we have received a request to subscribe <%= @email %> to Chicago street sweeping alerts for the following areas:
+Hi! Someone—hopefully you—asked to receive Chicago street sweeping alerts at <%= @email %> for these areas:
 
 - <%= @formatted_address_area %>
 <% @neighbor_areas.each do |neighbor_area| -%>
 - <%= neighbor_area.name %>
 <% end -%>
-
-Alerts will be sent out one day prior to a scheduled street sweeping.
 <% else -%>
-You are receiving this email because we have received a request to subscribe <%= @email %> to Chicago street sweeping alerts for <%= @formatted_address_area %>. Alerts will be sent out one day prior to a scheduled street sweeping.
-<% end -%>
+Hi! Someone—hopefully you—asked to receive Chicago street sweeping alerts at <%= @email %> for <%= @formatted_address_area %>.
+<% end %>
+Confirm your subscription<%= 's' if @neighbor_areas.any? %>: <%= @confirmation_url %>
 
-Click here to confirm your subscription<%= 's' if @neighbor_areas.any? %>:
-<%= @confirmation_url %>
-<%= render "shared/email_footer" %>
+We'll email you the day before each sweep. No spam, no account needed.
+
+Didn't request this? You can ignore this email and nothing will happen.
+<%= render "shared/email_footer", disclaimer: true, coffee_link: false %>

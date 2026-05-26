@@ -1,13 +1,21 @@
 Dear Alderperson <%= @name %>,
 
-The <%= Time.current.year %> Chicago street sweeping schedules are now live on <%= ENV["SITE_NAME"] %> (<%= ENV["SITE_URL"] %>).
+<%= ENV["SITE_NAME"] %> (<%= ENV["SITE_URL"] %>) offers free, opt-in email reminders that notify Ward <%= @ward %> residents the day before their street is swept—helping to reduce parking tickets, towing, and 311 calls.
 
-Residents of Ward <%= @ward %> can visit our website to look up their sweeping schedule and sign up to receive free email reminders before their street is swept. No app to download, no account to create — just an email address and a street address.
+The <%= Time.current.year %> Chicago street sweeping schedules are now live on our site.
 
-If your office would like to share this resource with constituents, here is a direct link:
-<%= ENV["SITE_URL"] %>
+- No app, no account—just an email and a street address
+- Free for residents and for your office
+- Covers all 50 wards using City sweeping data
 
-Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago. We do, however, work with City data officials to identify and resolve issues with the data provided by the Department of Streets and Sanitation. If your ward office is ever interested in making text message alerts available to constituents, we would be happy to discuss that possibility, provided that there is budget available to do so.
+Visit <%= ENV["SITE_NAME"] %>: <%= ENV["SITE_URL"] %>
+
+Want to share this with constituents? Here's some sample copy your office can drop into a newsletter or social post:
+
+  > Sign up for free street sweeping reminders at <%= ENV["SITE_URL"] %>.
+  > You'll get an email the day before your street is swept—no app, no account.
 
 Thank you for helping to keep Chicago's streets clean!
-<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>
+
+<%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago. We do, however, work with City data officials to identify and resolve issues with the data provided by the Department of Streets and Sanitation.
+<%= render "shared/email_footer", signoff: "Best regards," %>

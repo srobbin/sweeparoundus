@@ -1,28 +1,27 @@
 <%# See _email_footer.html.erb for the full local-arg contract. The text
     version mirrors the HTML one but renders links inline in the
-    "label (URL)" / "label: URL" forms that read cleanly as plain text
-    (rather than as <a href> tags, which is how `link_to` would render
-    in this format). %>
-<% signoff      = local_assigns.fetch(:signoff, "Cheers,") %>
-<% disclaimer   = local_assigns.fetch(:disclaimer, false) %>
-<% manage_url   = local_assigns[:manage_url] %>
-<% unsubscribe_url = local_assigns[:unsubscribe_url] %>
-<% coffee_link  = local_assigns.fetch(:coffee_link, true) %>
+    "label: URL" form that reads cleanly as plain text (rather than as
+    <a href> tags, which is how `link_to` would render in this format). -%>
+<% signoff         = local_assigns.fetch(:signoff, "Cheers,") -%>
+<% disclaimer      = local_assigns.fetch(:disclaimer, false) -%>
+<% manage_url      = local_assigns[:manage_url] -%>
+<% unsubscribe_url = local_assigns[:unsubscribe_url] -%>
+<% coffee_link     = local_assigns.fetch(:coffee_link, true) -%>
+<% coffee_context  = local_assigns.fetch(:coffee_context, :generic) -%>
 
 <%= signoff %>
 <%= ENV["SITE_NAME"] %> (<%= ENV["SITE_URL"] %>)
-<% if disclaimer %>
+<% if disclaimer -%>
 
 <%= ApplicationMailer::DISCLAIMER %>
-<% end %>
-<% if manage_url %>
+<% end -%>
+<% if manage_url -%>
 
 Manage subscriptions: <%= manage_url %>
-<% end %>
-<% if unsubscribe_url %>
+<% end -%>
+<% if unsubscribe_url -%>
 Unsubscribe: <%= unsubscribe_url %>
-<% end %>
-<% if coffee_link %>
-
-☕ Enjoying this free service? Buy us a coffee: <%= coffee_link_url %>
-<% end %>
+<% end -%>
+<% if coffee_link -%>
+<%= render "shared/coffee_block", coffee_context: coffee_context %>
+<% end -%>

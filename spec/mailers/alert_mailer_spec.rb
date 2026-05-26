@@ -25,14 +25,16 @@ RSpec.describe AlertMailer, type: :mailer do
 
     it 'has the right attributes' do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
-      expect(mail.subject).to eq("#{Time.current.year} street sweeping schedule is now live")
+      expect(mail.subject).to eq("Your #{Time.current.year} sweep dates are ready—check your schedule")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include('Hello,')
-      expect(html_body).to include("You are receiving this email because you subscribed to Chicago street sweeping alerts for the following street address: #{alert.street_address}")
-      expect(html_body).to include('If you no longer want to receive alerts for this address,')
+      expect(html_body).to include(alert.street_address)
+      expect(html_body).to include(area.name)
+      expect(html_body).to include("The #{Time.current.year} sweeping schedule is live.")
+      expect(html_body).to include("Your first sweep is <strong>#{sweep.date_1.strftime('%A, %B %-d')}</strong>")
+      expect(html_body).to include('Moved recently?')
+      expect(html_body).to include('Manage your subscriptions')
+      expect(html_body).to include("View your #{Time.current.year} schedule")
       expect(html_body).to include(unsubscribe_area_alerts_url(area))
-      expect(html_body).to include('manage your subscriptions')
-      expect(html_body).to include('If you have moved and wish to receive alerts for a new address,')
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
@@ -49,8 +51,23 @@ RSpec.describe AlertMailer, type: :mailer do
     end
 
     it 'includes the manage link in the text body' do
-      expect(text_body).to include('manage your subscriptions')
+      expect(text_body).to include('Manage your subscriptions')
       expect(text_body).to include(manage_subscriptions_url.to_s)
+    end
+
+    it 'includes the coffee block in the HTML body with the annual variant' do
+      expect(html_body).to include('Buy us a coffee')
+      expect(html_body).to include('Want to chip in?')
+    end
+
+    context 'when no sweeps exist yet for the year' do
+      before { area.sweeps.destroy_all }
+
+      it 'renders the carry-over fallback copy and omits a first-sweep date' do
+        expect(html_body).to include("carried over for the #{Time.current.year} season")
+        expect(html_body).not_to include('Your first sweep is')
+        expect(text_body).to include("carried over for the #{Time.current.year} season")
+      end
     end
   end
 
@@ -65,25 +82,49 @@ RSpec.describe AlertMailer, type: :mailer do
 
     it 'has the right attributes' do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
-      expect(mail.subject).to eq('Please confirm your subscription to Ward 28, Sweep Area 7')
+      expect(mail.subject).to eq("Confirm your #{ENV["SITE_NAME"]} alerts for #{alert.street_address}")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include('Hello,')
-      expect(html_body).to include('You are receiving this email because we have received a request to subscribe')
+      expect(html_body).to include('Hi! Someone')
+      expect(html_body).to include('hopefully you')
+      expect(html_body).to include('asked to receive Chicago street')
       expect(html_body).to include(alert.email)
-      expect(html_body).to include("to Chicago street sweeping alerts for <strong>#{alert.street_address} (#{area.name})</strong>.")
-      expect(html_body).to include('Alerts will be sent out one day prior to a scheduled street sweeping.')
+      expect(html_body).to include("<strong>#{alert.street_address} (#{area.name})</strong>")
+      expect(html_body).to include('Confirm your subscription')
       expect(html_body).to include(confirm_area_alerts_url(area))
+      expect(html_body).to include("We'll email you the day before each sweep")
+      expect(html_body).to include("Didn't request this?")
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
     end
 
+    it 'omits the coffee block' do
+      expect(html_body).not_to include('Buy us a coffee')
+    end
+
     context 'when alert has no street address' do
       let!(:alert) { create :alert, :unconfirmed, area: area }
 
-      it 'has the right attributes' do
-        expect(html_body).to include("to Chicago street sweeping alerts for <strong>#{area.name}</strong>.")
+      it 'falls back to the area name in the subject and body' do
+        expect(mail.subject).to eq("Confirm your #{ENV["SITE_NAME"]} alerts for #{area.name}")
+        expect(html_body).to include("<strong>#{area.name}</strong>")
+      end
+    end
+
+    context 'with neighbor alerts' do
+      let!(:neighbor_area) { create :area, number: 8, ward: 28, slug: 'ward-28-sweep-area-8', shortcode: 'W28A8' }
+      let!(:neighbor_alert) { create :alert, :unconfirmed, :with_address, area: neighbor_area, email: alert.email }
+      let(:mail) do
+        described_class
+          .with(alert: alert, neighbor_alerts: [ neighbor_alert ])
+          .confirm
+          .deliver_now
+      end
+
+      it 'pluralizes the subject and lists each area' do
+        expect(mail.subject).to eq("Confirm your 2 #{ENV["SITE_NAME"]} subscriptions")
+        expect(html_body).to include(neighbor_area.name)
       end
     end
   end
@@ -92,20 +133,20 @@ RSpec.describe AlertMailer, type: :mailer do
     let!(:alert) { create :alert, :confirmed, :with_address, area: area }
     let(:mail) do
       described_class
-        .with(alert: alert, sweep: sweep)\
+        .with(alert: alert, sweep: sweep)
         .reminder
         .deliver_now
     end
 
     it 'has the right attributes' do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
-      expect(mail.subject).to eq('Street sweeping alert for Ward 28, Sweep Area 7')
+      expect(mail.subject).to eq("Tomorrow: street sweeping at #{alert.street_address}")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include('Hello,')
-      expect(html_body).to include("This is a reminder that street sweeping for #{alert.street_address}")
+      expect(html_body).to include(alert.street_address)
       expect(html_body).to include(area_url(area))
-      expect(html_body).to include('will begin tomorrow.')
-      expect(html_body).to include(sweep.date_1.strftime('%B %-d'))
+      expect(html_body).to include('Street sweeping starts tomorrow morning.')
+      expect(html_body).to include('Sweep dates:')
+      expect(html_body).to include(sweep.date_1.strftime('%A, %B %-d'))
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
@@ -128,11 +169,18 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(text_body).to include(manage_subscriptions_url.to_s)
     end
 
+    it 'includes the coffee block with the reminder variant' do
+      expect(html_body).to include('Buy us a coffee')
+      expect(html_body).to include('If we just saved you a parking ticket')
+    end
+
     context 'when alert has no street address' do
       let!(:alert) { create :alert, :unconfirmed, area: area }
 
-      it 'has the right attributes' do
-        expect(html_body).to include("This is a reminder that street sweeping for <a href=")
+      it 'falls back to the area name in the subject and chip' do
+        expect(mail.subject).to eq("Tomorrow: street sweeping in #{area.name}")
+        expect(html_body).to include(area.name)
+        expect(html_body).to include(area_url(area))
       end
     end
   end
@@ -190,14 +238,17 @@ RSpec.describe AlertMailer, type: :mailer do
 
     it 'has the right attributes' do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
-      expect(mail.subject).to eq('Your street sweeping alert subscription has been canceled')
+      expect(mail.subject).to eq("Your #{ENV["SITE_NAME"]} subscription for #{area.name} was canceled—here's why")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include('Hello,')
-      expect(html_body).to include("We've just updated the Chicago street sweeping schedules for the #{Time.current.year} season, and wanted to let you know that your subscription for <strong>#{area.name}</strong> has been canceled. (This is because your subscription was unconfirmed and/or did not have a specific street address, and because the City's sweeping areas often change from year to year.)")
-      expect(html_body).to include("If you'd like to continue receiving alerts for this (or another) area,")
+      expect(html_body).to include("Your #{ENV["SITE_NAME"]} subscription for #{area.name} has been canceled.")
+      expect(html_body).to include("Each year, the City of Chicago redraws its sweeping areas")
+      expect(html_body).to include('Re-subscribe')
+      expect(html_body).to include(ENV["SITE_URL"])
+      expect(html_body).to include('Day-before reminders')
+      expect(html_body).to include('Map of your sweep zone')
+      expect(html_body).to include('Always free')
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
-      expect(html_body).to include(ENV["SITE_URL"])
     end
   end
 end

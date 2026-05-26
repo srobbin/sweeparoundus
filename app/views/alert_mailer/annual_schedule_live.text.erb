@@ -1,9 +1,20 @@
-Hello,
+<%= render "shared/address_chip", street_address: @street_address, area: @area -%>
 
-You are receiving this email because you subscribed to Chicago street sweeping alerts for the following street address: <%= @street_address %>.
+The <%= Time.current.year %> sweeping schedule is live.
+<% if @first_sweep_dates.any? -%>
 
-If you no longer want to receive alerts for this address, unsubscribe by clicking here: <%= @unsubscribe_url %>
-Or manage your subscriptions: <%= @manage_url %>
+Your first sweep is <%= @first_sweep_dates.first %><% if @first_sweep_dates.size > 1 %>, continuing into <%= @first_sweep_dates[1..].to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %><% end %>.
+<% else -%>
 
-If you have moved and wish to receive alerts for a new address, create a new subscription: <%= ENV["SITE_URL"] %>
-<%= render "shared/email_footer", disclaimer: true %>
+Your subscription has been carried over for the <%= Time.current.year %> season.
+<% end %>
+Moved recently? Update your subscription so you keep getting alerts for the right address.
+
+Manage your subscriptions: <%= @manage_url %>
+
+View your <%= Time.current.year %> schedule: <%= area_url(@area) %>
+<%= render "shared/email_footer",
+      disclaimer: true,
+      manage_url: @manage_url,
+      unsubscribe_url: @unsubscribe_url,
+      coffee_context: :annual_schedule_live %>

@@ -85,13 +85,27 @@ class PermitMailer < ApplicationMailer
   end
 
   # Lists affected street names; falls back to the subscriber's address
-  # if no permit has a usable street name.
+  # if no permit has a usable street name. Prefixed with the earliest
+  # start date across @matches so subscribers can triage by urgency
+  # straight from the inbox.
   def subject_line
     streets = @matches.map { |m| m.permit.display_street }.compact.uniq
-    if streets.empty?
+    base = if streets.empty?
       "Temporary No Parking near #{@street_address}"
     else
       "Temporary No Parking on #{streets.join(', ')}"
     end
+
+    prefix = earliest_start_prefix
+    prefix ? "#{prefix}: #{base}" : base
+  end
+
+  def earliest_start_prefix
+    starts = @matches
+      .map { |m| m.permit.application_start_date&.in_time_zone(TIME_ZONE) }
+      .compact
+    return nil if starts.empty?
+
+    starts.min.strftime("%a %b %-d")
   end
 end

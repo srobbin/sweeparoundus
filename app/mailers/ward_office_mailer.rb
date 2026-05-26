@@ -6,7 +6,7 @@ class WardOfficeMailer < ApplicationMailer
 
     mail(
       to: @email,
-      subject: "Street sweeping reminder resource - #{Time.current.year} schedules live",
+      subject: "Free #{Time.current.year} street sweeping reminders for your Ward #{@ward} constituents",
     )
   end
 

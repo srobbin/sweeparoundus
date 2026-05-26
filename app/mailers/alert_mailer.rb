@@ -4,6 +4,7 @@ class AlertMailer < ApplicationMailer
   before_action :set_street_address, only: [ :reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed ]
   before_action :set_formatted_address_area, only: [ :confirm ]
   before_action :set_sweep_dates, only: [ :reminder ]
+  before_action :set_annual_first_sweep, only: [ :annual_schedule_live ]
   before_action :set_mailer_urls, only: [ :confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed ]
   before_action :set_manage_url, only: [ :reminder, :annual_schedule_live, :sweeping_data_delayed ]
   before_action :set_static_map_url, only: [ :reminder, :confirm ]
@@ -11,23 +12,18 @@ class AlertMailer < ApplicationMailer
   def reminder
     mail(
       to: @email,
-      subject: "Street sweeping alert for #{@area.name}",
+      subject: reminder_subject,
     )
   end
 
   def confirm
-    subject = if @neighbor_areas.any?
-      "Please confirm your #{1 + @neighbor_areas.size} street sweeping subscriptions"
-    else
-      "Please confirm your subscription to #{@area.name}"
-    end
-    mail(to: @email, subject: subject)
+    mail(to: @email, subject: confirm_subject)
   end
 
   def annual_schedule_live
     mail(
       to: @email,
-      subject: "#{Time.current.year} street sweeping schedule is now live",
+      subject: "Your #{Time.current.year} sweep dates are ready—check your schedule",
     )
   end
 
@@ -41,7 +37,7 @@ class AlertMailer < ApplicationMailer
   def deleted_notification
     mail(
       to: @email,
-      subject: "Your street sweeping alert subscription has been canceled",
+      subject: "Your #{ENV["SITE_NAME"]} subscription for #{@area.name} was canceled—here's why",
     )
   end
 
@@ -68,12 +64,25 @@ class AlertMailer < ApplicationMailer
 
   def set_sweep_dates
     @sweep = params[:sweep]
-    @dates = [
-      @sweep.date_1,
-      @sweep.date_2,
-      @sweep.date_3,
-      @sweep.date_4
-    ].compact.map { |d| d.strftime("%B %-d") }
+    @dates = format_sweep_dates(@sweep)
+  end
+
+  # The annual_schedule_live email surfaces the first sweep of the new
+  # season near the top, so subscribers immediately see when the year
+  # "starts" for their address. Area#sweeps is already scoped to the
+  # current year and ordered by date_1, so .first is "the first sweep
+  # of the new season". Returns [] when there are no sweeps yet, which
+  # the view uses to render carry-over copy instead.
+  def set_annual_first_sweep
+    @first_sweep_dates = format_sweep_dates(@area.sweeps.first)
+  end
+
+  def format_sweep_dates(sweep)
+    return [] unless sweep
+
+    [ sweep.date_1, sweep.date_2, sweep.date_3, sweep.date_4 ]
+      .compact
+      .map { |d| d.strftime("%A, %B %-d") }
   end
 
   def set_mailer_urls
@@ -89,5 +98,23 @@ class AlertMailer < ApplicationMailer
 
   def set_static_map_url
     @static_map_url = AlertStaticMap.new(alert: @alert, area: @area).url
+  end
+
+  def reminder_subject
+    if @street_address.present?
+      "Tomorrow: street sweeping at #{@street_address}"
+    else
+      "Tomorrow: street sweeping in #{@area.name}"
+    end
+  end
+
+  def confirm_subject
+    if @neighbor_areas.any?
+      "Confirm your #{1 + @neighbor_areas.size} #{ENV["SITE_NAME"]} subscriptions"
+    elsif @street_address.present?
+      "Confirm your #{ENV["SITE_NAME"]} alerts for #{@street_address}"
+    else
+      "Confirm your #{ENV["SITE_NAME"]} alerts for #{@area.name}"
+    end
   end
 end
