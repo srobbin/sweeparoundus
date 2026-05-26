@@ -87,7 +87,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include('Confirm your sweeping alert')
       expect(html_body).to include('We received a request to subscribe')
       expect(html_body).to include(alert.email)
-      expect(html_body).to include("<strong>#{alert.street_address} (#{area.name})</strong>")
+      expect(html_body).to include("<strong>#{CGI.escapeHTML(alert.street_address)} (#{area.name})</strong>")
       expect(html_body).to include('Confirm your subscription')
       expect(html_body).to include(confirm_area_alerts_url(area))
       expect(html_body).to include("We'll email you the day before each sweep")
@@ -96,6 +96,14 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
       expect(html_body).to include(CGI.escapeHTML(ApplicationMailer::DISCLAIMER))
+    end
+
+    it 'encodes the raw street address in the confirmation JWT so the DB lookup succeeds' do
+      token = html_body.match(/confirm\?t=([^"&\s]+)/)[1]
+      decoded = decode_jwt(token)
+
+      expect(decoded["sub"]).to eq(alert.email)
+      expect(decoded["street_address"]).to eq(alert.street_address)
     end
 
     it 'omits the coffee block' do
@@ -141,7 +149,7 @@ RSpec.describe AlertMailer, type: :mailer do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
       expect(mail.subject).to eq("Tomorrow: street sweeping at #{alert.street_address}")
       expect(mail.to).to include(alert.email)
-      expect(html_body).to include(alert.street_address)
+      expect(html_body).to include(CGI.escapeHTML(alert.street_address))
       expect(html_body).to include(area_url(area))
       expect(html_body).to include('Street sweeping starts tomorrow.')
       expect(html_body).to include(sweep.date_1.strftime('%a, %b %-d'))
