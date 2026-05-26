@@ -55,7 +55,8 @@ class AlertMailer < ApplicationMailer
   end
 
   def set_street_address
-    @street_address = @alert.street_address&.sub(/,\s*Chicago,\s*IL,\s*USA\s*\z/i, "")
+    @raw_street_address = @alert.street_address
+    @street_address = @raw_street_address&.sub(/,\s*Chicago,\s*IL,\s*USA\s*\z/i, "")
   end
 
   def set_formatted_address_area
@@ -87,7 +88,7 @@ class AlertMailer < ApplicationMailer
 
   def set_mailer_urls
     neighbor_ids = @neighbor_alerts.map { |a| a.id.to_s }.presence
-    token = encode_jwt(@email, @street_address, neighbor_alert_ids: neighbor_ids)
+    token = encode_jwt(@email, @raw_street_address, neighbor_alert_ids: neighbor_ids)
     @confirmation_url = confirm_area_alerts_url(@area, t: token)
     @unsubscribe_url = unsubscribe_area_alerts_url(@area, t: token)
   end
