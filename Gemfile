@@ -45,7 +45,7 @@ gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
 group :development, :test do
-  gem "byebug", platforms: [ :mri, :mingw, :x64_mingw ]
+  gem "debug", platforms: [ :mri, :mingw, :x64_mingw ]
   gem "factory_bot_rails", "~> 6.2"
   gem "faker", "~> 3.2"
   gem "prosopite"
