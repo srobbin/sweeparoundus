@@ -82,7 +82,7 @@ class AlertMailer < ApplicationMailer
 
     [ sweep.date_1, sweep.date_2, sweep.date_3, sweep.date_4 ]
       .compact
-      .map { |d| d.strftime("%A, %B %-d") }
+      .map { |d| d.strftime("%a, %b %-d") }
   end
 
   def set_mailer_urls

@@ -2,24 +2,22 @@
 
 <%= render "shared/address_chip", street_address: @street_address, area: @area %>
 
+<p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.25em;">
+  The <%= Time.current.year %> sweeping schedule is live.
+</p>
+
 <% if @first_sweep_dates.any? %>
-  <p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.5em;">
-    The <%= Time.current.year %> sweeping schedule is live.
-  </p>
-  <p style="margin-top: 0;">
+  <p style="margin: 0 0 1em;">
     Your first sweep is <strong><%= @first_sweep_dates.first %></strong><% if @first_sweep_dates.size > 1 %>,
     continuing into <strong><%= @first_sweep_dates[1..].to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %></strong><% end %>.
   </p>
 <% else %>
-  <p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.5em;">
-    The <%= Time.current.year %> sweeping schedule is live.
-  </p>
-  <p style="margin-top: 0;">
+  <p style="margin: 0 0 1em;">
     Your subscription has been carried over for the <%= Time.current.year %> season.
   </p>
 <% end %>
 
-<p>
+<p style="margin: 0 0 1em;">
   Moved recently? Update your subscription so you keep getting alerts for the
   right address.
 </p>
