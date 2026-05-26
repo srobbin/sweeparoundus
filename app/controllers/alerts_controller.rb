@@ -130,14 +130,23 @@ class AlertsController < ApplicationController
     return [] if ids.empty?
 
     Area.where(id: ids).filter_map do |neighbor_area|
-      alert = neighbor_area.alerts.find_or_initialize_by(email: email, street_address: nil)
-      if alert.save
-        alert
-      else
-        Rails.logger.warn("[AlertsController] Neighbor alert save failed for area #{neighbor_area.id}: #{alert.errors.full_messages.join(', ')}")
-        nil
-      end
+      find_or_create_neighbor_alert(neighbor_area, email)
     end
+  end
+
+  def find_or_create_neighbor_alert(neighbor_area, email)
+    existing = neighbor_area.alerts.find_by(email: email)
+    return existing if existing
+
+    alert = neighbor_area.alerts.new(email: email, street_address: nil)
+    return alert if alert.save
+
+    # Concurrent requests can both pass find_by and race on insert.
+    existing = neighbor_area.alerts.find_by(email: email)
+    return existing if existing
+
+    Rails.logger.warn("[AlertsController] Neighbor alert save failed for area #{neighbor_area.id}: #{alert.errors.full_messages.join(', ')}")
+    nil
   end
 
   def street_address

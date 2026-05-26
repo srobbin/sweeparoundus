@@ -144,6 +144,48 @@ RSpec.describe "Alerts", type: :request do
         }.not_to change(Alert, :count)
       end
     end
+
+    context "with neighbor area subscriptions" do
+      let!(:neighbor_area) do
+        shape = RGeo::Geos.factory(srid: 0).parse_wkt(
+          "MULTIPOLYGON (((-87.69 41.86, -87.69 41.87, -87.68 41.87, -87.68 41.86, -87.69 41.86)))"
+        )
+        create(:area, ward: 28, number: 8, shortcode: "W28A8", slug: "ward-28-sweep-area-8", shape: shape)
+      end
+
+      it "creates alerts for selected neighbor areas" do
+        expect {
+          post area_alerts_path(area), params: {
+            email: valid_email,
+            neighbor_area_ids: [ neighbor_area.id ]
+          }
+        }.to change(Alert, :count).by(2)
+
+        neighbor_alert = neighbor_area.alerts.find_by!(email: valid_email)
+        expect(neighbor_alert.street_address).to be_nil
+      end
+
+      it "reuses an existing neighbor alert that has a street address" do
+        existing = create(:alert, :with_address, area: neighbor_area, email: valid_email)
+
+        mailer_dbl = double
+        allow(AlertMailer).to receive(:with).and_return(mailer_dbl)
+        allow(mailer_dbl).to receive(:confirm).and_return(mailer_dbl)
+        allow(mailer_dbl).to receive(:deliver_later)
+
+        expect {
+          post area_alerts_path(area), params: {
+            email: valid_email,
+            neighbor_area_ids: [ neighbor_area.id ]
+          }
+        }.to change(Alert, :count).by(1)
+
+        expect(AlertMailer).to have_received(:with).with(
+          alert: area.alerts.find_by!(email: valid_email),
+          neighbor_alerts: [ existing ]
+        )
+      end
+    end
   end
 
   describe "GET /areas/:area_id/alerts/unsubscribe" do
