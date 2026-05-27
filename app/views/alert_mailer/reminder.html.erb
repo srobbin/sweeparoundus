@@ -3,12 +3,14 @@
 <%= render "shared/address_chip", street_address: @street_address, area: @area %>
 
 <p style="font-size: 12pt; font-weight: bold; margin: 0 0 0.25em;">
-  Street sweeping starts tomorrow.
+  Street sweeping starts tomorrow:
 </p>
 
-<p style="margin-top: 0;">
-  <%= @dates.to_sentence(two_words_connector: " and ", last_word_connector: ", and ") %>
-</p>
+<ul style="margin: 0 0 1em; padding-left: 1.5em;">
+  <% @dates.each do |date| %>
+    <li><%= date %></li>
+  <% end %>
+</ul>
 
 <% if @static_map_url %>
   <p style="margin-bottom: 0;">
@@ -18,9 +20,11 @@
           height: AlertStaticMap::HEIGHT,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
-  <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address; the shaded area is your sweep zone.
-  </p>
+  <% if @street_address %>
+    <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
+      The blue <strong>H</strong> marker is your address; the shaded area is your sweep zone.
+    </p>
+  <% end %>
 <% end %>
 
 <%= render "shared/email_footer",

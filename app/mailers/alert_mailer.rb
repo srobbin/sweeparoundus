@@ -103,9 +103,9 @@ class AlertMailer < ApplicationMailer
 
   def reminder_subject
     if @street_address.present?
-      "Tomorrow: street sweeping at #{@street_address}"
+      "Tomorrow: Street sweeping at #{@street_address}"
     else
-      "Tomorrow: street sweeping in #{@area.name}"
+      "Tomorrow: Street sweeping in #{@area.name}"
     end
   end
 

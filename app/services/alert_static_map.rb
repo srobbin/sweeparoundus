@@ -27,7 +27,6 @@ class AlertStaticMap
 
   def url
     return nil if api_key.blank?
-    return nil if alert_lat.nil? || alert_lng.nil?
     return nil if @area&.shape.nil?
 
     coords = extract_polygon_coords
@@ -37,7 +36,7 @@ class AlertStaticMap
     parts << "size=#{SIZE}"
     parts << "scale=#{SCALE}"
     parts << "maptype=#{MAP_TYPE}"
-    parts << marker_param(HOME_MARKER_STYLE, alert_lat, alert_lng)
+    parts << marker_param(HOME_MARKER_STYLE, alert_lat, alert_lng) if alert_lat && alert_lng
     parts << polygon_path_param(coords)
     parts << "key=#{encode(api_key)}"
     "#{BASE_URL}?#{parts.join('&')}"
