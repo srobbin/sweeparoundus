@@ -463,8 +463,8 @@ GEM
       google-protobuf (~> 4.31)
     sass-embedded (1.94.2-x86_64-linux-gnu)
       google-protobuf (~> 4.31)
-    sassc (2.4.0)
-      ffi (~> 1.9)
+    sassc-embedded (1.80.8)
+      sass-embedded (~> 1.80)
     scout_apm (6.2.0)
       parser
     scout_apm_logging (2.1.0)
@@ -593,7 +593,7 @@ DEPENDENCIES
   rgeo-geojson (~> 2.2)
   rspec-rails (~> 7.1)
   rubocop-rails-omakase
-  sassc (~> 2.4)
+  sassc-embedded
   scout_apm (~> 6.2)
   scout_apm_logging (~> 2.1)
   selenium-webdriver (~> 4.20)
