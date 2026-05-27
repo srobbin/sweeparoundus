@@ -297,7 +297,7 @@ RSpec.describe "Subscriptions", type: :request do
       it "shows a generic error" do
         post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Could not create subscription")
       end
     end
@@ -316,7 +316,7 @@ RSpec.describe "Subscriptions", type: :request do
       it "shows an error" do
         post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("could not find the sweep area")
       end
     end
@@ -331,7 +331,7 @@ RSpec.describe "Subscriptions", type: :request do
       it "shows an error" do
         post create_subscription_path, params: { t: token, address: "", lat: lat, lng: lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("enter an address")
       end
     end
@@ -346,7 +346,7 @@ RSpec.describe "Subscriptions", type: :request do
       it "shows an error" do
         post create_subscription_path, params: { t: token, address: address }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("select an address from the suggestions")
       end
     end

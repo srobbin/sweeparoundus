@@ -126,6 +126,6 @@ class SubscriptionsController < ApplicationController
 
   def render_manage_with_error
     set_alerts
-    render :show, status: :unprocessable_entity
+    render :show, status: :unprocessable_content
   end
 end

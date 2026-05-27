@@ -65,7 +65,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 with param name" do
         get "/api/v1/sweeps", params: { lng: inside_lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Missing required parameter: lat")
       end
@@ -75,7 +75,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 with param name" do
         get "/api/v1/sweeps", params: { lat: inside_lat }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Missing required parameter: lng")
       end
@@ -85,7 +85,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 identifying the first missing param" do
         get "/api/v1/sweeps"
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Missing required parameter: lat")
       end
@@ -95,7 +95,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 as missing param" do
         get "/api/v1/sweeps", params: { lat: "", lng: "" }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Missing required parameter: lat")
       end
@@ -105,7 +105,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422" do
         get "/api/v1/sweeps", params: { lat: "abc", lng: "xyz" }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Invalid coordinates.")
       end
@@ -115,7 +115,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422" do
         get "/api/v1/sweeps", params: { lat: "Infinity", lng: inside_lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Invalid coordinates.")
       end
@@ -125,7 +125,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 for lat outside -90..90" do
         get "/api/v1/sweeps", params: { lat: 999, lng: inside_lng }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Invalid coordinates.")
       end
@@ -133,7 +133,7 @@ RSpec.describe "Api::V1::Sweeps", type: :request do
       it "returns 422 for lng outside -180..180" do
         get "/api/v1/sweeps", params: { lat: inside_lat, lng: -500 }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json["error"]).to eq("Invalid coordinates.")
       end
