@@ -1,69 +1,83 @@
 source "https://rubygems.org"
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.4.7"
 
 gem "rails", "~> 7.2.3.1"
-gem "pg", "~> 1.6"
-gem "jbuilder", "~> 2.15"
 
-gem "activeadmin", "~> 3.5"
-gem "activerecord-postgis-adapter", "~> 10.0"
+# Core
 gem "bootsnap", "~> 1.18", require: false
-gem "dartsass-rails", "~> 0.5.1"
-gem "sassc-embedded"
-gem "devise", "~> 5.0"
-gem "draper", "~> 4.0"
-gem "friendly_id", "~> 5.4"
-gem "importmap-rails"
-gem "icalendar", "~> 2.12"
-gem "jwt", "~> 3.2"
-gem "sendgrid-ruby", "~> 6.7"
+gem "pg", "~> 1.6"
 gem "puma", "~> 8.0"
-gem "pundit", "~> 2.1"
-gem "rack-attack", "~> 6.7"
 gem "redis", "~> 5.4"
+
+# Frontend / Assets
+gem "dartsass-rails", "~> 0.5.1"
+gem "importmap-rails", "~> 2.2"
+gem "rails_icons", "~> 1.8"
+gem "sassc-embedded", "~> 1.80"
+gem "sprockets-rails", "~> 3.5"
+gem "stimulus-rails", "~> 1.3"
+gem "tailwindcss-rails", "~> 2.7"
+gem "turbo-rails", "~> 2.0"
+
+# Authentication / Authorization
+gem "devise", "~> 5.0"
+gem "jwt", "~> 3.2"
+gem "pundit", "~> 2.1"
+
+# Background Jobs
+gem "sidekiq", "~> 7.3"
+gem "sidekiq-cron", "~> 2.0"
+
+# Database / Geo
+gem "activerecord-postgis-adapter", "~> 10.0"
+gem "friendly_id", "~> 5.4"
 gem "rgeo-geojson", "~> 2.2"
+
+# Admin / Views
+gem "activeadmin", "~> 3.5"
+gem "draper", "~> 4.0"
+
+# Monitoring / Performance
+gem "scout_apm", "~> 6.2"
+gem "scout_apm_logging", "~> 2.1"
 gem "sentry-rails", "~> 6.5"
 gem "sentry-ruby", "~> 6.5"
 gem "sentry-sidekiq", "~> 6.5"
-gem "scout_apm", "~> 6.2"
-gem "scout_apm_logging", "~> 2.1"
 gem "stackprof", "~> 0.2"
-gem "sidekiq", "~> 7.3"
-gem "sidekiq-cron", "~> 2.0"
-gem "rails_icons", "~> 1.8"
-gem "sprockets-rails", "~> 3.5"
-gem "tailwindcss-rails", "~> 2.7"
-gem "tzinfo-data", platforms: [ :mingw, :mswin, :x64_mingw, :jruby ]
 
-gem "stimulus-rails", "~> 1.3"
-gem "turbo-rails", "~> 2.0"
+# Email / Notifications
+gem "icalendar", "~> 2.12"
+gem "sendgrid-ruby", "~> 6.7"
 
+# Security / Middleware
+gem "rack-attack", "~> 6.7"
+
+# Ruby stdlib extractions (required in Ruby 3.4+)
 gem "connection_pool", "~> 2.4"
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
+# Platform-specific
+gem "tzinfo-data", platforms: [ :mingw, :mswin, :x64_mingw, :jruby ]
+
 group :development, :test do
-  gem "debug", platforms: [ :mri, :mingw, :x64_mingw ]
+  gem "debug", "~> 1.11", platforms: [ :mri, :mingw, :x64_mingw ]
   gem "factory_bot_rails", "~> 6.2"
   gem "faker", "~> 3.2"
-  gem "prosopite"
-  gem "pg_query"
+  gem "pg_query", "~> 6.2"
+  gem "prosopite", "~> 2.2"
   gem "rspec-rails", "~> 8.0"
 end
 
 group :development do
-  gem "rubocop-rails-omakase", require: false
   gem "foreman", "~> 0.90.0"
   gem "letter_opener_web", "~> 3.0"
   gem "listen", "~> 3.9"
-  gem "web-console", ">= 4.1.0"
-  # gem "rack-mini-profiler", "~> 2.0"
+  gem "rubocop-rails-omakase", require: false
+  gem "web-console", "~> 4.2"
 end
 
 group :test do
-  gem "capybara", ">= 3.26"
-  gem "selenium-webdriver", "~> 4.20"
   gem "webmock", "~> 3.23"
 end

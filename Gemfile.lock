@@ -105,15 +105,6 @@ GEM
     bootsnap (1.18.6)
       msgpack (~> 1.2)
     builder (3.3.0)
-    capybara (3.39.2)
-      addressable
-      matrix
-      mini_mime (>= 0.1.3)
-      nokogiri (~> 1.8)
-      rack (>= 1.6.0)
-      rack-test (>= 0.6.3)
-      regexp_parser (>= 1.5, < 3.0)
-      xpath (~> 3.2)
     cgi (0.5.1)
     concurrent-ruby (1.3.6)
     connection_pool (2.5.5)
@@ -209,9 +200,6 @@ GEM
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.15.0)
-      actionview (>= 7.0.0)
-      activesupport (>= 7.0.0)
     jquery-rails (4.6.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -256,7 +244,6 @@ GEM
       net-pop
       net-smtp
     marcel (1.1.0)
-    matrix (0.4.2)
     mini_mime (1.1.5)
     minitest (5.27.0)
     msgpack (1.8.0)
@@ -459,7 +446,6 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     ruby_http_client (3.5.5)
-    rubyzip (3.3.0)
     sass-embedded (1.94.2-aarch64-linux-gnu)
       google-protobuf (~> 4.31)
     sass-embedded (1.94.2-x86_64-linux-gnu)
@@ -479,12 +465,6 @@ GEM
       opentelemetry-sdk (>= 1.2)
       scout_apm
     securerandom (0.4.1)
-    selenium-webdriver (4.43.0)
-      base64 (~> 0.2)
-      logger (~> 1.4)
-      rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 4.0)
-      websocket (~> 1.0)
     sendgrid-ruby (6.7.0)
       ruby_http_client (~> 3.4)
     sentry-rails (6.5.0)
@@ -547,13 +527,10 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    xpath (3.2.0)
-      nokogiri (~> 1.8)
     zeitwerk (2.7.5)
 
 PLATFORMS
@@ -564,10 +541,9 @@ DEPENDENCIES
   activeadmin (~> 3.5)
   activerecord-postgis-adapter (~> 10.0)
   bootsnap (~> 1.18)
-  capybara (>= 3.26)
   connection_pool (~> 2.4)
   dartsass-rails (~> 0.5.1)
-  debug
+  debug (~> 1.11)
   devise (~> 5.0)
   draper (~> 4.0)
   factory_bot_rails (~> 6.2)
@@ -575,16 +551,15 @@ DEPENDENCIES
   foreman (~> 0.90.0)
   friendly_id (~> 5.4)
   icalendar (~> 2.12)
-  importmap-rails
-  jbuilder (~> 2.15)
+  importmap-rails (~> 2.2)
   jwt (~> 3.2)
   letter_opener_web (~> 3.0)
   listen (~> 3.9)
   observer (~> 0.1)
   ostruct (~> 0.6)
   pg (~> 1.6)
-  pg_query
-  prosopite
+  pg_query (~> 6.2)
+  prosopite (~> 2.2)
   puma (~> 8.0)
   pundit (~> 2.1)
   rack-attack (~> 6.7)
@@ -594,10 +569,9 @@ DEPENDENCIES
   rgeo-geojson (~> 2.2)
   rspec-rails (~> 8.0)
   rubocop-rails-omakase
-  sassc-embedded
+  sassc-embedded (~> 1.80)
   scout_apm (~> 6.2)
   scout_apm_logging (~> 2.1)
-  selenium-webdriver (~> 4.20)
   sendgrid-ruby (~> 6.7)
   sentry-rails (~> 6.5)
   sentry-ruby (~> 6.5)
@@ -610,7 +584,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 2.7)
   turbo-rails (~> 2.0)
   tzinfo-data
-  web-console (>= 4.1.0)
+  web-console (~> 4.2)
   webmock (~> 3.23)
 
 RUBY VERSION
