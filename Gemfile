@@ -31,7 +31,7 @@ gem "sidekiq-cron", "~> 2.0"
 
 # Database / Geo
 gem "activerecord-postgis-adapter", "~> 10.0"
-gem "friendly_id", "~> 5.4"
+gem "friendly_id", "~> 5.7"
 gem "rgeo-geojson", "~> 2.2"
 
 # Admin / Views
