@@ -4,7 +4,7 @@ module Api
       include Rails.application.routes.url_helpers
 
       rescue_from ActionController::ParameterMissing do |e|
-        render json: { error: "Missing required parameter: #{e.param}" }, status: :unprocessable_entity
+        render json: { error: "Missing required parameter: #{e.param}" }, status: :unprocessable_content
       end
 
       private

@@ -50,7 +50,7 @@ group :development, :test do
   gem "faker", "~> 3.2"
   gem "prosopite"
   gem "pg_query"
-  gem "rspec-rails", "~> 7.1"
+  gem "rspec-rails", "~> 8.0"
 end
 
 group :development do

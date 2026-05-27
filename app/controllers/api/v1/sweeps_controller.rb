@@ -7,7 +7,7 @@ module Api
 
         unless valid_lat?(lat) && valid_lng?(lng)
           return render json: { error: "Invalid coordinates." },
-                        status: :unprocessable_entity
+                        status: :unprocessable_content
         end
 
         area = Area.find_by_coordinates(lat, lng)
