@@ -58,8 +58,10 @@ RSpec.describe AlertStaticMap, type: :service do
     context "when alert has no coordinates" do
       let(:alert) { AlertCoords.new(nil, nil) }
 
-      it "returns nil" do
-        expect(subject.url).to be_nil
+      it "returns a valid URL without a marker" do
+        url = subject.url
+        expect(url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+        expect(url).not_to include("markers=")
       end
     end
 

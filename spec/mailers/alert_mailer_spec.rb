@@ -147,12 +147,12 @@ RSpec.describe AlertMailer, type: :mailer do
 
     it 'has the right attributes' do
       expect(mail.from).to eq([ 'info@wethesweeple.com' ])
-      expect(mail.subject).to eq("Tomorrow: street sweeping at #{alert.street_address}")
+      expect(mail.subject).to eq("Tomorrow: Street sweeping at #{alert.street_address}")
       expect(mail.to).to include(alert.email)
       expect(html_body).to include(CGI.escapeHTML(alert.street_address))
       expect(html_body).to include(area_url(area))
-      expect(html_body).to include('Street sweeping starts tomorrow.')
-      expect(html_body).to include(sweep.date_1.strftime('%a, %b %-d'))
+      expect(html_body).to include('Street sweeping starts tomorrow:')
+      expect(html_body).to include("<li>#{sweep.date_1.strftime('%a, %b %-d')}</li>")
       expect(html_body).to include('Cheers,')
       expect(html_body).to include(ENV["SITE_NAME"])
       expect(html_body).to include(ENV["SITE_URL"])
@@ -184,7 +184,7 @@ RSpec.describe AlertMailer, type: :mailer do
       let!(:alert) { create :alert, :unconfirmed, area: area }
 
       it 'falls back to the area name in the subject and chip' do
-        expect(mail.subject).to eq("Tomorrow: street sweeping in #{area.name}")
+        expect(mail.subject).to eq("Tomorrow: Street sweeping in #{area.name}")
         expect(html_body).to include(area.name)
         expect(html_body).to include(area_url(area))
       end
