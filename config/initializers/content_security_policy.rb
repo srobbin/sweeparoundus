@@ -12,9 +12,9 @@
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
-    policy.upgrade_insecure_requests = true
     policy.font_src    :self, :data,
-                       "https://fonts.gstatic.com"
+                       "https://fonts.gstatic.com",
+                       "http://fonts.gstatic.com"
     policy.img_src     :self, :data,
                        "https://*.googleapis.com",
                        "https://*.gstatic.com",
