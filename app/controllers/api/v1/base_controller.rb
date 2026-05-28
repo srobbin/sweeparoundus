@@ -2,6 +2,7 @@ module Api
   module V1
     class BaseController < ActionController::API
       include Rails.application.routes.url_helpers
+      include NoStoreResponses
 
       rescue_from ActionController::ParameterMissing do |e|
         render json: { error: "Missing required parameter: #{e.param}" }, status: :unprocessable_content

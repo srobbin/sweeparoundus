@@ -92,6 +92,13 @@ RSpec.describe "Areas", type: :request do
         expect(response.headers["ETag"]).to be_present
       end
 
+      it "does not set no-store so calendar clients can use conditional GETs" do
+        get area_path(area, format: :ics)
+
+        cache_control = response.headers["Cache-Control"]
+        expect(cache_control).not_to include("no-store")
+      end
+
       it "returns 304 Not Modified when the ETag matches" do
         get area_path(area, format: :ics)
         etag = response.headers["ETag"]
