@@ -52,4 +52,10 @@ Rails.application.config.after_initialize do
   ActiveAdmin::BaseController.content_security_policy(&relaxed_script_src)
   ActiveAdmin::Devise::SessionsController.content_security_policy(&relaxed_script_src)
   ActiveAdmin::Devise::PasswordsController.content_security_policy(&relaxed_script_src)
+
+  if Rails.env.development?
+    LetterOpenerWeb::ApplicationController.content_security_policy do |policy|
+      policy.frame_src :self
+    end
+  end
 end

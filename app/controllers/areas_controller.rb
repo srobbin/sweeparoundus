@@ -22,7 +22,7 @@ class AreasController < ApplicationController
   private
 
   def find_area
-    @area = Area.find(params[:id]).decorate
+    @area = Area.find(params[:id]).decorate(session: session)
   end
 
   def calendar

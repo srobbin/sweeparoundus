@@ -1,7 +1,13 @@
 class AreaDecorator < ApplicationDecorator
-  decorates_association :sweeps
-
   MAX_PATH_CHARS = 12_000
+
+  # Override the AR relation so callers get decorated Sweep objects.
+  # Returns a plain Array (not an AR relation), so you can iterate
+  # but can't chain .where / .order / etc. on the result.
+  # Memoized to avoid re-querying on repeated calls in the same request.
+  def sweeps
+    @sweeps ||= object.sweeps.map { |sweep| SweepDecorator.new(sweep, session: session) }
+  end
 
   def map_image(show_marker: false)
     path = cached_map_path
@@ -9,7 +15,11 @@ class AreaDecorator < ApplicationDecorator
 
     url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400#{marker}&path=color:0x00000000|weight:5|fillcolor:0xAA000033#{path}&sensor=false&key=#{ENV["GOOGLE_MAPS_FRONTEND_API_KEY"]}"
 
-    image_tag url, alt: "Sweep area map for #{object.name}", style: "width:100%; height:auto;"
+    image_tag(
+      url,
+      alt: "Sweep area map for #{object.name}",
+      style: "width:100%; height:auto;"
+    )
   end
 
   # Largest tolerance we'll ever try. ~0.001° lng at Chicago latitude is
