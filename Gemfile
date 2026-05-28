@@ -26,7 +26,7 @@ gem "jwt", "~> 3.2"
 gem "pundit", "~> 2.1"
 
 # Background Jobs
-gem "sidekiq", "~> 7.3"
+gem "sidekiq", "~> 8.0.0" # pinned to 8.0.x — 8.1 requires connection_pool 3.x (breaks Rails 7.2's RedisCacheStore)
 gem "sidekiq-cron", "~> 2.0"
 
 # Database / Geo
@@ -53,7 +53,7 @@ gem "sendgrid-ruby", "~> 6.7"
 gem "rack-attack", "~> 6.7"
 
 # Ruby stdlib extractions (required in Ruby 3.4+)
-gem "connection_pool", "~> 2.4"
+gem "connection_pool", "~> 2.5" # pinned to 2.x — Rails 7.2 RedisCacheStore calls ConnectionPool.new(positional_hash); CP 3.0 is keyword-only
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
