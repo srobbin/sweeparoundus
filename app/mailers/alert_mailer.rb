@@ -3,6 +3,7 @@ class AlertMailer < ApplicationMailer
   before_action :set_email
   before_action :set_street_address, only: [ :reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed ]
   before_action :set_formatted_address_area, only: [ :confirm ]
+  before_action :set_multi_flag, only: [ :confirm ]
   before_action :set_sweep_dates, only: [ :reminder ]
   before_action :set_annual_first_sweep, only: [ :annual_schedule_live ]
   before_action :set_mailer_urls, only: [ :confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed ]
@@ -97,8 +98,17 @@ class AlertMailer < ApplicationMailer
     @manage_url = manage_subscriptions_url(t: encode_manage_jwt(@email, expires_in: 60.days))
   end
 
+  def set_multi_flag
+    @multi = @neighbor_areas.any?
+  end
+
   def set_static_map_url
-    @static_map_url = AlertStaticMap.new(alert: @alert, area: @area).url
+    map_areas = if action_name == "confirm"
+      [ @area, *@neighbor_areas ]
+    else
+      [ @area ]
+    end
+    @static_map_url = AlertStaticMap.new(alert: @alert, areas: map_areas).url
   end
 
   def reminder_subject

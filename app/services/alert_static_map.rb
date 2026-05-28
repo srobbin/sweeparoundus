@@ -13,31 +13,38 @@ class AlertStaticMap
 
   HOME_MARKER_STYLE = "color:blue|label:H".freeze
 
-  FILL_COLOR = "0xFF6D0033".freeze
-  BORDER_COLOR = "0xE65100BB".freeze
+  PALETTE = [
+    { fill: "0xFF6D0033", border: "0xE65100BB" }, # orange
+    { fill: "0x1E88E533", border: "0x1565C0BB" }, # blue
+    { fill: "0x43A04733", border: "0x2E7D32BB" }, # green
+    { fill: "0xAB47BC33", border: "0x7B1FA2BB" } # purple
+  ].freeze
   BORDER_WEIGHT = 2
 
   # Google Static Maps has a ~16 KB URL limit; cap polygon detail to stay safe.
   MAX_POLYGON_POINTS = 80
 
-  def initialize(alert:, area:)
+  def initialize(alert:, area: nil, areas: nil)
     @alert = alert
-    @area = area
+    @areas = Array(areas.presence || area).compact
   end
 
   def url
     return nil if api_key.blank?
-    return nil if @area&.shape.nil?
+    return nil if @areas.empty?
 
-    coords = extract_polygon_coords
-    return nil if coords.empty?
+    polygon_params = @areas.each_with_index.filter_map do |a, i|
+      coords = extract_polygon_coords(a)
+      polygon_path_param(coords, i) unless coords.empty?
+    end
+    return nil if polygon_params.empty?
 
     parts = []
     parts << "size=#{SIZE}"
     parts << "scale=#{SCALE}"
     parts << "maptype=#{MAP_TYPE}"
     parts << marker_param(HOME_MARKER_STYLE, alert_lat, alert_lng) if alert_lat && alert_lng
-    parts << polygon_path_param(coords)
+    parts.concat(polygon_params)
     parts << "key=#{encode(api_key)}"
     "#{BASE_URL}?#{parts.join('&')}"
   end
@@ -47,8 +54,10 @@ class AlertStaticMap
   def alert_lat = @alert.lat
   def alert_lng = @alert.lng
 
-  def extract_polygon_coords
-    shape = @area.shape
+  def extract_polygon_coords(area)
+    shape = area&.shape
+    return [] if shape.nil?
+
     ring = case shape.geometry_type.type_name
     when "Polygon"      then shape.exterior_ring
     when "MultiPolygon" then shape.first&.exterior_ring
@@ -66,9 +75,10 @@ class AlertStaticMap
     (0...MAX_POLYGON_POINTS).map { |i| points[(i * step).round] }
   end
 
-  def polygon_path_param(coords)
+  def polygon_path_param(coords, index)
+    colors = PALETTE[index % PALETTE.size]
     encoded_path = encode_polyline(coords)
-    style = "fillcolor:#{FILL_COLOR}|color:#{BORDER_COLOR}|weight:#{BORDER_WEIGHT}|enc:#{encoded_path}"
+    style = "fillcolor:#{colors[:fill]}|color:#{colors[:border]}|weight:#{BORDER_WEIGHT}|enc:#{encoded_path}"
     "path=#{encode(style)}"
   end
 
