@@ -23,6 +23,15 @@ Rails.application.configure do
   # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
   # config.public_file_server.enabled = false
 
+  # Fingerprinted assets under /assets/* are safe to cache long-term —
+  # the digest changes on recompile. This header also applies to other
+  # files in public/ (robots.txt, favicon, custom error pages), so we
+  # deliberately omit `immutable`: a forced reload should still
+  # revalidate those non-fingerprinted files.
+  config.public_file_server.headers = {
+    "Cache-Control" => "public, max-age=#{1.year.to_i}"
+  }
+
   # Compress CSS using a preprocessor.
   config.assets.css_compressor = nil
 

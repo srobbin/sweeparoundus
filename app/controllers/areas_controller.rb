@@ -1,6 +1,8 @@
 class AreasController < ApplicationController
   include SearchContext
 
+  skip_before_action :set_cache_control_headers, only: :show, if: -> { request.format.ics? }
+
   before_action :find_area, only: :show
   before_action :set_search_context, only: :show, if: -> { request.format.html? }
   before_action :load_neighbors, only: :show, if: -> { request.format.html? }
