@@ -23,7 +23,7 @@ gem "turbo-rails", "~> 2.0"
 # Authentication / Authorization
 gem "devise", "~> 5.0"
 gem "jwt", "~> 3.2"
-gem "pundit", "~> 2.1"
+gem "pundit", "~> 2.5"
 
 # Background Jobs
 gem "sidekiq", "~> 8.0.0" # pinned to 8.0.x — 8.1 requires connection_pool 3.x (breaks Rails 7.2's RedisCacheStore)
