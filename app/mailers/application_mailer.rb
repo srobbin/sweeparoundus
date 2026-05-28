@@ -3,12 +3,13 @@ class ApplicationMailer < ActionMailer::Base
   helper ApplicationHelper
 
   rescue_from StandardError do |exception|
-    Sentry.set_context("mailer", {
-      mailer: self.class.name,
-      action: action_name,
-      to: message.to,
-      params: params&.transform_values { |v| v.try(:id) || v.class.name }
-    })
+    context = { mailer: is_a?(Class) ? name : self.class.name }
+    unless is_a?(Class)
+      context[:action] = action_name
+      context[:to] = message.to
+      context[:params] = params&.transform_values { |v| v.try(:id) || v.class.name }
+    end
+    Sentry.set_context("mailer", context)
     Sentry.capture_exception(exception)
     raise
   end

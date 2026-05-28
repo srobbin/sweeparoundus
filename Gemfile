@@ -36,7 +36,6 @@ gem "rgeo-geojson", "~> 2.2"
 
 # Admin / Views
 gem "activeadmin", "~> 3.5"
-gem "draper", "~> 4.0"
 
 # Monitoring / Performance
 gem "scout_apm", "~> 6.2"

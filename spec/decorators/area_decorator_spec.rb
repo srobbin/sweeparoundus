@@ -10,18 +10,6 @@ RSpec.describe AreaDecorator do
   end
 
   describe "#map_image" do
-    # Decorators reach `session` via Draper::LazyHelpers' method_missing,
-    # so it isn't a real method on AreaDecorator and rspec-mocks'
-    # `verify_partial_doubles` rejects stubbing it. Bypass the check
-    # for these examples — we're stubbing a deliberately-dynamic method.
-    around do |example|
-      without_partial_double_verification { example.run }
-    end
-
-    before do
-      allow(decorated_area).to receive(:session).and_return({})
-    end
-
     it "returns an <img> tag with a Google Static Maps URL" do
       expect(decorated_area.map_image).to match(/<img.+src="https:\/\/maps\.googleapis\.com\/maps\/api\/staticmap/)
     end
@@ -44,10 +32,8 @@ RSpec.describe AreaDecorator do
     end
 
     context "when show_marker is false (default)" do
-      before do
-        allow(decorated_area).to receive(:session).and_return(
-          search_lat: 41.886, search_lng: -87.706
-        )
+      let(:decorated_area) do
+        area.decorate(session: { search_lat: 41.886, search_lng: -87.706 })
       end
 
       it "does not include a markers parameter" do
@@ -58,10 +44,8 @@ RSpec.describe AreaDecorator do
     end
 
     context "when show_marker is true and session has search coordinates" do
-      before do
-        allow(decorated_area).to receive(:session).and_return(
-          search_lat: 41.886, search_lng: -87.706
-        )
+      let(:decorated_area) do
+        area.decorate(session: { search_lat: 41.886, search_lng: -87.706 })
       end
 
       it "includes a markers parameter at the searched coordinates" do
