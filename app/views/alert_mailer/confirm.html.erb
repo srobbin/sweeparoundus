@@ -35,13 +35,13 @@
 <% if @static_map_url %>
   <p style="margin-bottom: 0;">
     <%= image_tag @static_map_url,
-          alt: "Map showing the sweep area for #{@formatted_address_area}",
+          alt: "Map showing the sweep #{@multi ? 'areas' : 'area'} for #{@formatted_address_area}",
           width: AlertStaticMap::WIDTH,
           height: AlertStaticMap::HEIGHT,
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
   <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address; the shaded area is the sweep zone.
+    The blue <strong>H</strong> marker is your address; the shaded <%= @multi ? 'areas are' : 'area is' %> the sweep <%= @multi ? 'zones' : 'zone' %>.
   </p>
 <% end %>
 

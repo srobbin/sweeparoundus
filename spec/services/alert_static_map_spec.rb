@@ -43,8 +43,9 @@ RSpec.describe AlertStaticMap, type: :service do
       url = subject.url
       expect(url).to include("path=")
       encoded = URI.decode_www_form_component(url)
-      expect(encoded).to include("fillcolor:#{AlertStaticMap::FILL_COLOR}")
-      expect(encoded).to include("color:#{AlertStaticMap::BORDER_COLOR}")
+      first_colors = AlertStaticMap::PALETTE[0]
+      expect(encoded).to include("fillcolor:#{first_colors[:fill]}")
+      expect(encoded).to include("color:#{first_colors[:border]}")
       expect(encoded).to include("enc:")
     end
 
@@ -115,6 +116,53 @@ RSpec.describe AlertStaticMap, type: :service do
 
       it "still produces a valid URL" do
         expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+      end
+    end
+  end
+
+  describe "with multiple areas" do
+    let(:polygon2) do
+      factory.parse_wkt(
+        "MULTIPOLYGON (((-87.690 41.860, -87.680 41.860, -87.680 41.870, -87.690 41.870, -87.690 41.860)))"
+      )
+    end
+    let(:area2) { double("Area", shape: polygon2) }
+
+    subject { described_class.new(alert: alert, areas: [ area, area2 ]) }
+
+    it "includes a path param for each area" do
+      url = subject.url
+      path_count = url.scan("path=").size
+      expect(path_count).to eq(2)
+    end
+
+    it "uses distinct colors for each area" do
+      decoded = URI.decode_www_form_component(subject.url)
+      colors = AlertStaticMap::PALETTE
+      expect(decoded).to include("fillcolor:#{colors[0][:fill]}")
+      expect(decoded).to include("fillcolor:#{colors[1][:fill]}")
+    end
+
+    it "still produces a valid URL" do
+      expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+    end
+
+    context "when one area has no shape" do
+      let(:area2) { double("Area", shape: nil) }
+
+      it "renders the valid area and skips the nil one" do
+        url = subject.url
+        expect(url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+        expect(url.scan("path=").size).to eq(1)
+      end
+    end
+
+    context "when all areas have no shape" do
+      let(:area) { double("Area", shape: nil) }
+      let(:area2) { double("Area", shape: nil) }
+
+      it "returns nil" do
+        expect(subject.url).to be_nil
       end
     end
   end

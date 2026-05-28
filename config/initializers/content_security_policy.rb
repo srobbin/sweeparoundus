@@ -30,7 +30,7 @@ Rails.application.configure do
                        "https://*.analytics.google.com",
                        "https://*.googletagmanager.com",
                        "https://www.google.com"
-    policy.frame_src   :none
+    policy.frame_src   Rails.env.development? ? :self : :none
     policy.base_uri    :self
     policy.form_action :self
     policy.report_uri  "/csp-violation-report"
@@ -52,10 +52,4 @@ Rails.application.config.after_initialize do
   ActiveAdmin::BaseController.content_security_policy(&relaxed_script_src)
   ActiveAdmin::Devise::SessionsController.content_security_policy(&relaxed_script_src)
   ActiveAdmin::Devise::PasswordsController.content_security_policy(&relaxed_script_src)
-
-  if Rails.env.development?
-    LetterOpenerWeb::ApplicationController.content_security_policy do |policy|
-      policy.frame_src :self
-    end
-  end
 end
