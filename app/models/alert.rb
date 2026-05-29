@@ -11,7 +11,7 @@ class Alert < ApplicationRecord
 
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, unless: -> { self.phone.present? }
   validates :email, uniqueness: { scope: :street_address }, if: -> { email.present? && street_address.present? }
-  validates :email, uniqueness: { scope: :area_id }, if: -> { email.present? && street_address.nil? }
+  validates :email, uniqueness: { scope: :area_id, conditions: -> { where(street_address: nil) } }, if: -> { email.present? && street_address.nil? }
   validate :email_or_phone
   validate :email_domain_has_mx_record, on: :create, if: -> { email.present? && errors[:email].empty? }
 
