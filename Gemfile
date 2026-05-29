@@ -63,7 +63,7 @@ gem "tzinfo-data", platforms: [ :mingw, :mswin, :x64_mingw, :jruby ]
 group :development, :test do
   gem "debug", "~> 1.11", platforms: [ :mri, :mingw, :x64_mingw ]
   gem "factory_bot_rails", "~> 6.5"
-  gem "faker", "~> 3.2"
+  gem "faker", "~> 3.8"
   gem "pg_query", "~> 6.2"
   gem "prosopite", "~> 2.2"
   gem "rspec-rails", "~> 8.0"
