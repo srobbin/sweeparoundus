@@ -170,6 +170,20 @@ RSpec.describe Alert do
 
         expect(alert).to be_valid
       end
+
+      it "allows a nil street_address subscription alongside a street_address subscription in the same area" do
+        create(:alert, :confirmed, email: "both@example.com", street_address: "123 Main St", area: area)
+        alert = Alert.new(email: "both@example.com", street_address: nil, area: area)
+
+        expect(alert).to be_valid
+      end
+
+      it "confirms a nil street_address alert when the same email has a street_address alert in the area" do
+        create(:alert, :confirmed, email: "both@example.com", street_address: "123 Main St", area: area)
+        general = create(:alert, :unconfirmed, email: "both@example.com", street_address: nil, area: area)
+
+        expect(general.update(confirmed: true)).to be(true)
+      end
     end
   end
 

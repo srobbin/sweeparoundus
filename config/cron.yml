@@ -1,5 +1,5 @@
 sync_cdot_permits:
-  cron: "0 4 * * * America/Chicago"
+  cron: "5 4 * * * America/Chicago"
   class: "SyncCdotPermitsJob"
 
 cleanup_stale_cdot_permits:

@@ -6,8 +6,16 @@ class SyncCdotPermits
   PAGE_SIZE = 1000
   OPEN_TIMEOUT = 10
   READ_TIMEOUT = 30
-  MAX_RETRIES = 3
+  MAX_RETRIES = 5
   RETRY_BASE_DELAY = 2
+  # Cap the exponential backoff between in-process retries. These retries
+  # sleep on the Sidekiq worker thread, so an uncapped 2 * 2**n sequence
+  # (which would reach 32s on the 5th retry) risks parking the worker for
+  # too long on a sustained upstream incident. The cap keeps the worst-case
+  # total park time bounded (~2+4+8+15+15 = 44s) while still leaning on the
+  # job-level retry in SyncCdotPermitsJob to ride out longer outages without
+  # holding the worker.
+  MAX_BACKOFF_DELAY = 15
   # Cap any server-supplied Retry-After to keep one slow upstream from
   # parking the worker for an unbounded amount of time.
   MAX_RETRY_AFTER = 60
@@ -274,7 +282,11 @@ class SyncCdotPermits
     if error.is_a?(HttpError) && error.retry_after_seconds
       [ error.retry_after_seconds, MAX_RETRY_AFTER ].min
     else
-      RETRY_BASE_DELAY * (2**(retries - 1))
+      base = [ RETRY_BASE_DELAY * (2**(retries - 1)), MAX_BACKOFF_DELAY ].min
+      # Add a little jitter so repeated failures don't synchronize into a
+      # tight, perfectly-spaced retry pulse against an already-struggling
+      # upstream.
+      base + rand * RETRY_BASE_DELAY
     end
   end
 
