@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby "3.4.7"
 
-gem "rails", "~> 7.2.3.1"
+gem "rails", "~> 8.1"
 
 # Core
 gem "bootsnap", "~> 1.18", require: false
@@ -26,11 +26,11 @@ gem "jwt", "~> 3.2"
 gem "pundit", "~> 2.5"
 
 # Background Jobs
-gem "sidekiq", "~> 8.0.0" # pinned to 8.0.x — 8.1 requires connection_pool 3.x (breaks Rails 7.2's RedisCacheStore)
+gem "sidekiq", "~> 8.1"
 gem "sidekiq-cron", "~> 2.0"
 
 # Database / Geo
-gem "activerecord-postgis-adapter", "~> 10.0"
+gem "activerecord-postgis-adapter", "~> 11.1"
 gem "friendly_id", "~> 5.7"
 gem "rgeo-geojson", "~> 2.2"
 
@@ -53,7 +53,7 @@ gem "sendgrid-ruby", "~> 6.7"
 gem "rack-attack", "~> 6.7"
 
 # Ruby stdlib extractions (required in Ruby 3.4+)
-gem "connection_pool", "~> 2.5" # pinned to 2.x — Rails 7.2 RedisCacheStore calls ConnectionPool.new(positional_hash); CP 3.0 is keyword-only
+gem "connection_pool", "~> 3.0"
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
@@ -74,7 +74,7 @@ group :development do
   gem "letter_opener_web", "~> 3.0"
   gem "listen", "~> 3.10"
   gem "rubocop-rails-omakase", require: false
-  gem "web-console", "~> 4.2"
+  gem "web-console", "~> 4.3"
 end
 
 group :test do

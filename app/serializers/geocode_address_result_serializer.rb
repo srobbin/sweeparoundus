@@ -9,8 +9,6 @@ class GeocodeAddressResultSerializer < ActiveJob::Serializers::ObjectSerializer
     GeocodeAddress::Result.new(lat: hash["lat"], lng: hash["lng"])
   end
 
-  private
-
   def klass
     GeocodeAddress::Result
   end
