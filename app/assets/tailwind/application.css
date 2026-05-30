@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+/* Preserve Tailwind v3 default border/ring color (gray-200 instead of
+   v4's currentColor) so existing `border`/`ring` utilities look unchanged. */
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  /* Restore Tailwind v3's pointer cursor on interactive buttons; v4 Preflight
+     defaults these to `cursor: default` to match the browser. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

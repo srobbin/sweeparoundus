@@ -1,8 +1,8 @@
 <% variant = local_assigns.fetch(:variant, :primary) %>
 <form method="GET" action="/search/" data-controller="search" data-action="search#submit">
   <label for="address" class="block font-medium sr-only">Search for a Chicago address</label>
-  <div class="mt-1 flex rounded-md shadow-sm">
-    <div class="flex items-stretch flex-grow">
+  <div class="mt-1 flex rounded-md shadow-xs">
+    <div class="flex items-stretch grow">
       <gmp-place-autocomplete
         name="address"
         class="search-autocomplete search-autocomplete--rounded-l"
@@ -16,12 +16,12 @@
       <input type="hidden" name="lng" data-search-target="lng" />
     </div>
     <% if variant == :secondary %>
-      <button data-search-target="submit" class="-ml-px relative inline-flex items-center space-x-2 px-5 py-3 lg:py-2 border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+      <button data-search-target="submit" class="-ml-px relative inline-flex items-center gap-2 px-5 py-3 lg:py-2 cursor-pointer border border-gray-300 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
         <span data-search-target="label">Search</span>
         <%= icon "circle-notch", class: "hidden animate-spin h-5 w-5", data: { search_target: "spinner" }, aria: { hidden: true } %>
       </button>
     <% else %>
-      <button data-search-target="submit" class="-ml-px relative inline-flex items-center space-x-2 px-5 py-3 lg:py-2 border border-transparent font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      <button data-search-target="submit" class="-ml-px relative inline-flex items-center gap-2 px-5 py-3 lg:py-2 cursor-pointer border border-transparent font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-1 focus:ring-blue-500">
         <span data-search-target="label">Search</span>
         <%= icon "circle-notch", class: "hidden animate-spin h-5 w-5 text-white", data: { search_target: "spinner" }, aria: { hidden: true } %>
       </button>

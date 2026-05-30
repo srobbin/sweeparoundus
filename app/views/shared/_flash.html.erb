@@ -1,7 +1,7 @@
 <% flash.each do |key, value| %>
   <%= content_tag :div, class: "rounded-md p-4 mb-6 #{%w(alert error).include?(key) ? "bg-red-100" :  "bg-blue-100"}" do %>
     <div class="flex">
-      <div class="flex-shrink-0">
+      <div class="shrink-0">
         <% if %w(alert error).include?(key) %>
           <%= icon "x-circle", variant: "fill", class: "h-5 w-5 text-red-400", aria: { hidden: true } %>
         <% else %>
