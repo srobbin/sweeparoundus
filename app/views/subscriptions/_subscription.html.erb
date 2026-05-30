@@ -17,7 +17,9 @@
 
       <div class="mt-1 text-sm text-gray-700 space-y-1.5">
         <% if alert.area %>
-          <div class="text-xs text-gray-500"><%= alert.area.name %></div>
+          <div class="text-xs text-gray-500">
+            <%= link_to alert.area.name, alert.area, class: "underline hover:text-gray-700" %>
+          </div>
           <% next_sweep_text = alert.area.decorate.next_sweep %>
           <div>
             <span class="text-gray-500">Next sweep:</span>
