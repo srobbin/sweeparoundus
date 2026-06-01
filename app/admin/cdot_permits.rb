@@ -44,6 +44,7 @@ ActiveAdmin.register CdotPermit do
 
   scope :all, default: true
   scope :with_open_status
+  scope :with_notifications_sent
 
   show do
     attributes_table do

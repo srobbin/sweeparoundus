@@ -3,6 +3,7 @@ class CdotPermit < ApplicationRecord
 
   scope :with_open_status, -> { where(application_status: "Open") }
   scope :starting_after, ->(time) { where("application_start_date > ?", time) }
+  scope :with_notifications_sent, -> { where.not(notifications_sent_at: nil) }
 
   # Addresses that anchor the two ends of the permit's construction segment.
   # Returns a 2-element array (from_address, to_address). Either entry may be

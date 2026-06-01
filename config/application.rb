@@ -37,6 +37,12 @@ module Sweeparoundus
     # Sidekiq
     config.active_job.queue_adapter = :sidekiq
 
+    # This app stores no image attachments and generates no variants, so skip
+    # the image_processing gem (and its native libvips/ImageMagick dependency).
+    # Disabling the variant processor also silences the boot-time warning Rails
+    # logs when image_processing is absent.
+    config.active_storage.variant_processor = :disabled
+
     # Time zone
     config.time_zone = ENV.fetch("DEFAULT_TIMEZONE") { "Central Time (US & Canada)" }
 

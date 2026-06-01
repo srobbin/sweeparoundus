@@ -47,6 +47,16 @@ RSpec.describe CdotPermit do
         expect(CdotPermit.starting_after(Time.current)).not_to include(closed_past, open_past)
       end
     end
+
+    describe ".with_notifications_sent" do
+      let!(:notified) { create(:cdot_permit, notifications_sent_at: 1.hour.ago) }
+      let!(:not_notified) { create(:cdot_permit, notifications_sent_at: nil) }
+
+      it "returns only permits with a notifications_sent_at timestamp" do
+        expect(CdotPermit.with_notifications_sent).to include(notified)
+        expect(CdotPermit.with_notifications_sent).not_to include(not_notified)
+      end
+    end
   end
 
   describe "#segment_label" do
