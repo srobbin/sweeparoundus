@@ -69,20 +69,41 @@ class AlertsController < ApplicationController
     decoded_params = decode_jwt(token)
     email = decoded_params["sub"]
     address = decoded_params["street_address"]
-    @alert = Alert.find_by(area: @area, email: email, street_address: address)
+    @alert = lookup_alert(email, address)
+    # The link's area_id (from the URL) can be stale if regeocoding or the
+    # annual carry-over moved the alert to a new area after the email was sent.
+    # Resync @area to the alert's current area so downstream code is correct.
+    @area = @alert.area if @alert
     @neighbor_alert_ids = Array(decoded_params["neighbor_alert_ids"])
 
-    unless @alert
-      Sentry.set_context("find_alert", {
-        area_id: @area.id,
-        email: email,
-        jwt_street_address: address,
-        action: params[:action]
-      })
-      Sentry.capture_message("Valid JWT but alert not found", level: :warning)
-    end
+    report_missing_alert(email, address) unless @alert
   rescue JWT::DecodeError, JSON::ParserError
     render_invalid_link
+  end
+
+  # email + street_address is globally unique (see Alert validations), so for
+  # address-bearing alerts we ignore the (possibly stale) URL area. Address-less
+  # neighbor alerts are only unique per area, so those stay scoped to @area.
+  def lookup_alert(email, address)
+    if address.present?
+      Alert.find_by(email: email, street_address: address)
+    else
+      Alert.find_by(area: @area, email: email, street_address: nil)
+    end
+  end
+
+  def report_missing_alert(email, address)
+    # A missing alert on unsubscribe is expected and benign (double-clicks,
+    # already-unsubscribed links, alerts removed by cleanup), so don't alert.
+    return if params[:action] == "unsubscribe"
+
+    Sentry.set_context("find_alert", {
+      area_id: @area.id,
+      email: email,
+      jwt_street_address: address,
+      action: params[:action]
+    })
+    Sentry.capture_message("Valid JWT but alert not found", level: :warning)
   end
 
   def render_invalid_link

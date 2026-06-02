@@ -35,6 +35,15 @@ RSpec.describe "Areas", type: :request do
 
         expect(response.body).to include("No sweeps scheduled in the near future")
       end
+
+      # The HTML page shows per-session search context (and isn't a conditional
+      # GET), so it must be no-store, unlike the .ics feed. no-store also keeps
+      # it out of the browser's back/forward cache, so a stale CSP can't linger.
+      it "sets no-store so the page is not retained by browser caches" do
+        get area_path(area)
+
+        expect(response.headers["Cache-Control"]).to include("no-store")
+      end
     end
 
     context "ICS format" do

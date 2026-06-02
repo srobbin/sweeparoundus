@@ -274,6 +274,37 @@ RSpec.describe "Alerts", type: :request do
       end
     end
 
+    context "when the alert was moved to a different area after the email was sent" do
+      let!(:new_area) do
+        shape = RGeo::Geos.factory(srid: 0).parse_wkt(
+          "MULTIPOLYGON (((-87.69 41.86, -87.69 41.87, -87.68 41.87, -87.68 41.86, -87.69 41.86)))"
+        )
+        create(:area, ward: 28, number: 8, shortcode: "W28A8", slug: "ward-28-sweep-area-8", shape: shape)
+      end
+      let!(:moved_alert) { create(:alert, :unconfirmed, :with_address, area: new_area) }
+      let(:token) { encode_jwt(moved_alert.email, moved_alert.street_address) }
+
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+      end
+
+      it "confirms the alert using the stale URL area" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(moved_alert.reload.confirmed).to be true
+      end
+
+      it "does not report a missing alert to Sentry" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(Sentry).not_to have_received(:capture_message).with(
+          "Valid JWT but alert not found",
+          level: :warning
+        )
+      end
+    end
+
     context "with a token for a non-existent alert" do
       let(:token) { encode_jwt("nobody@example.com", nil) }
 

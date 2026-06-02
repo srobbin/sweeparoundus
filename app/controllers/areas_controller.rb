@@ -1,7 +1,9 @@
 class AreasController < ApplicationController
   include SearchContext
 
-  skip_before_action :set_cache_control_headers, only: :show, if: -> { request.format.ics? }
+  # The `.ics` calendar feed uses ETag conditional GETs (`stale?`), so it must
+  # not be `no-store`. The `.html` page keeps the default `no-store`.
+  no_store_skip_formats :ics
 
   before_action :find_area, only: :show
   before_action :set_search_context, only: :show, if: -> { request.format.html? }
