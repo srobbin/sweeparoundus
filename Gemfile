@@ -42,7 +42,7 @@ gem "scout_apm", "~> 6.2"
 gem "scout_apm_logging", "~> 2.1"
 gem "sentry-rails", "~> 6.5"
 gem "sentry-ruby", "~> 6.5"
-gem "sentry-sidekiq", "~> 6.5"
+gem "sentry-sidekiq", "~> 6.6"
 gem "stackprof", "~> 0.2"
 
 # Email / Notifications
