@@ -655,4 +655,63 @@ RSpec.describe "Subscriptions", type: :request do
       expect(Alert.exists?(other_alert.id)).to be true
     end
   end
+
+  describe "GET /subscriptions/manage eager-loads sweeps" do
+    let(:token) { encode_manage_jwt(email) }
+
+    # Each alert points at a distinct area (distinct unique number/slug/shortcode)
+    # so the N+1 would actually fan out: belongs_to preload shares an area
+    # instance across alerts with the same area_id, which would mask the bug.
+    def create_subscription_with_sweep(index)
+      area = create(
+        :area,
+        number: 100 + index,
+        slug: "ward-28-eager-#{index}",
+        shortcode: "EAGER#{index}"
+      )
+      create(:sweep, area: area, date_1: Date.tomorrow)
+      create(:alert, :confirmed, :with_address, email: email, area: area)
+    end
+
+    def sweeps_queries_during
+      queries = []
+      subscriber = lambda do |_name, _start, _finish, _id, payload|
+        next if payload[:cached] || %w[SCHEMA TRANSACTION].include?(payload[:name])
+
+        queries << payload[:sql] if payload[:sql]&.match?(/\bsweeps\b/)
+      end
+
+      ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") { yield }
+      queries
+    end
+
+    it "issues a single sweeps query regardless of the number of subscriptions (no N+1)" do
+      3.times { |i| create_subscription_with_sweep(i) }
+
+      queries = sweeps_queries_during do
+        get manage_subscriptions_path, params: { t: token }
+      end
+
+      expect(response).to have_http_status(:ok)
+      # The `includes(area: :sweeps)` preload loads every area's sweeps in one
+      # query. Without it (or if `next_sweep` queried instead of using the
+      # loaded association) this would be one query per subscription.
+      expect(queries.size).to eq(1)
+    end
+
+    it "does not grow the sweeps query count as subscriptions are added" do
+      create_subscription_with_sweep(0)
+      one_subscription = sweeps_queries_during do
+        get manage_subscriptions_path, params: { t: token }
+      end.size
+
+      create_subscription_with_sweep(1)
+      create_subscription_with_sweep(2)
+      three_subscriptions = sweeps_queries_during do
+        get manage_subscriptions_path, params: { t: token }
+      end.size
+
+      expect(three_subscriptions).to eq(one_subscription)
+    end
+  end
 end

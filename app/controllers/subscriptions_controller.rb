@@ -120,7 +120,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def set_alerts
-    @alerts = Alert.where(email: @email).includes(:area).order(:created_at)
+    @alerts = Alert.where(email: @email).includes(area: :sweeps).order(:created_at)
     @pending_alerts, @active_alerts = @alerts.partition { |a| !a.confirmed? }
   end
 

@@ -70,5 +70,37 @@ RSpec.describe Area do
         expect(area.next_sweep).to be_nil
       end
     end
+
+    context 'when the sweeps association is already loaded (eager-loaded)' do
+      let!(:area) { create(:area) }
+      let!(:upcoming) { create(:sweep, area: area, date_1: today + 7) }
+
+      def sweeps_queries_during
+        queries = []
+        subscriber = lambda do |_name, _start, _finish, _id, payload|
+          next if payload[:cached] || %w[SCHEMA TRANSACTION].include?(payload[:name])
+
+          queries << payload[:sql] if payload[:sql]&.match?(/\bsweeps\b/)
+        end
+
+        ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") { yield }
+        queries
+      end
+
+      it 'reads from the loaded association without issuing another sweeps query' do
+        loaded_area = Area.includes(:sweeps).find(area.id)
+        expect(loaded_area.sweeps).to be_loaded
+
+        queries = sweeps_queries_during { loaded_area.next_sweep }
+
+        expect(queries).to be_empty
+      end
+
+      it 'still returns the correct sweep when reading from the loaded association' do
+        loaded_area = Area.includes(:sweeps).find(area.id)
+
+        expect(loaded_area.next_sweep).to eq(upcoming)
+      end
+    end
   end
 end
