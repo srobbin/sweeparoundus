@@ -19,7 +19,7 @@ COPY . ./
 FROM base as dev
 ENV BUNDLE_PATH=/bundle
 RUN bundle config set path ${BUNDLE_PATH}
-RUN gem install bundler -v 2.4.10
+RUN gem install bundler -v 4.0.10
 
 ########
 # PROD #

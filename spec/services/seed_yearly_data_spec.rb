@@ -94,20 +94,20 @@ RSpec.describe SeedYearlyData, type: :model do
         end
 
         describe 'when files exist for arg year' do
-          let(:year) { '2024' }
+          let(:year) { '2026' }
 
           it 'returns a success message' do
             expect(subject).to include('SUCCESS')
           end
 
-          # The 2024 CSV has Ward 1 Section 9 sweeping Sep 30 and Oct 1.
+          # The 2026 CSV has Ward 1 Section 4 sweeping Sep 30 and Oct 1.
           # Pre-fix those landed in two separate Sweep records (each with
           # only date_1 filled) because clustering ran per-month. The fix
           # gathers an area's dates across the whole year before
           # clustering, so the pair should now land in a single Sweep.
           it 'merges month-boundary pairs into a single Sweep' do
             subject
-            area = Area.find_by(ward: 1, number: 9)
+            area = Area.find_by(ward: 1, number: 4)
             current_year = Date.current.year
 
             sep_30 = Date.new(current_year, 9, 30)

@@ -1,3 +1,5 @@
+require "csv"
+
 class SeedYearlyData
   attr_reader :write, :year, :skip_geojson
 

@@ -13,7 +13,7 @@ from the terminal:
 ```sh
 # Make a copy of the environment variables file
 # NOTE: You'll need a Google API key for maps/address autocomplete,
-# and a Mailgun API key for sending transactional emails
+# and a SendGrid API key for sending transactional emails
 cp .env.example .env
 
 # Build the Docker image
@@ -147,7 +147,7 @@ GET /api/v1/sweeps?lat=41.885&lng=-87.712
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s).call`
 - Disable 'Maintenance Mode' on Heroku.
-- Flip `NEW_SCHEDULES_LIVE` boolean value.
+- Set `NEW_SCHEDULES_LIVE = true` in `app/controllers/home_controller.rb` (controls the home page banner until schedules go live).
 - Destroy alerts that are unconfirmed or don't have an associated street address:
   - TEST: `DestroyIneligibleAlerts.new(write: false).call`
   - `DestroyIneligibleAlerts.new(write: true).call`
