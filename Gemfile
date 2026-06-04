@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.4.7"
+ruby "4.0.5"
 
 gem "rails", "~> 8.1"
 
@@ -52,7 +52,8 @@ gem "sendgrid-ruby", "~> 6.7"
 # Security / Middleware
 gem "rack-attack", "~> 6.7"
 
-# Ruby stdlib extractions (required in Ruby 3.4+)
+# Ruby stdlib extractions (removed in Ruby 4.0)
+gem "cgi", "~> 0.4"
 gem "connection_pool", "~> 3.0"
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
