@@ -59,10 +59,10 @@ gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
 
 # Platform-specific
-gem "tzinfo-data", platforms: [ :mingw, :mswin, :x64_mingw, :jruby ]
+gem "tzinfo-data", platforms: [ :windows, :jruby ]
 
 group :development, :test do
-  gem "debug", "~> 1.11", platforms: [ :mri, :mingw, :x64_mingw ]
+  gem "debug", "~> 1.11", platforms: [ :mri, :windows ]
   gem "factory_bot_rails", "~> 6.5"
   gem "faker", "~> 3.8"
   gem "pg_query", "~> 6.2"
