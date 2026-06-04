@@ -47,5 +47,14 @@ RSpec.describe "Home", type: :request do
         expect(response.body).to include("alert subscriptions do not carry over from year to year")
       end
     end
+
+    context "when a bot requests a non-HTML format" do
+      it "renders the HTML home page with a 200 instead of a 406" do
+        get root_path, params: { format: :ics }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("alert subscriptions do not carry over from year to year")
+      end
+    end
   end
 end

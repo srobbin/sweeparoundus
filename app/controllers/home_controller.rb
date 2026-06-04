@@ -1,4 +1,5 @@
 class HomeController < ApplicationController
+  before_action :force_html_format
   before_action :set_note_header
   before_action :set_note
 
@@ -9,6 +10,14 @@ class HomeController < ApplicationController
   end
 
   private
+
+  # Bots and feed readers sometimes request "/" with a non-HTML format
+  # (e.g. .ics), which would otherwise raise UnknownFormat -> 406 and create
+  # Sentry log noise. The home page only has an HTML representation, so always
+  # render it.
+  def force_html_format
+    request.format = :html
+  end
 
   def set_note_header
     @note_header =

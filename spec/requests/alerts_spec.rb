@@ -234,10 +234,10 @@ RSpec.describe "Alerts", type: :request do
     end
 
     context "with no token" do
-      it "renders the invalid link page" do
+      it "renders the invalid link page with a 200 (bots hit the bare URL; avoids 400 log noise)" do
         get unsubscribe_area_alerts_path(area)
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include("This link is invalid or has expired")
       end
     end
@@ -392,10 +392,10 @@ RSpec.describe "Alerts", type: :request do
     end
 
     context "with no token" do
-      it "renders the invalid link page" do
+      it "renders the invalid link page with a 200 (bots hit the bare URL; avoids 400 log noise)" do
         get confirm_area_alerts_path(area)
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include("This link is invalid or has expired")
       end
     end

@@ -64,7 +64,11 @@ class AlertsController < ApplicationController
 
   def find_alert
     token = params[:t]
-    return render_invalid_link unless token.present?
+    # A blank token means the request didn't come from a real email link
+    # (those always carry ?t=<jwt>); it's almost always a bot or link scanner
+    # hitting the bare URL. Render the invalid-link page with a 200 so Rails
+    # doesn't log it as a 400 warning and create Sentry noise.
+    return render_invalid_link(status: :ok) unless token.present?
 
     decoded_params = decode_jwt(token)
     email = decoded_params["sub"]
@@ -106,8 +110,8 @@ class AlertsController < ApplicationController
     Sentry.capture_message("Valid JWT but alert not found", level: :warning)
   end
 
-  def render_invalid_link
-    render "alerts/invalid_link", status: :bad_request
+  def render_invalid_link(status: :bad_request)
+    render "alerts/invalid_link", status: status
   end
 
   def confirm_neighbor_alerts
