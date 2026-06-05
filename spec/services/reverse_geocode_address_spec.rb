@@ -139,7 +139,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
     context "when the network call raises" do
       before do
-        stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
+        stub_request(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/)
           .to_raise(Net::OpenTimeout.new("timed out"))
         allow(Rails.logger).to receive(:warn)
       end
