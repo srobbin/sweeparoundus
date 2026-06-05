@@ -8,7 +8,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
   before do
     ActiveJob::Base.queue_adapter = :test
     stub_const("GoogleGeocoder::RETRY_BASE_DELAY", 0)
-    stub_request(:get, /maps.googleapis.com/)
+    stub_request(:get, /maps\.googleapis\.com/)
       .to_return(body: File.read(Rails.root.join('spec', 'fixtures', 'google_maps_response.json')))
     allow(Area).to receive(:where).and_return([ alert.area ])
   end
@@ -35,7 +35,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
     let(:street_address) { 'invalid address' }
 
     before do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: File.read(Rails.root.join('spec', 'fixtures', 'google_maps_failure_response.json')))
     end
 
@@ -59,14 +59,14 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
   context 'when there is a network error' do
     context 'with a retryable transient error (Net::OpenTimeout)' do
       before do
-        stub_request(:get, /maps.googleapis.com/)
+        stub_request(:get, /maps\.googleapis\.com/)
           .to_raise(Net::OpenTimeout.new('timed out'))
       end
 
       it 'retries via GoogleGeocoder up to MAX_RETRIES + 1 attempts' do
         described_class.new(write: true).call
 
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
           .times(GoogleGeocoder::MAX_RETRIES + 1)
       end
 
@@ -81,7 +81,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
 
     context 'with a non-retryable generic StandardError' do
       before do
-        stub_request(:get, /maps.googleapis.com/)
+        stub_request(:get, /maps\.googleapis\.com/)
           .to_raise(StandardError.new('Network error'))
       end
 
@@ -89,7 +89,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
         service = described_class.new(write: true)
         service.call
 
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
         expect(service.failures).to contain_exactly(
           a_hash_including(id: alert.id, reason: "http_error: Network error")
         )

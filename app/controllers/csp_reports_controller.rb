@@ -1,6 +1,4 @@
 class CspReportsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: :create
-
   # Third-party hosts that browser extensions inject (iframes, scripts, etc.)
   # but that carry no source-file, so the source-file heuristic below misses
   # them. e.g. the Ibotta cashback extension injects an authenticate.ibotta.com

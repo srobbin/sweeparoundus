@@ -34,7 +34,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
       it "passes the lat,lng as the `latlng` query param" do
         subject.call
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
           .with(query: hash_including("latlng" => "#{lat},#{lng}", "key" => "test-key"))
       end
 
@@ -108,7 +108,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
       before { allow(Rails.logger).to receive(:warn) }
 
       it "retries and recovers if a later attempt succeeds" do
-        stub_request(:get, /maps.googleapis.com/)
+        stub_request(:get, /maps\.googleapis\.com/)
           .to_return(body: { status: "OVER_QUERY_LIMIT", results: [] }.to_json).then
           .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
@@ -165,7 +165,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
       it "returns nil without making an HTTP request" do
         expect(subject.call).to be_nil
-        expect(WebMock).not_to have_requested(:get, /maps.googleapis.com/)
+        expect(WebMock).not_to have_requested(:get, /maps\.googleapis\.com/)
       end
     end
   end

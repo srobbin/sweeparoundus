@@ -26,7 +26,7 @@ RSpec.describe AlertStaticMap, type: :service do
 
   describe "#url" do
     it "starts with the Static Maps API base URL" do
-      expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+      expect(subject.url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
     end
 
     it "includes the configured API key" do
@@ -61,7 +61,7 @@ RSpec.describe AlertStaticMap, type: :service do
 
       it "returns a valid URL without a marker" do
         url = subject.url
-        expect(url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+        expect(url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
         expect(url).not_to include("markers=")
       end
     end
@@ -115,7 +115,7 @@ RSpec.describe AlertStaticMap, type: :service do
       end
 
       it "still produces a valid URL" do
-        expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+        expect(subject.url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
       end
     end
   end
@@ -144,7 +144,7 @@ RSpec.describe AlertStaticMap, type: :service do
     end
 
     it "still produces a valid URL" do
-      expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+      expect(subject.url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
     end
 
     context "when one area has no shape" do
@@ -152,7 +152,7 @@ RSpec.describe AlertStaticMap, type: :service do
 
       it "renders the valid area and skips the nil one" do
         url = subject.url
-        expect(url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+        expect(url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
         expect(url.scan("path=").size).to eq(1)
       end
     end

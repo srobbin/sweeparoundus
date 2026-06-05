@@ -47,7 +47,7 @@ RSpec.describe GoogleGeocoder, type: :service do
 
   describe "successful response" do
     before do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "OK", results: [ { formatted_address: "1 Main St" } ] }.to_json)
     end
 
@@ -65,7 +65,7 @@ RSpec.describe GoogleGeocoder, type: :service do
         subject.call
         travel described_class::CACHE_TTL - 1.second
         expect(subclass.new(query: "Anywhere").call).to eq("1 Main St")
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
       end
     end
 
@@ -74,14 +74,14 @@ RSpec.describe GoogleGeocoder, type: :service do
         subject.call
         travel described_class::CACHE_TTL + 1.second
         subclass.new(query: "Anywhere").call
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/).twice
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).twice
       end
     end
   end
 
   describe "ZERO_RESULTS" do
     before do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "ZERO_RESULTS", results: [] }.to_json)
     end
 
@@ -95,7 +95,7 @@ RSpec.describe GoogleGeocoder, type: :service do
         subject.call
         travel described_class::NIL_CACHE_TTL - 1.second
         subclass.new(query: "Anywhere").call
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
       end
     end
 
@@ -109,7 +109,7 @@ RSpec.describe GoogleGeocoder, type: :service do
 
   describe "OK with unparseable result" do
     before do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "OK", results: [ { formatted_address: nil } ] }.to_json)
     end
 
@@ -125,17 +125,17 @@ RSpec.describe GoogleGeocoder, type: :service do
     %w[OVER_QUERY_LIMIT UNKNOWN_ERROR].each do |status|
       context status do
         it "retries up to MAX_RETRIES, then returns nil with a status-flavored error_reason" do
-          stub_request(:get, /maps.googleapis.com/)
+          stub_request(:get, /maps\.googleapis\.com/)
             .to_return(body: { status: status, results: [] }.to_json)
 
           expect(subject.call).to be_nil
           expect(subject.error_reason).to eq("geocode_status: #{status}")
-          expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+          expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
             .times(described_class::MAX_RETRIES + 1)
         end
 
         it "returns the parsed result if a retry succeeds" do
-          stub_request(:get, /maps.googleapis.com/)
+          stub_request(:get, /maps\.googleapis\.com/)
             .to_return(body: { status: status, results: [] }.to_json).then
             .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
@@ -148,7 +148,7 @@ RSpec.describe GoogleGeocoder, type: :service do
 
   describe "non-retryable API statuses" do
     before do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "REQUEST_DENIED", results: [] }.to_json)
       allow(Rails.logger).to receive(:warn)
     end
@@ -156,7 +156,7 @@ RSpec.describe GoogleGeocoder, type: :service do
     it "does not retry and returns nil with the status as error_reason" do
       expect(subject.call).to be_nil
       expect(subject.error_reason).to eq("geocode_status: REQUEST_DENIED")
-      expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+      expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
     end
 
     it "logs a warning" do
@@ -179,18 +179,18 @@ RSpec.describe GoogleGeocoder, type: :service do
     [ 500, 502, 503, 504, 429 ].each do |code|
       context "HTTP #{code}" do
         it "retries and eventually surfaces an http_status error_reason" do
-          stub_request(:get, /maps.googleapis.com/).to_return(status: code, body: "boom")
+          stub_request(:get, /maps\.googleapis\.com/).to_return(status: code, body: "boom")
 
           expect(subject.call).to be_nil
           expect(subject.error_reason).to eq("http_status: #{code}")
-          expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+          expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
             .times(described_class::MAX_RETRIES + 1)
         end
       end
     end
 
     it "recovers when an early 5xx is followed by a 200" do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(status: 503, body: "Unavailable").then
         .to_return(body: { status: "OK", results: [ { formatted_address: "Recovered" } ] }.to_json)
 
@@ -200,11 +200,11 @@ RSpec.describe GoogleGeocoder, type: :service do
     [ 400, 401, 403, 404 ].each do |code|
       context "HTTP #{code}" do
         it "does not retry and surfaces an http_status error_reason" do
-          stub_request(:get, /maps.googleapis.com/).to_return(status: code, body: "no")
+          stub_request(:get, /maps\.googleapis\.com/).to_return(status: code, body: "no")
 
           expect(subject.call).to be_nil
           expect(subject.error_reason).to eq("http_status: #{code}")
-          expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+          expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
         end
       end
     end
@@ -216,22 +216,22 @@ RSpec.describe GoogleGeocoder, type: :service do
     [ Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET ].each do |error_class|
       context error_class.name do
         it "retries and eventually surfaces an http_error reason" do
-          stub_request(:get, /maps.googleapis.com/).to_raise(error_class.new("boom"))
+          stub_request(:get, /maps\.googleapis\.com/).to_raise(error_class.new("boom"))
 
           expect(subject.call).to be_nil
           expect(subject.error_reason).to start_with("http_error:")
-          expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+          expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
             .times(described_class::MAX_RETRIES + 1)
         end
       end
     end
 
     it "does not retry on generic StandardError and reports it" do
-      stub_request(:get, /maps.googleapis.com/).to_raise(StandardError.new("Network error"))
+      stub_request(:get, /maps\.googleapis\.com/).to_raise(StandardError.new("Network error"))
 
       expect(subject.call).to be_nil
       expect(subject.error_reason).to eq("http_error: Network error")
-      expect(WebMock).to have_requested(:get, /maps.googleapis.com/).once
+      expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
     end
   end
 
@@ -240,16 +240,16 @@ RSpec.describe GoogleGeocoder, type: :service do
       allow(ENV).to receive(:[]).with("GOOGLE_MAPS_BACKEND_API_KEY").and_return(nil)
 
       expect(subject.call).to be_nil
-      expect(WebMock).not_to have_requested(:get, /maps.googleapis.com/)
+      expect(WebMock).not_to have_requested(:get, /maps\.googleapis\.com/)
     end
 
     it "appends the key as a query param" do
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "OK", results: [ { formatted_address: "X" } ] }.to_json)
 
       subject.call
 
-      expect(WebMock).to have_requested(:get, /maps.googleapis.com/)
+      expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/)
         .with(query: hash_including("key" => "test-key"))
     end
   end
@@ -258,7 +258,7 @@ RSpec.describe GoogleGeocoder, type: :service do
     it "treats legacy hash entries (no :value key) as a cache miss and re-fetches" do
       memory_cache.write("test_geocoder:Anywhere", { address: "stale-format" })
 
-      stub_request(:get, /maps.googleapis.com/)
+      stub_request(:get, /maps\.googleapis\.com/)
         .to_return(body: { status: "OK", results: [ { formatted_address: "Fresh" } ] }.to_json)
 
       expect(subject.call).to eq("Fresh")
@@ -279,7 +279,7 @@ RSpec.describe GoogleGeocoder, type: :service do
       service = blank_subclass.new
       expect(service.call).to be_nil
       expect(service.error_reason).to be_nil
-      expect(WebMock).not_to have_requested(:get, /maps.googleapis.com/)
+      expect(WebMock).not_to have_requested(:get, /maps\.googleapis\.com/)
     end
   end
 

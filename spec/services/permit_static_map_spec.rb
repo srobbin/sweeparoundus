@@ -20,7 +20,7 @@ RSpec.describe PermitStaticMap, type: :service do
 
   describe "#url" do
     it "starts with the Static Maps API base URL" do
-      expect(subject.url).to start_with("https://maps.googleapis.com/maps/api/staticmap?")
+      expect(subject.url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
     end
 
     it "includes the configured API key" do
