@@ -92,7 +92,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
       it "does not retry within the request" do
         subject.call
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/).once
       end
 
       it "caches with ERROR_CACHE_TTL, not the longer NIL_CACHE_TTL" do
