@@ -59,6 +59,35 @@ RSpec.describe "Alerts", type: :request do
           post area_alerts_path(area), params: { email: "not-an-email" }
         }.not_to change(Alert, :count)
       end
+
+      it "does not create a subscriber" do
+        expect {
+          post area_alerts_path(area), params: { email: "not-an-email" }
+        }.not_to change(Subscriber, :count)
+      end
+    end
+
+    context "when the primary alert fails to save" do
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+        allow_any_instance_of(Alert).to receive(:save).and_return(false)
+      end
+
+      it "does not leave a childless subscriber behind" do
+        expect {
+          post area_alerts_path(area), params: { email: valid_email }
+        }.not_to change(Subscriber, :count)
+      end
+
+      it "reports the unexpected failure to Sentry" do
+        post area_alerts_path(area), params: { email: valid_email }
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "Primary alert save failed",
+          level: :warning
+        )
+      end
     end
 
     context "with street address saving enabled" do
@@ -161,7 +190,8 @@ RSpec.describe "Alerts", type: :request do
           }
         }.to change(Alert, :count).by(2)
 
-        neighbor_alert = neighbor_area.alerts.find_by!(email: valid_email)
+        subscriber = Subscriber.find_by!(email: valid_email)
+        neighbor_alert = neighbor_area.alerts.find_by!(subscriber: subscriber)
         expect(neighbor_alert.street_address).to be_nil
       end
 
@@ -180,8 +210,9 @@ RSpec.describe "Alerts", type: :request do
           }
         }.to change(Alert, :count).by(1)
 
+        subscriber = Subscriber.find_by!(email: valid_email)
         expect(AlertMailer).to have_received(:with).with(
-          alert: area.alerts.find_by!(email: valid_email),
+          alert: area.alerts.find_by!(subscriber: subscriber),
           neighbor_alerts: [ existing ]
         )
       end

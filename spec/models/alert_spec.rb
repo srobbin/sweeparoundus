@@ -4,183 +4,82 @@ RSpec.describe Alert do
   let!(:area) { create(:area) }
 
   describe "validations" do
-    it "is valid with an email and area" do
+    it "is valid with a subscriber and area" do
       alert = build(:alert, area: area)
 
       expect(alert).to be_valid
     end
 
-    it "is valid with a phone number and no email" do
-      alert = Alert.new(phone: "3125551234", area: area)
-
-      expect(alert).to be_valid
-    end
-
-    it "is invalid without both email and phone" do
-      alert = Alert.new(area: area)
+    it "is invalid without a subscriber" do
+      alert = Alert.new(area: area, subscriber: nil)
 
       expect(alert).not_to be_valid
-      expect(alert.errors[:base]).to include("You must specify either an email or phone number.")
-    end
-
-    it "is invalid with a malformed email" do
-      alert = Alert.new(email: "not-an-email", area: area)
-
-      expect(alert).not_to be_valid
-      expect(alert.errors[:email]).to be_present
-    end
-
-    it "is valid with a properly formatted email" do
-      alert = Alert.new(email: "user@example.com", area: area)
-
-      expect(alert).to be_valid
-    end
-
-    it "skips email validation when phone is present" do
-      alert = Alert.new(phone: "3125551234", email: nil, area: area)
-
-      expect(alert).to be_valid
-    end
-
-    it "accepts emails with dots and hyphens" do
-      alert = Alert.new(email: "first.last-name@sub.example.com", area: area)
-
-      expect(alert).to be_valid
+      expect(alert.errors[:subscriber]).to be_present
     end
 
     it "belongs to area optionally" do
-      alert = Alert.new(email: "user@example.com", area: nil)
+      alert = build(:alert, area: nil)
 
       expect(alert).to be_valid
     end
 
-    describe "email domain MX validation" do
-      it "is valid when the domain has MX records" do
-        alert = Alert.new(email: "user@gmail.com", area: area)
+    it "delegates email to its subscriber" do
+      subscriber = create(:subscriber, email: "delegated@example.com")
+      alert = build(:alert, subscriber: subscriber, area: area)
 
-        expect(alert).to be_valid
-      end
-
-      it "is valid when the domain has no MX but has A records" do
-        dns = instance_double(Resolv::DNS)
-        allow(Resolv::DNS).to receive(:open).and_yield(dns)
-        allow(dns).to receive(:timeouts=)
-        allow(dns).to receive(:getresources)
-          .with("example.com", Resolv::DNS::Resource::IN::MX)
-          .and_return([])
-        allow(dns).to receive(:getresources)
-          .with("example.com", Resolv::DNS::Resource::IN::A)
-          .and_return([ instance_double(Resolv::DNS::Resource::IN::A) ])
-
-        alert = Alert.new(email: "user@example.com", area: area)
-
-        expect(alert).to be_valid
-      end
-
-      it "is invalid when the domain has no MX or A records" do
-        dns = instance_double(Resolv::DNS)
-        allow(Resolv::DNS).to receive(:open).and_yield(dns)
-        allow(dns).to receive(:timeouts=)
-        allow(dns).to receive(:getresources).and_return([])
-
-        alert = Alert.new(email: "opera1651@gmail.como", area: area)
-
-        expect(alert).not_to be_valid
-        expect(alert.errors[:email]).to include("domain does not appear to accept email")
-      end
-
-      it "sets a valid positive timeout on the resolver" do
-        dns = Resolv::DNS.new
-        allow(Resolv::DNS).to receive(:open).and_yield(dns)
-        allow(dns).to receive(:getresources).and_return([])
-
-        alert = Alert.new(email: "user@nodns.example", area: area)
-
-        expect { alert.valid? }.not_to raise_error
-      end
-
-      it "does not block signups when DNS lookup fails" do
-        allow(Resolv::DNS).to receive(:open).and_raise(Resolv::ResolvError)
-
-        alert = Alert.new(email: "user@flaky-dns.com", area: area)
-
-        expect(alert).to be_valid
-      end
-
-      it "does not block signups when DNS lookup times out" do
-        allow(Resolv::DNS).to receive(:open).and_raise(Resolv::ResolvTimeout)
-
-        alert = Alert.new(email: "user@slow-dns.com", area: area)
-
-        expect(alert).to be_valid
-      end
-
-      it "skips MX validation when email format is already invalid" do
-        alert = Alert.new(email: "not-an-email", area: area)
-
-        expect(Resolv::DNS).not_to receive(:open)
-        alert.valid?
-        expect(alert.errors[:email]).to be_present
-      end
-
-      it "skips MX validation when phone is present and email is nil" do
-        alert = Alert.new(phone: "3125551234", email: nil, area: area)
-
-        expect(Resolv::DNS).not_to receive(:open)
-        expect(alert).to be_valid
-      end
+      expect(alert.email).to eq("delegated@example.com")
     end
 
-    describe "email + street_address uniqueness" do
+    describe "subscriber-scoped uniqueness" do
+      let!(:subscriber) { create(:subscriber, email: "dupe@example.com") }
+      let(:other_subscriber) { create(:subscriber, email: "other@example.com") }
       let!(:existing) do
-        create(:alert, :confirmed, email: "dupe@example.com", street_address: "123 Main St", area: area)
+        create(:alert, :confirmed, subscriber: subscriber, street_address: "123 Main St", area: area)
       end
 
-      it "is invalid when email and street_address match an existing record" do
-        alert = Alert.new(email: "dupe@example.com", street_address: "123 Main St", area: area)
+      it "is invalid when street_address matches an existing record for the same subscriber" do
+        alert = Alert.new(subscriber: subscriber, street_address: "123 Main St", area: area)
 
         expect(alert).not_to be_valid
-        expect(alert.errors[:email]).to be_present
+        expect(alert.errors[:street_address]).to be_present
       end
 
-      it "is valid when same email has a different street_address" do
-        alert = Alert.new(email: "dupe@example.com", street_address: "456 Oak Ave", area: area)
+      it "is valid when the same subscriber has a different street_address" do
+        alert = Alert.new(subscriber: subscriber, street_address: "456 Oak Ave", area: area)
 
         expect(alert).to be_valid
       end
 
-      it "is valid when different email has the same street_address" do
-        alert = Alert.new(email: "other@example.com", street_address: "123 Main St", area: area)
+      it "is valid when a different subscriber has the same street_address" do
+        alert = Alert.new(subscriber: other_subscriber, street_address: "123 Main St", area: area)
 
         expect(alert).to be_valid
       end
 
-      it "prevents duplicate alerts with the same email, nil street_address, and same area" do
-        create(:alert, :confirmed, email: "nil-addr@example.com", street_address: nil, area: area)
-        alert = Alert.new(email: "nil-addr@example.com", street_address: nil, area: area)
+      it "prevents duplicate alerts with the same subscriber, nil street_address, and same area" do
+        create(:alert, :confirmed, subscriber: other_subscriber, street_address: nil, area: area)
+        alert = Alert.new(subscriber: other_subscriber, street_address: nil, area: area)
 
         expect(alert).not_to be_valid
-        expect(alert.errors[:email]).to include("has already been taken")
+        expect(alert.errors[:area_id]).to include("has already been taken")
       end
 
-      it "allows same email with nil street_address across different areas" do
-        create(:alert, :confirmed, email: "nil-addr@example.com", street_address: nil, area: area)
+      it "allows same subscriber with nil street_address across different areas" do
+        create(:alert, :confirmed, subscriber: other_subscriber, street_address: nil, area: area)
         other_area = create(:area, number: 99, ward: 99, slug: "ward-99-sweep-area-99", shortcode: "W99A99")
-        alert = Alert.new(email: "nil-addr@example.com", street_address: nil, area: other_area)
+        alert = Alert.new(subscriber: other_subscriber, street_address: nil, area: other_area)
 
         expect(alert).to be_valid
       end
 
       it "allows a nil street_address subscription alongside a street_address subscription in the same area" do
-        create(:alert, :confirmed, email: "both@example.com", street_address: "123 Main St", area: area)
-        alert = Alert.new(email: "both@example.com", street_address: nil, area: area)
+        alert = Alert.new(subscriber: subscriber, street_address: nil, area: area)
 
         expect(alert).to be_valid
       end
 
-      it "confirms a nil street_address alert when the same email has a street_address alert in the area" do
-        create(:alert, :confirmed, email: "both@example.com", street_address: "123 Main St", area: area)
-        general = create(:alert, :unconfirmed, email: "both@example.com", street_address: nil, area: area)
+      it "confirms a nil street_address alert when the same subscriber has a street_address alert in the area" do
+        general = create(:alert, :unconfirmed, subscriber: subscriber, street_address: nil, area: area)
 
         expect(general.update(confirmed: true)).to be(true)
       end
@@ -263,24 +162,6 @@ RSpec.describe Alert do
       it "returns only alerts with permit_notifications enabled" do
         expect(Alert.permit_notifications_enabled).to include(opted_in)
         expect(Alert.permit_notifications_enabled).not_to include(opted_out)
-      end
-    end
-
-    describe ".email" do
-      let!(:phone_only_alert) { Alert.create!(phone: "3125551234", area: area) }
-
-      it "returns alerts with an email" do
-        expect(Alert.email).to include(confirmed_with_address)
-        expect(Alert.email).not_to include(phone_only_alert)
-      end
-    end
-
-    describe ".phone" do
-      let!(:phone_only_alert) { Alert.create!(phone: "3125551234", area: area) }
-
-      it "returns alerts with a phone number" do
-        expect(Alert.phone).to include(phone_only_alert)
-        expect(Alert.phone).not_to include(confirmed_with_address)
       end
     end
   end

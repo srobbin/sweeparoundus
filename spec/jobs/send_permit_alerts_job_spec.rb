@@ -106,13 +106,13 @@ RSpec.describe SendPermitAlertsJob do
                       street_address: "123 Main", lat: 41.942, lng: -87.6987,
                       permit_notifications: true)
       end
-      # Phone-only subscriber: the proximity query in
-      # FindCdotPermitAffectedAlerts doesn't filter on email (phone-only
-      # alerts are valid for other channels), so the job has to skip these
-      # explicitly. Confirmed + opted-in cases are already filtered in SQL
-      # by the service and are covered by find_cdot_permit_affected_alerts_spec.
+      # An alert with no resolvable email: the proximity query in
+      # FindCdotPermitAffectedAlerts doesn't filter on email, so the job has to
+      # skip these explicitly via notifiable?. Confirmed + opted-in cases are
+      # already filtered in SQL by the service and are covered by
+      # find_cdot_permit_affected_alerts_spec.
       let(:phone_only_alert) do
-        build_stubbed(:alert, :confirmed, area: area, email: nil, phone: "+15551234567",
+        build_stubbed(:alert, :confirmed, area: area, subscriber: nil,
                       street_address: "789 Main", lat: 41.942, lng: -87.6987,
                       permit_notifications: true)
       end
@@ -338,7 +338,7 @@ RSpec.describe SendPermitAlertsJob do
                       application_start_date: chicago_tomorrow_start + 9.hours)
       end
       let(:email_blank_alert) do
-        build_stubbed(:alert, :confirmed, area: area, email: nil, phone: "+15551234567",
+        build_stubbed(:alert, :confirmed, area: area, subscriber: nil,
                       permit_notifications: true)
       end
 

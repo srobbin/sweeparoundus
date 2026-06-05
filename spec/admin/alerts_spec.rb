@@ -72,6 +72,55 @@ RSpec.describe "Admin Alerts", type: :request do
     end
   end
 
+  describe "GET /sau_admin/alerts/new" do
+    let!(:subscriber) { create(:subscriber, email: "suggest@example.com") }
+
+    it "renders an email autocomplete datalist of existing subscribers" do
+      get new_sau_admin_alert_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<datalist")
+      expect(response.body).to include("suggest@example.com")
+    end
+  end
+
+  describe "POST /sau_admin/alerts" do
+    let!(:subscriber) { create(:subscriber, email: "picked@example.com") }
+
+    it "links the new alert to the subscriber matching the typed email (case-insensitively)" do
+      expect {
+        post sau_admin_alerts_path, params: { alert: {
+          area_id: area.id, email: "Picked@Example.com",
+          street_address: "123 Main St", confirmed: "1", permit_notifications: "1"
+        } }
+      }.to change(Alert, :count).by(1)
+
+      expect(Alert.last.subscriber).to eq(subscriber)
+    end
+
+    it "does not create an alert or a subscriber for an unknown email" do
+      expect {
+        post sau_admin_alerts_path, params: { alert: {
+          area_id: area.id, email: "typo@example.com", street_address: "1 A St"
+        } }
+      }.not_to change(Alert, :count)
+
+      expect(Subscriber.exists?(email: "typo@example.com")).to be(false)
+    end
+  end
+
+  describe "PATCH /sau_admin/alerts/:id" do
+    let!(:original_subscriber) { create(:subscriber, email: "one@example.com") }
+    let!(:new_subscriber) { create(:subscriber, email: "two@example.com") }
+    let!(:alert) { create(:alert, subscriber: original_subscriber, area: area) }
+
+    it "reassigns the subscriber when the email is changed to another existing subscriber" do
+      patch sau_admin_alert_path(alert), params: { alert: { email: "two@example.com" } }
+
+      expect(alert.reload.subscriber).to eq(new_subscriber)
+    end
+  end
+
   describe "scopes" do
     let!(:confirmed_alert) { create(:alert, :confirmed, area: area) }
     let!(:unconfirmed_alert) { create(:alert, :unconfirmed, area: area) }

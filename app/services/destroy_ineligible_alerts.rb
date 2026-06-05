@@ -14,7 +14,12 @@ class DestroyIneligibleAlerts
 
     begin
       send_mailers_to_confirmed_users
+      # Capture the affected subscribers before destroying so cleanup is scoped
+      # to them — a global `where.missing(:alerts)` sweep could delete a
+      # subscriber created by an in-flight signup that hasn't saved its alert.
+      affected_subscriber_ids = alerts_to_destroy.distinct.pluck(:subscriber_id).compact
       destroyed_objects = alerts_to_destroy.destroy_all
+      Subscriber.where(id: affected_subscriber_ids).where.missing(:alerts).delete_all
       "SUCCESS: #{destroyed_objects.count} alerts (unconfirmed or without street address) deleted"
     rescue => e
       Sentry.capture_exception(e, contexts: {

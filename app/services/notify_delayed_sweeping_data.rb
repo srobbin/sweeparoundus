@@ -9,7 +9,7 @@ class NotifyDelayedSweepingData
   def call
     raise "SITE_NAME and SITE_URL must be set" if ENV["SITE_NAME"].blank? || ENV["SITE_URL"].blank?
 
-    alerts = Alert.confirmed.email
+    alerts = Alert.confirmed
 
     return "TEST: #{alerts.count} confirmed alert(s) would be notified" unless write
 

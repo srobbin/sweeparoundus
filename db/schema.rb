@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_21_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_04_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -41,12 +41,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_000000) do
     t.boolean "permit_notifications", default: true, null: false
     t.string "phone"
     t.string "street_address"
+    t.uuid "subscriber_id"
     t.datetime "updated_at", null: false
     t.index ["area_id"], name: "index_alerts_on_area_id"
     t.index ["email", "area_id"], name: "index_alerts_on_email_area_without_address", unique: true, where: "(street_address IS NULL)"
     t.index ["email", "street_address"], name: "index_alerts_on_subscription_uniqueness", unique: true
     t.index ["email"], name: "index_alerts_on_email"
     t.index ["location"], name: "index_alerts_on_location", using: :gist
+    t.index ["subscriber_id", "area_id"], name: "index_alerts_on_subscriber_and_area_without_address", unique: true, where: "(street_address IS NULL)"
+    t.index ["subscriber_id", "street_address"], name: "index_alerts_on_subscriber_and_street_address", unique: true
   end
 
   create_table "areas", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -110,6 +113,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_000000) do
     t.index ["ward"], name: "index_cdot_permits_on_ward"
   end
 
+  create_table "subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_subscribers_on_email", unique: true
+  end
+
   create_table "sweeps", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "area_id", null: false
     t.datetime "created_at", null: false
@@ -122,5 +132,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_000000) do
   end
 
   add_foreign_key "alerts", "areas"
+  add_foreign_key "alerts", "subscribers"
   add_foreign_key "sweeps", "areas"
 end

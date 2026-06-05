@@ -109,8 +109,8 @@ RSpec.describe "Subscriptions", type: :request do
         it "shows all alerts" do
           get manage_subscriptions_path, params: { t: token }
 
-          expect(response.body).to include(confirmed_alert.street_address)
-          expect(response.body).to include(unconfirmed_alert.street_address)
+          expect(response.body).to include(CGI.escapeHTML(confirmed_alert.street_address))
+          expect(response.body).to include(CGI.escapeHTML(unconfirmed_alert.street_address))
         end
 
         it "shows status indicators" do
@@ -128,7 +128,7 @@ RSpec.describe "Subscriptions", type: :request do
           get manage_subscriptions_path, params: { t: token }
 
           expect(response.body).to include("Needs your attention")
-          expect(response.body).to include(pending_alert.street_address)
+          expect(response.body).to include(CGI.escapeHTML(pending_alert.street_address))
           expect(response.body).to include("No active subscriptions yet")
           expect(response.body).not_to include("empty-state")
         end
@@ -149,7 +149,9 @@ RSpec.describe "Subscriptions", type: :request do
           get manage_subscriptions_path, params: { t: token }
 
           expect(response).to have_http_status(:ok)
-          expect(response.body).to include(orphaned_alert.street_address)
+          # Faker addresses can contain apostrophes, which are HTML-escaped in
+          # the rendered body, so compare against the escaped value.
+          expect(response.body).to include(CGI.escapeHTML(orphaned_alert.street_address))
           expect(response.body).to include("Area no longer available")
         end
       end
@@ -294,6 +296,12 @@ RSpec.describe "Subscriptions", type: :request do
         }.not_to change(Alert, :count)
       end
 
+      it "does not leave a childless subscriber behind" do
+        expect {
+          post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng }
+        }.not_to change(Subscriber, :count)
+      end
+
       it "shows a generic error" do
         post create_subscription_path, params: { t: token, address: address, lat: lat, lng: lng }
 
@@ -412,7 +420,7 @@ RSpec.describe "Subscriptions", type: :request do
         # they change which section the alert belongs to).
         expect(response.body).to include(ActionView::RecordIdentifier.dom_id(alert))
         expect(response.body).not_to include("subscriptions-wrapper")
-        expect(response.body).to include(alert.street_address)
+        expect(response.body).to include(CGI.escapeHTML(alert.street_address))
       end
     end
 
@@ -505,7 +513,7 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.media_type).to eq("text/vnd.turbo-stream.html")
         expect(response.body).to include("turbo-stream")
-        expect(response.body).to include(alert.street_address)
+        expect(response.body).to include(CGI.escapeHTML(alert.street_address))
       end
     end
 
@@ -558,7 +566,7 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response.body).to include("subscriptions-wrapper")
         expect(response.body).to include("Subscription removed")
         expect(response.body).to include("manage-flash")
-        expect(response.body).not_to include(alert.street_address)
+        expect(response.body).not_to include(CGI.escapeHTML(alert.street_address))
       end
 
       it "renders the empty state when the last alert is removed" do

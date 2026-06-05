@@ -11,23 +11,39 @@ class AlertsController < ApplicationController
   end
 
   def create
-    email = params[:email].strip.downcase
+    email = params[:email].to_s.strip.downcase
+    subscriber = find_or_create_subscriber(email)
 
-    @alert = build_primary_alert(email)
+    unless subscriber
+      flash.now[:alert] = "Invalid email"
+      return respond_to do |format|
+        format.html { redirect_to @area }
+        format.turbo_stream
+      end
+    end
+
+    @alert = build_primary_alert(subscriber)
 
     if @alert.save
-      @neighbor_alerts = create_neighbor_alerts(email)
+      @neighbor_alerts = create_neighbor_alerts(subscriber)
 
       AlertMailer.with(alert: @alert, neighbor_alerts: @neighbor_alerts).confirm.deliver_later
 
       area_count = 1 + @neighbor_alerts.size
       flash.now[:notice] = if area_count > 1
-        "Please check your inbox to confirm your #{area_count} subscriptions. You won't receive alerts at #{email} unless you confirm."
+        "Check your inbox to confirm your #{area_count} subscriptions. You won't receive alerts at #{email} unless you confirm."
       else
-        "Please check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
+        "Check your inbox to confirm your subscription. You won't receive alerts at #{email} unless you confirm."
       end
     else
-      flash.now[:alert] = "Invalid email"
+      flash.now[:alert] = "Something went wrong creating your subscription. Please try again."
+      subscriber.destroy_if_childless
+      Sentry.set_context("create_alert", {
+        area_id: @area.id,
+        subscriber_id: subscriber.id,
+        errors: @alert.errors.full_messages
+      })
+      Sentry.capture_message("Primary alert save failed", level: :warning)
     end
 
     respond_to do |format|
@@ -85,14 +101,18 @@ class AlertsController < ApplicationController
     render_invalid_link
   end
 
-  # email + street_address is globally unique (see Alert validations), so for
-  # address-bearing alerts we ignore the (possibly stale) URL area. Address-less
-  # neighbor alerts are only unique per area, so those stay scoped to @area.
+  # (subscriber_id, street_address) is globally unique (see Alert validations),
+  # so for address-bearing alerts we ignore the (possibly stale) URL area.
+  # Address-less alerts are only unique per area, so those stay scoped
+  # to @area. The email may come from a legacy JWT, so normalize before lookup.
   def lookup_alert(email, address)
+    subscriber = Subscriber.find_by(email: email.to_s.strip.downcase)
+    return nil unless subscriber
+
     if address.present?
-      Alert.find_by(email: email, street_address: address)
+      subscriber.alerts.find_by(street_address: address)
     else
-      Alert.find_by(area: @area, email: email, street_address: nil)
+      subscriber.alerts.find_by(area: @area, street_address: nil)
     end
   end
 
@@ -117,7 +137,7 @@ class AlertsController < ApplicationController
   def confirm_neighbor_alerts
     return if @neighbor_alert_ids.blank?
 
-    neighbors = Alert.where(id: @neighbor_alert_ids, email: @alert.email)
+    neighbors = Alert.where(id: @neighbor_alert_ids, subscriber_id: @alert.subscriber_id)
 
     if neighbors.none?
       Sentry.set_context("confirm_neighbor_alerts", {
@@ -141,8 +161,17 @@ class AlertsController < ApplicationController
     Sentry.capture_message("Failed to confirm neighbor alerts", level: :warning)
   end
 
-  def build_primary_alert(email)
-    alert = @area.alerts.find_or_initialize_by(email: email, street_address: street_address)
+  def find_or_create_subscriber(email)
+    Subscriber.find_or_create_by!(email: email)
+  rescue ActiveRecord::RecordInvalid
+    nil
+  rescue ActiveRecord::RecordNotUnique
+    # Concurrent first-time signups race on the unique index; the loser re-reads.
+    Subscriber.find_by(email: email)
+  end
+
+  def build_primary_alert(subscriber)
+    alert = @area.alerts.find_or_initialize_by(subscriber: subscriber, street_address: street_address)
     if street_address
       alert.lat = session[:search_lat]
       alert.lng = session[:search_lng]
@@ -150,24 +179,24 @@ class AlertsController < ApplicationController
     alert
   end
 
-  def create_neighbor_alerts(email)
+  def create_neighbor_alerts(subscriber)
     ids = Array(params[:neighbor_area_ids]).compact_blank
     return [] if ids.empty?
 
     Area.where(id: ids).filter_map do |neighbor_area|
-      find_or_create_neighbor_alert(neighbor_area, email)
+      find_or_create_neighbor_alert(neighbor_area, subscriber)
     end
   end
 
-  def find_or_create_neighbor_alert(neighbor_area, email)
-    existing = neighbor_area.alerts.find_by(email: email)
+  def find_or_create_neighbor_alert(neighbor_area, subscriber)
+    existing = neighbor_area.alerts.find_by(subscriber: subscriber)
     return existing if existing
 
-    alert = neighbor_area.alerts.new(email: email, street_address: nil)
+    alert = neighbor_area.alerts.new(subscriber: subscriber, street_address: nil)
     return alert if alert.save
 
     # Concurrent requests can both pass find_by and race on insert.
-    existing = neighbor_area.alerts.find_by(email: email)
+    existing = neighbor_area.alerts.find_by(subscriber: subscriber)
     return existing if existing
 
     Rails.logger.warn("[AlertsController] Neighbor alert save failed for area #{neighbor_area.id}: #{alert.errors.full_messages.join(', ')}")

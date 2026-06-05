@@ -125,7 +125,7 @@ class SendPermitAlertsJob < ApplicationJob
   end
 
   # The proximity query already filters on confirmed/address/coords/
-  # permit_notifications; we just guard against blank email (phone-only alerts).
+  # permit_notifications; we just guard against alerts with no resolvable email.
   def notifiable?(alert)
     alert.email.present?
   end

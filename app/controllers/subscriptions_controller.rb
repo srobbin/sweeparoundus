@@ -9,7 +9,7 @@ class SubscriptionsController < ApplicationController
 
   def send_link
     email = params[:email].to_s.strip.downcase
-    if email.match?(Alert::VALID_EMAIL_REGEX)
+    if email.match?(Subscriber::VALID_EMAIL_REGEX)
       SubscriptionMailer.with(email: email).manage_link.deliver_later
     end
     redirect_to subscriptions_path, notice: "If you have any subscriptions, you'll receive an email with a link to manage them shortly."
@@ -39,10 +39,13 @@ class SubscriptionsController < ApplicationController
       return render_manage_with_error
     end
 
-    @alert = Alert.find_or_initialize_by(
-      email: @email,
-      street_address: address
-    )
+    @subscriber ||= find_or_create_subscriber(@email)
+    unless @subscriber&.persisted?
+      flash.now[:alert] = "Could not create subscription."
+      return render_manage_with_error
+    end
+
+    @alert = @subscriber.alerts.find_or_initialize_by(street_address: address)
     @alert.assign_attributes(area: area, lat: lat, lng: lng)
     @alert.confirmed = true
 
@@ -54,14 +57,19 @@ class SubscriptionsController < ApplicationController
       end
     else
       flash.now[:alert] = "Could not create subscription."
+      # Don't leave a just-created subscriber orphaned if its first alert failed.
+      @subscriber.destroy_if_childless
       render_manage_with_error
     end
   rescue ActiveRecord::RecordNotUnique
+    # Subscriber races are handled in find_or_create_subscriber, so this only
+    # fires on the alert's unique index — a concurrent request already created
+    # this address's subscription.
     redirect_to manage_subscriptions_path(t: params[:t]), notice: "You already have a subscription for this address."
   end
 
   def update
-    @alert = Alert.find_by(id: params[:id], email: @email)
+    @alert = @subscriber&.alerts&.find_by(id: params[:id])
 
     unless @alert
       return redirect_to manage_subscriptions_path(t: params[:t]), alert: "Subscription not found."
@@ -78,7 +86,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def confirm
-    @alert = Alert.find_by(id: params[:id], email: @email)
+    @alert = @subscriber&.alerts&.find_by(id: params[:id])
 
     unless @alert&.update(confirmed: true)
       return redirect_to manage_subscriptions_path(t: params[:t]), alert: "Could not confirm subscription."
@@ -92,7 +100,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def destroy
-    @alert = Alert.find_by(id: params[:id], email: @email)
+    @alert = @subscriber&.alerts&.find_by(id: params[:id])
 
     unless @alert
       return redirect_to manage_subscriptions_path(t: params[:t]), notice: "That subscription could not be found."
@@ -109,9 +117,20 @@ class SubscriptionsController < ApplicationController
 
   private
 
+  # Resolves (creating on first contact) the subscriber for this manage-page
+  # signup. Returns an unpersisted record when the email is invalid (the caller
+  # checks `persisted?`), and re-reads on a concurrent-creation race so that
+  # subscriber races never surface as the alert-level "already subscribed" flash.
+  def find_or_create_subscriber(email)
+    Subscriber.find_or_create_by(email: email)
+  rescue ActiveRecord::RecordNotUnique
+    Subscriber.find_by(email: email)
+  end
+
   def authenticate_manage_token
     decoded = decode_manage_jwt(params[:t])
-    @email = decoded["sub"]
+    @email = decoded["sub"].to_s.strip.downcase
+    @subscriber = Subscriber.find_by(email: @email)
     @token = params[:t]
   rescue JWT::ExpiredSignature
     redirect_to subscriptions_path, alert: "Your link has expired. Please request a new one."
@@ -120,7 +139,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def set_alerts
-    @alerts = Alert.where(email: @email).includes(area: :sweeps).order(:created_at)
+    @alerts = @subscriber&.alerts&.includes(area: :sweeps)&.order(:created_at) || Alert.none
     @pending_alerts, @active_alerts = @alerts.partition { |a| !a.confirmed? }
   end
 
