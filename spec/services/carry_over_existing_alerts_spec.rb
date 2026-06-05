@@ -104,7 +104,7 @@ RSpec.describe CarryOverExistingAlerts, type: :service do
     before do
       failure_body = File.read(Rails.root.join('spec', 'fixtures', 'google_maps_failure_response.json'))
 
-      stub_request(:get, /maps.googleapis.com.*invalid/)
+      stub_request(:get, /maps\.googleapis\.com.*invalid/)
         .to_return(body: failure_body)
     end
 
