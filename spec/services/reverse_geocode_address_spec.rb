@@ -118,7 +118,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
     context "when the HTTP response is non-200" do
       before do
-        stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
+        stub_request(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/)
           .to_return(status: 500, body: "Internal Server Error")
         allow(Rails.logger).to receive(:warn)
       end
