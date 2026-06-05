@@ -80,7 +80,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
 
     context "when the API returns a non-retryable error status" do
       before do
-        stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
+        stub_request(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/)
           .to_return(body: { status: "REQUEST_DENIED", results: [] }.to_json)
         allow(Rails.logger).to receive(:warn)
       end
