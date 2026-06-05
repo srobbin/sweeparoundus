@@ -65,7 +65,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         subject.call
         described_class.new(lat: lat, lng: lng).call
 
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/).once
       end
 
       it "caches a hash wrapper with nil value to distinguish from a cache miss" do
