@@ -21,7 +21,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
   describe "#call" do
     context "when the API returns a valid result" do
       before do
-        stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
+        stub_request(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/)
           .to_return(body: {
             status: "OK",
             results: [ { formatted_address: "3300 N California Ave, Chicago, IL 60618, USA" } ]
@@ -42,13 +42,13 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         subject.call
         described_class.new(lat: lat, lng: lng).call
 
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/).once
       end
     end
 
     context "when the API returns ZERO_RESULTS" do
       before do
-        stub_request(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/)
+        stub_request(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/)
           .to_return(body: { status: "ZERO_RESULTS", results: [] }.to_json)
       end
 
@@ -65,7 +65,7 @@ RSpec.describe ReverseGeocodeAddress, type: :service do
         subject.call
         described_class.new(lat: lat, lng: lng).call
 
-        expect(WebMock).to have_requested(:get, /maps.googleapis.com\/maps\/api\/geocode\/json/).once
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com\/maps\/api\/geocode\/json/).once
       end
 
       it "caches a hash wrapper with nil value to distinguish from a cache miss" do
