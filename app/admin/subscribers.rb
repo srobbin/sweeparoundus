@@ -4,13 +4,17 @@ ActiveAdmin.register Subscriber do
 
   controller do
     def scoped_collection
-      super.includes(:alerts)
+      super.left_joins(:alerts)
+           .select("subscribers.*, COUNT(alerts.id) AS alerts_count")
+           .group("subscribers.id")
     end
   end
 
+  scope :all, default: true
+
   index do
     column :email
-    column("Alerts") { |subscriber| subscriber.alerts.size }
+    column("Alerts", sortable: "alerts_count") { |subscriber| subscriber.alerts_count }
     column :created_at
     column :updated_at
     actions

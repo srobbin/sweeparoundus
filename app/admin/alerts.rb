@@ -54,7 +54,7 @@ ActiveAdmin.register Alert do
     actions
   end
 
-  scope :all
+  scope :all, default: true
   scope :confirmed
   scope :unconfirmed
 

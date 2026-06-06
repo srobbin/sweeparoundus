@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_04_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_05_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -34,19 +34,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_000004) do
     t.uuid "area_id"
     t.boolean "confirmed", default: false
     t.datetime "created_at", null: false
-    t.string "email"
     t.decimal "lat", precision: 10, scale: 6
     t.decimal "lng", precision: 10, scale: 6
     t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}
     t.boolean "permit_notifications", default: true, null: false
-    t.string "phone"
     t.string "street_address"
-    t.uuid "subscriber_id"
+    t.uuid "subscriber_id", null: false
     t.datetime "updated_at", null: false
     t.index ["area_id"], name: "index_alerts_on_area_id"
-    t.index ["email", "area_id"], name: "index_alerts_on_email_area_without_address", unique: true, where: "(street_address IS NULL)"
-    t.index ["email", "street_address"], name: "index_alerts_on_subscription_uniqueness", unique: true
-    t.index ["email"], name: "index_alerts_on_email"
     t.index ["location"], name: "index_alerts_on_location", using: :gist
     t.index ["subscriber_id", "area_id"], name: "index_alerts_on_subscriber_and_area_without_address", unique: true, where: "(street_address IS NULL)"
     t.index ["subscriber_id", "street_address"], name: "index_alerts_on_subscriber_and_street_address", unique: true
