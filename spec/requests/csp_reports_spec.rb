@@ -49,5 +49,15 @@ RSpec.describe "CSP reports", type: :request do
 
       expect(response).to have_http_status(:no_content)
     end
+
+    it "accepts reports without a CSRF token when forgery protection is on" do
+      ActionController::Base.allow_forgery_protection = true
+
+      post_report("blocked-uri" => "https://example.com")
+
+      expect(response).to have_http_status(:no_content)
+    ensure
+      ActionController::Base.allow_forgery_protection = false
+    end
   end
 end

@@ -1,4 +1,8 @@
 class CspReportsController < ApplicationController
+  # Browsers POST CSP violation reports without a CSRF token, so CSRF protection
+  # would reject every report with a 422 before we ever see it.
+  skip_forgery_protection
+
   # Third-party hosts that browser extensions inject (iframes, scripts, etc.)
   # but that carry no source-file, so the source-file heuristic below misses
   # them. e.g. the Ibotta cashback extension injects an authenticate.ibotta.com
