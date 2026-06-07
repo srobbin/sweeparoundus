@@ -42,6 +42,15 @@ RSpec.describe "CSP reports", type: :request do
       )
     end
 
+    it "suppresses Google Translate's gen204 logging beacons" do
+      expect(Rails.logger).not_to receive(:warn)
+
+      post_report(
+        "violated-directive" => "img-src",
+        "blocked-uri" => "https://translate.google.com/gen204?sl=en&tl=es"
+      )
+    end
+
     it "does not crash on malformed JSON" do
       post "/csp-violation-report",
            params: "not json",

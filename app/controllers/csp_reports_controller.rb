@@ -3,12 +3,17 @@ class CspReportsController < ApplicationController
   # would reject every report with a 422 before we ever see it.
   skip_forgery_protection
 
-  # Third-party hosts that browser extensions inject (iframes, scripts, etc.)
-  # but that carry no source-file, so the source-file heuristic below misses
-  # them. e.g. the Ibotta cashback extension injects an authenticate.ibotta.com
-  # iframe, which our frame-src 'none' policy blocks.
+  # Third-party hosts injected by browser features/extensions (iframes, scripts,
+  # beacons, etc.) that carry no source-file, so the source-file heuristic below
+  # misses them. These are user-initiated and outside our control:
+  #   - authenticate.ibotta.com: the Ibotta cashback extension injects this
+  #     iframe, which our frame-src 'none' policy blocks.
+  #   - translate.google.com: Chrome's built-in "translate this page" feature
+  #     fires gen204 logging beacons (loaded as img-src) when a user translates
+  #     the page.
   KNOWN_EXTENSION_HOSTS = %w[
     authenticate.ibotta.com
+    translate.google.com
   ].freeze
 
   def create
