@@ -44,7 +44,7 @@ RSpec.describe "Home", type: :request do
       travel_to Date.new(2026, 5, 15) do
         get root_path
 
-        expect(response.body).to include("alert subscriptions do not carry over from year to year")
+        expect(response.body).to include("email subscriptions don't carry over from year to year")
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe "Home", type: :request do
         get root_path, params: { format: :ics }
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("alert subscriptions do not carry over from year to year")
+        expect(response.body).to include("email subscriptions don't carry over from year to year")
       end
     end
   end

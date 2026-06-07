@@ -58,6 +58,24 @@ docker compose run app /bin/bash
 docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
 ```
 
+### Testing
+
+The full suite runs without touching the network and is safe for CI:
+
+```sh
+docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
+```
+
+#### FAQ external link liveness check
+
+`spec/requests/faq_spec.rb` includes an opt-in check that actually fetches every external link on the FAQ page and confirms each one resolves. It hits the public internet, so it is **skipped by default** to keep the normal suite fast and deterministic (a third-party outage shouldn't fail an unrelated build). It follows redirects and retries timeouts/5xx/429 responses with a short backoff before failing.
+
+Run it on demand by setting `CHECK_EXTERNAL_LINKS=1`:
+
+```sh
+docker compose run --rm -e RAILS_ENV=test -e CHECK_EXTERNAL_LINKS=1 app bundle exec rspec spec/requests/faq_spec.rb -e "external links resolve"
+```
+
 ### Linting
 
 This project uses [RuboCop](https://rubocop.org/) with the [rails-omakase](https://github.com/rails/rubocop-rails-omakase) style guide. A pre-commit hook runs RuboCop automatically on staged `.rb` files.

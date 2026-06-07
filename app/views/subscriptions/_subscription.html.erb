@@ -42,7 +42,7 @@
                       aria: { label: "Temporary No Parking alerts for #{alert.street_address}" },
                       data: { action: "change->auto-submit#submit" } },
                     "1", "0" %>
-              <span class="absolute inset-0 bg-gray-300 rounded-full transition-colors peer-checked:bg-blue-600 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2" aria-hidden="true"></span>
+              <span class="absolute inset-0 bg-gray-300 rounded-full transition-colors peer-checked:bg-sky-600 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-500 peer-focus-visible:ring-offset-2" aria-hidden="true"></span>
               <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-4" aria-hidden="true"></span>
             </span>
             <span class="ml-2">Temporary &ldquo;No Parking&rdquo; alerts</span>
@@ -79,7 +79,7 @@
       </span>
       <%= button_to confirm_subscription_path(alert, t: token),
             method: :patch,
-            class: "inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 shadow-xs",
+            class: "inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-hidden focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 shadow-xs",
             aria: { describedby: status_id } do %>
         Confirm
       <% end %>

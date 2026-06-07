@@ -1,15 +1,15 @@
 <% flash.each do |key, value| %>
-  <%= content_tag :div, class: "rounded-md p-4 mb-6 #{%w(alert error).include?(key) ? "bg-red-100" :  "bg-blue-100"}" do %>
+  <%= content_tag :div, class: "rounded-md p-4 mb-6 #{%w(alert error).include?(key) ? "bg-red-100" :  "bg-sky-100"}" do %>
     <div class="flex">
       <div class="shrink-0">
         <% if %w(alert error).include?(key) %>
           <%= icon "x-circle", variant: "fill", class: "h-5 w-5 text-red-400", aria: { hidden: true } %>
         <% else %>
-          <%= icon "info", variant: "fill", class: "h-5 w-5 text-blue-400", aria: { hidden: true } %>
+          <%= icon "info", variant: "fill", class: "h-5 w-5 text-sky-400", aria: { hidden: true } %>
         <% end %>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm leading-5 font-medium <%= %w(alert error).include?(key) ? "text-red-800" : "text-blue-700" %>">
+        <h3 class="text-sm leading-5 font-medium <%= %w(alert error).include?(key) ? "text-red-800" : "text-sky-700" %>">
           <%= value %>
         </h3>
       </div>
