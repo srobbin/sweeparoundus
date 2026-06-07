@@ -1,11 +1,6 @@
 class Alert < ApplicationRecord
   GEO_FACTORY = RGeo::Geographic.spherical_factory(srid: 4326)
 
-  # email/phone live on the alerts table until the contract migration drops them.
-  # Ignoring them frees the `email` attribute name for the delegate below and
-  # stops Rails from selecting columns the app no longer uses.
-  self.ignored_columns += %w[email phone]
-
   belongs_to :area, optional: true
   belongs_to :subscriber
 

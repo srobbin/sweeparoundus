@@ -28,11 +28,8 @@ class SendPermitAlertsJob < ApplicationJob
       pre_filter_skipped += 1 if service.pre_filter_skipped?
       next if affected.empty?
 
-      notifiable_alerts = affected.select { |affected_alert| notifiable?(affected_alert.alert) }
-      next if notifiable_alerts.empty?
-
       permits_with_alerts += 1
-      notifiable_alerts.each do |affected_alert|
+      affected.each do |affected_alert|
         alert_ids_by_permit[permit.id] << affected_alert.alert.id
         bucket = matches_by_alert_id[affected_alert.alert.id] ||= { alert: affected_alert.alert, matches: [] }
         bucket[:matches] << {
@@ -46,11 +43,11 @@ class SendPermitAlertsJob < ApplicationJob
       Rails.logger.info(
         "[SendPermitAlertsJob] permit=#{permit.unique_key} " \
         "segment=#{permit.segment_label.inspect} " \
-        "matched=#{affected.size} notified=#{notifiable_alerts.size}"
+        "matched=#{affected.size}"
       )
       Sentry.logger.info(
-        "send_permit_alerts.permit_matched permit_key=%{permit_key} matched=%{matched} notified=%{notified}",
-        permit_key: permit.unique_key, matched: affected.size, notified: notifiable_alerts.size,
+        "send_permit_alerts.permit_matched permit_key=%{permit_key} matched=%{matched}",
+        permit_key: permit.unique_key, matched: affected.size,
       )
     end
 
@@ -81,7 +78,7 @@ class SendPermitAlertsJob < ApplicationJob
 
     if enqueued_count.zero? && permits_with_alerts.positive?
       Sentry.capture_message(
-        "[SendPermitAlertsJob] Had notifiable matches but enqueued 0 emails",
+        "[SendPermitAlertsJob] Had matching alerts but enqueued 0 emails",
         level: :error,
         contexts: { job_result: summary },
       )
@@ -90,7 +87,7 @@ class SendPermitAlertsJob < ApplicationJob
     Rails.logger.info(
       "[SendPermitAlertsJob] SUCCESS: scanned #{permits.size} permit(s), " \
       "#{pre_filter_skipped} pre-filtered, " \
-      "#{permits_with_alerts} had notifiable alerts, " \
+      "#{permits_with_alerts} had matching alerts, " \
       "#{enqueued_count} email(s) enqueued"
     )
     Sentry.logger.info(
@@ -122,12 +119,6 @@ class SendPermitAlertsJob < ApplicationJob
 
       CdotPermit.upsert_all(rows, unique_by: :id, update_only: %i[processed_alert_ids notifications_sent_at])
     end
-  end
-
-  # The proximity query already filters on confirmed/address/coords/
-  # permit_notifications; we just guard against alerts with no resolvable email.
-  def notifiable?(alert)
-    alert.email.present?
   end
 
   def upcoming_permits

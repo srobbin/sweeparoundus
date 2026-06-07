@@ -106,24 +106,13 @@ RSpec.describe SendPermitAlertsJob do
                       street_address: "123 Main", lat: 41.942, lng: -87.6987,
                       permit_notifications: true)
       end
-      # An alert with no resolvable email: the proximity query in
-      # FindCdotPermitAffectedAlerts doesn't filter on email, so the job has to
-      # skip these explicitly via notifiable?. Confirmed + opted-in cases are
-      # already filtered in SQL by the service and are covered by
-      # find_cdot_permit_affected_alerts_spec.
-      let(:phone_only_alert) do
-        build_stubbed(:alert, :confirmed, area: area, subscriber: nil,
-                      street_address: "789 Main", lat: 41.942, lng: -87.6987,
-                      permit_notifications: true)
-      end
 
       before do
         allow(FindCdotPermitAffectedAlerts).to receive(:new) do |**_|
           instance_double(
             FindCdotPermitAffectedAlerts,
             call: [
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: eligible_alert, distance_feet: 100),
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: phone_only_alert, distance_feet: 100)
+              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: eligible_alert, distance_feet: 100)
             ],
             line_from: line_from,
             line_to: line_to,
@@ -132,7 +121,7 @@ RSpec.describe SendPermitAlertsJob do
         end
       end
 
-      it "enqueues a PermitMailer.notify only for alerts with an email" do
+      it "enqueues a PermitMailer.notify for each affected alert" do
         message = double("Mail").as_null_object
         allow(PermitMailer).to receive_message_chain(:with, :notify).and_return(message)
 
@@ -163,15 +152,15 @@ RSpec.describe SendPermitAlertsJob do
         end
       end
 
-      it "logs per-permit and SUCCESS lines reflecting the filtered totals" do
+      it "logs per-permit and SUCCESS lines reflecting the totals" do
         allow(PermitMailer).to receive_message_chain(:with, :notify, :deliver_later)
 
         described_class.new.perform
 
         expect(Rails.logger).to have_received(:info)
-          .with(/permit=2000001 segment="3300-3350 N CALIFORNIA AVE" matched=2 notified=1/)
+          .with(/permit=2000001 segment="3300-3350 N CALIFORNIA AVE" matched=1/)
         expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 1 permit\(s\), 0 pre-filtered, 1 had notifiable alerts, 1 email\(s\) enqueued/
+          /SUCCESS: scanned 1 permit\(s\), 0 pre-filtered, 1 had matching alerts, 1 email\(s\) enqueued/
         )
       end
 
@@ -275,7 +264,7 @@ RSpec.describe SendPermitAlertsJob do
         described_class.new.perform
 
         expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 2 permit\(s\), 0 pre-filtered, 2 had notifiable alerts, 1 email\(s\) enqueued/
+          /SUCCESS: scanned 2 permit\(s\), 0 pre-filtered, 2 had matching alerts, 1 email\(s\) enqueued/
         )
       end
     end
@@ -332,50 +321,6 @@ RSpec.describe SendPermitAlertsJob do
       end
     end
 
-    context "when no affected alerts are notifiable" do
-      let!(:permit) do
-        create_permit(unique_key: "3000001",
-                      application_start_date: chicago_tomorrow_start + 9.hours)
-      end
-      let(:email_blank_alert) do
-        build_stubbed(:alert, :confirmed, area: area, subscriber: nil,
-                      permit_notifications: true)
-      end
-
-      before do
-        allow(FindCdotPermitAffectedAlerts).to receive(:new) do |**_|
-          instance_double(
-            FindCdotPermitAffectedAlerts,
-            call: [
-              FindCdotPermitAffectedAlerts::AffectedAlert.new(alert: email_blank_alert, distance_feet: 100)
-            ],
-            line_from: GeocodeAddress::Result.new(lat: 1, lng: 2),
-            line_to: GeocodeAddress::Result.new(lat: 1, lng: 2),
-            pre_filter_skipped?: false,
-          )
-        end
-      end
-
-      it "enqueues no emails and reports zero notified" do
-        expect(PermitMailer).not_to receive(:with)
-
-        described_class.new.perform
-
-        expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 1 permit\(s\), 0 pre-filtered, 0 had notifiable alerts, 0 email\(s\) enqueued/
-        )
-      end
-
-      it "stamps the permit with an empty processed_alert_ids and a timestamp" do
-        allow(PermitMailer).to receive(:with) # safety no-op
-
-        described_class.new.perform
-
-        expect(permit.reload.processed_alert_ids).to eq([])
-        expect(permit.notifications_sent_at).to be_present
-      end
-    end
-
     context "when permits are pre-filtered" do
       let!(:permit_a) do
         create_permit(unique_key: "4000001",
@@ -398,7 +343,7 @@ RSpec.describe SendPermitAlertsJob do
         described_class.new.perform
 
         expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 2 permit\(s\), 2 pre-filtered, 0 had notifiable alerts, 0 email\(s\) enqueued/
+          /SUCCESS: scanned 2 permit\(s\), 2 pre-filtered, 0 had matching alerts, 0 email\(s\) enqueued/
         )
       end
 
@@ -418,7 +363,7 @@ RSpec.describe SendPermitAlertsJob do
         described_class.new.perform
 
         expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 0 permit\(s\), 0 pre-filtered, 0 had notifiable alerts, 0 email\(s\) enqueued/
+          /SUCCESS: scanned 0 permit\(s\), 0 pre-filtered, 0 had matching alerts, 0 email\(s\) enqueued/
         )
       end
     end
@@ -464,7 +409,7 @@ RSpec.describe SendPermitAlertsJob do
 
         expect(PermitMailer).not_to have_received(:with)
         expect(Rails.logger).to have_received(:info).with(
-          /SUCCESS: scanned 0 permit\(s\), 0 pre-filtered, 0 had notifiable alerts, 0 email\(s\) enqueued/
+          /SUCCESS: scanned 0 permit\(s\), 0 pre-filtered, 0 had matching alerts, 0 email\(s\) enqueued/
         )
       end
     end
