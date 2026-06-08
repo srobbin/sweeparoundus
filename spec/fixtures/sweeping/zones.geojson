@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"ward_section":"0101","ward":"01","section":"01"},"geometry":{"type":"Point","coordinates":[-87.6,41.8]}},{"type":"Feature","properties":{"ward_section":"0102","ward":"01","section":"02"},"geometry":{"type":"Point","coordinates":[-87.7,41.9]}}]}

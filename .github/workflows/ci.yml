@@ -1,0 +1,71 @@
+name: CI
+
+# Runs the full RSpec suite on every PR into main. This is the authoritative
+# validation gate — configure it as a required status check in branch
+# protection. It also validates the automated db/data candidate PRs opened by
+# CheckSweepingDataUpdatesJob: the spec/data/* specs read the canonical
+# db/data/...<Time.current.year> paths, so on a current-year data PR the CI
+# run-year matches the dataset year (the job only ever fetches the current
+# year), and the specs validate the candidate with no extra code.
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+    container:
+      image: ruby:4.0.5-slim
+
+    services:
+      db:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:8.8-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      POSTGRES_PASSWORD: postgres
+      REDIS_URL: redis://redis:6379/0
+
+    steps:
+      - name: Install system dependencies
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            build-essential libpq-dev postgresql-client libgeos-dev libyaml-dev git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache gems
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Install gems
+        run: |
+          gem install bundler -v 4.0.10
+          bundle config set --local without 'development'
+          bundle install --jobs 4 --retry 3
+
+      - name: Prepare test database
+        run: bin/rails db:test:prepare
+
+      - name: Run RSpec
+        run: bundle exec rspec

@@ -17,3 +17,9 @@ send_permit_alerts:
 send_alerts:
   cron: "0 10 * * * America/Chicago"
   class: "SendAlertsJob"
+
+# In-season only: the 3-11 month range trims winter wake-ups; the job's own
+# Mar 20 / Nov 30 guard enforces the precise season boundaries.
+check_sweeping_data_updates:
+  cron: "15 16 * 3-11 * America/Chicago"
+  class: "CheckSweepingDataUpdatesJob"

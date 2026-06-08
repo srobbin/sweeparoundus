@@ -49,6 +49,12 @@ gem "stackprof", "~> 0.2"
 gem "icalendar", "~> 2.12"
 gem "sendgrid-ruby", "~> 6.7"
 
+# GitHub API (CheckSweepingDataUpdatesJob opens data-update PRs).
+# faraday-retry enables Octokit's optional retry middleware (and silences its
+# load-time warning); without it Faraday v2 logs that the middleware is absent.
+gem "octokit", "~> 10.0"
+gem "faraday-retry", "~> 2.3"
+
 # Security / Middleware
 gem "rack-attack", "~> 6.7"
 
