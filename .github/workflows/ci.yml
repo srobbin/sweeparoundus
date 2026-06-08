@@ -39,6 +39,20 @@ jobs:
       RAILS_ENV: test
       POSTGRES_PASSWORD: postgres
       REDIS_URL: redis://redis:6379/0
+      # App config the suite depends on. These mirror the keys docker-compose
+      # loads from .env locally; CI has no .env so they must be set explicitly.
+      # All values are non-secret test stand-ins.
+      SECRET_KEY_BASE: ci-secret-key-base
+      SECRET_KEY_JWT: ci-secret-key-jwt
+      SITE_NAME: We The Sweeple
+      SITE_URL: http://example.com
+      DEFAULT_EMAIL: no.reply@example.com
+      COFFEE_LINK_URL: https://example.com/coffee
+      ADMIN_PATH: sau_admin
+      # Must be non-blank so GoogleGeocoder issues the HTTP request that WebMock
+      # stubs; a blank key makes it short-circuit before the stubbed request.
+      GOOGLE_MAPS_BACKEND_API_KEY: ci-test-key
+      GOOGLE_MAPS_FRONTEND_API_KEY: ci-test-key
 
     steps:
       - name: Install system dependencies
@@ -66,6 +80,14 @@ jobs:
 
       - name: Prepare test database
         run: bin/rails db:test:prepare
+
+      # app/assets/builds/* is gitignored, so the compiled CSS the layout links
+      # (tailwind.css, application.css) must be generated here or sprockets
+      # raises "asset is not present in the asset pipeline" while rendering.
+      - name: Build CSS assets
+        run: |
+          bin/rails tailwindcss:build
+          bin/rails dartsass:build
 
       - name: Run RSpec
         run: bundle exec rspec
