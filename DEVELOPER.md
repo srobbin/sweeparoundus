@@ -6,7 +6,7 @@ Developer setup, workflows, and operational runbooks for [We The Sweeple](http:/
 
 ### Initial setup
 
-If this is your first time running the application, you'll need to make sure you have [Docker](https://docs.docker.com/get-docker/) installed. Assuming you do, issue these commands from the terminal:
+If this is your first time running the application, you'll need to make sure you have [Docker](https://docs.docker.com/get-docker/) installed. Assuming you do, issue these commands from the terminal. Use `bin/setup` here — it's the **first-run** script that creates and seeds the database from scratch.
 
 ```sh
 # Make a copy of the environment variables file
@@ -26,7 +26,7 @@ docker compose up
 
 ### Running the app
 
-From a terminal session:
+For day-to-day work (after the initial setup above), use `bin/update` — the **routine** script that installs any new dependencies and runs pending migrations to keep your existing database in sync. From a terminal session:
 
 ```sh
 # Update to make sure your database and dependencies are in sync
@@ -42,20 +42,17 @@ Once the stack is running, visit: [http://localhost:3000](http://localhost:3000)
 
 ### Gems and console
 
-From time to time, you'll need to install new gems and access the console. In order to do so, use the `docker compose run app` command. For example:
+From time to time, you'll need to install new gems and access the console. Use `docker compose run` to run a one-off command in a new container. The `--rm` flag deletes that container when the command exits, so they don't pile up. For example:
 
 ```sh
 # Installing gems
-docker compose run app bundle add foo
+docker compose run --rm app bundle add foo
 
 # Accessing the console
-docker compose run app bin/rails console
+docker compose run --rm app bin/rails console
 
 # Start a bash shell
-docker compose run app /bin/bash
-
-# Run rspec tests
-docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
+docker compose run --rm app /bin/bash
 ```
 
 ### Testing
@@ -65,6 +62,8 @@ The full suite runs without touching the network and is safe for CI:
 ```sh
 docker compose run --rm -e RAILS_ENV=test app bundle exec rspec
 ```
+
+Always pass `-e RAILS_ENV=test`. The `.env` file sets `RAILS_ENV=development`, so without this override specs run against the development database and hit factory uniqueness violations from seeded data.
 
 #### FAQ external link liveness check
 
@@ -95,16 +94,22 @@ docker compose run --rm --no-deps app bundle exec rubocop app/models/area.rb
 
 In development, emails are captured and viewable at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener).
 
+### Deploying
+
+Production runs on Heroku using the container stack defined in [heroku.yml](heroku.yml) (a `web` dyno and a `sidekiq` worker, both built from `Dockerfile`). "Deploy" throughout this guide means getting the merged `main` branch onto Heroku.
+
+On every release, Heroku's `release` phase automatically runs `bin/rails db:migrate`, so **schema migrations apply on deploy**. Note that this only migrates the schema — it does **not** seed or update the sweep/area data. Changing what's in `db/data/` and deploying lands the new files in the slug, but the running database is unchanged until you run the seeding runbooks below ("Annual maintenance" or "Mid-season schedule corrections").
+
 ## Annual maintenance
 
 - Before the City publishes (late March), add the new year's dataset IDs to `SweepingDatasets::CONFIG` in [app/models/sweeping_datasets.rb](app/models/sweeping_datasets.rb). Without an entry for the current year, `CheckSweepingDataUpdatesJob` alerts (Sentry) and opens no PRs.
-- In late March, export the following files from the [Chicago Data Portal](data.cityofchicago.org):
+- In late March, export the following files from the [Chicago Data Portal](https://data.cityofchicago.org):
   - "Street Sweeping Zones - 202X" => `Street Sweeping Zones - 202X.geojson`
   - "Street Sweeping Schedule - 202X" => `Street_Sweeping_Schedule_-_202X.csv`
   - "Ward Offices" => `Ward_Offices_202X.csv`
-- Add files to the `db/data` directory.
+- Add files to the `db/data` directory. **The filenames must match exactly** (casing, spaces vs. underscores, and the year) — `SeedYearlyData` and the specs read these literal paths, so a typo silently fails to find the file. The Schedule/Zones paths are defined in `SweepingDatasets::Config` ([app/models/sweeping_datasets.rb](app/models/sweeping_datasets.rb)).
   - Note: Once the year's datasets are published and configured, `CheckSweepingDataUpdatesJob` will open the Schedule/Zones candidate PRs automatically (see "Automated in-season data updates" below), so the manual export of those two files is mainly for the initial pre-publish setup. `Ward_Offices_202X.csv` is **not** automated and is always exported/added by hand.
-- Run rspec test suite.
+- Run the rspec test suite (see [Testing](#testing)).
 - Merge into main and deploy.
 - Temporarily enable 'Maintenance Mode' on Heroku.
 - Seed db with new zone and schedule data (note that this will nullify `area_id` in existing alerts):
@@ -127,7 +132,7 @@ In development, emails are captured and viewable at [http://localhost:3000/lette
 If the City publishes a corrected `Street_Sweeping_Schedule_-_202X.csv` mid-season (the GeoJSON zones have not changed and alerts have already received their `annual_schedule_live` welcome email), refresh just the sweep data without touching `Area` records:
 
 - Replace `db/data/Street_Sweeping_Schedule_-_202X.csv` with the corrected file.
-- Run rspec test suite.
+- Run the rspec test suite (see [Testing](#testing)).
 - Merge into main and deploy.
 - Re-seed the schedule only; `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s, skip_geojson: true).call`
@@ -161,4 +166,3 @@ To rotate the key: generate a new private key on the App's settings page, re-enc
 ### CI as a required check
 
 [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the full suite on every PR into `main` (Postgres/PostGIS + Redis service containers, `RAILS_ENV=test`). For the green/red check to actually gate merges, it must be configured as a **required status check** in `main`'s branch protection (repo Settings → Branches). This is a one-time repo-admin action.
-
