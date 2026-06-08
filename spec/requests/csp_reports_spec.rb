@@ -33,6 +33,16 @@ RSpec.describe "CSP reports", type: :request do
       )
     end
 
+    it "suppresses violations injected by browser extensions via blocked-uri" do
+      expect(Rails.logger).not_to receive(:warn)
+
+      post_report(
+        "violated-directive" => "font-src",
+        "effective-directive" => "font-src",
+        "blocked-uri" => "chrome-extension"
+      )
+    end
+
     it "suppresses the Ibotta extension's authenticate.ibotta.com iframe" do
       expect(Rails.logger).not_to receive(:warn)
 

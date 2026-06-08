@@ -32,16 +32,22 @@ class CspReportsController < ApplicationController
     nil
   end
 
+  # Browser-injected resources show up either as a source-file or a blocked-uri
+  # that begins with one of these schemes.
+  EXTENSION_SCHEMES = %w[about moz-extension chrome-extension safari-extension].freeze
+
   # Browser extensions (password managers, ad blockers, translators, etc.)
   # inject inline scripts and resources into pages. These show up as CSP
-  # violations with source-file "about" or a moz-extension/chrome-extension
-  # URI. They're not actionable since they originate outside our code.
+  # violations with a source-file or blocked-uri of "about" or a
+  # moz-extension/chrome-extension URI. They're not actionable since they
+  # originate outside our code.
   def browser_extension_noise?(report)
     csp = report["csp-report"] || report
     source = csp["source-file"].to_s
     blocked = csp["blocked-uri"].to_s
 
-    source.start_with?("about", "moz-extension", "chrome-extension", "safari-extension") ||
+    source.start_with?(*EXTENSION_SCHEMES) ||
+      blocked.start_with?(*EXTENSION_SCHEMES) ||
       KNOWN_EXTENSION_HOSTS.any? { |host| blocked.include?(host) }
   end
 end
