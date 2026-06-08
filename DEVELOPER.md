@@ -129,11 +129,11 @@ If the City publishes a corrected `Street_Sweeping_Schedule_-_202X.csv` mid-seas
 - Replace `db/data/Street_Sweeping_Schedule_-_202X.csv` with the corrected file.
 - Run rspec test suite.
 - Merge into main and deploy.
-- Temporarily enable 'Maintenance Mode' on Heroku.
 - Re-seed the schedule only; `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s, skip_geojson: true).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s, skip_geojson: true).call`
-- Disable 'Maintenance Mode' on Heroku.
+
+**Maintenance Mode is not required for a CSV-only correction.** The `write: true` re-seed runs in a single transaction and only touches `Sweep` records, so concurrent requests see the old sweeps until commit and the new sweeps after — never a missing or half-deleted state. Consider it only if the correction changes dates within the next day or two, to avoid racing the daily `SendAlertsJob` (`Sweep.where(date_1: Date.tomorrow)`) — and note Heroku Maintenance Mode blocks only **web** dynos, not the scheduler/worker, so pause the scheduler or time the deploy instead.
 
 ## Automated in-season data updates
 
