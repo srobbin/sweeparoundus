@@ -111,6 +111,7 @@ On every release, Heroku's `release` phase automatically runs `bin/rails db:migr
   - Note: Once the year's datasets are published and configured, `CheckSweepingDataUpdatesJob` will open the Schedule/Zones candidate PRs automatically (see "Automated in-season data updates" below), so the manual export of those two files is mainly for the initial pre-publish setup. `Ward_Offices_202X.csv` is **not** automated and is always exported/added by hand.
 - Run the rspec test suite (see [Testing](#testing)).
 - Merge into main and deploy.
+- **Verify the deploy actually released before seeding.** `heroku run` reads the data files from the running slug, not from GitHub or your local checkout, so seeding before the release lands will re-import the *old* data. Confirm with `heroku releases --app sweeparoundus` (newest release should post-date your merge and reference the merge commit), or check the file on the dyno: `heroku run --app sweeparoundus -- ruby -e 'puts File.open("db/data/Street_Sweeping_Schedule_-_#{Time.now.year}.csv", &:readline)'`.
 - Temporarily enable 'Maintenance Mode' on Heroku.
 - Seed db with new zone and schedule data (note that this will nullify `area_id` in existing alerts):
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s).call`
@@ -134,9 +135,11 @@ If the City publishes a corrected `Street_Sweeping_Schedule_-_202X.csv` mid-seas
 - Replace `db/data/Street_Sweeping_Schedule_-_202X.csv` with the corrected file.
 - Run the rspec test suite (see [Testing](#testing)).
 - Merge into main and deploy.
+- **Verify the deploy actually released before seeding.** `heroku run` reads the CSV from the running slug, not from GitHub or your local checkout, so seeding before the release lands will re-import the *old* schedule (the re-seed will still report `SUCCESS` — with the wrong dates). Confirm with `heroku releases --app sweeparoundus` (newest release should post-date your merge and reference the merge commit), or spot-check the file on the dyno before seeding: `File.open("db/data/Street_Sweeping_Schedule_-_#{Time.current.year}.csv", &:readline)`.
 - Re-seed the schedule only; `Area` records are left intact, so existing `alert.area_id` values remain valid and no follow-up `CarryOverExistingAlerts` run is needed:
   - TEST: `SeedYearlyData.new(write: false, year: Time.current.year.to_s, skip_geojson: true).call`
   - `SeedYearlyData.new(write: true, year: Time.current.year.to_s, skip_geojson: true).call`
+- Verify the **dates**, not just the `SUCCESS` count — a correction often keeps the same number of sweeps, so the count alone won't reveal a stale read. Spot-check a corrected area, e.g. `Sweep.where(area: Area.find_by(ward: 1, number: 5)).order(:date_1).pluck(:date_1, :date_2)`.
 
 **Maintenance Mode is not required for a CSV-only correction.** The `write: true` re-seed runs in a single transaction and only touches `Sweep` records, so concurrent requests see the old sweeps until commit and the new sweeps after — never a missing or half-deleted state. Consider it only if the correction changes dates within the next day or two, to avoid racing the daily `SendAlertsJob` (`Sweep.where(date_1: Date.tomorrow)`) — and note Heroku Maintenance Mode blocks only **web** dynos, not the scheduler/worker, so pause the scheduler or time the deploy instead.
 
