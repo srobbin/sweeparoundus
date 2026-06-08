@@ -64,7 +64,7 @@ jobs:
             build-essential libpq-dev postgresql-client libgeos-dev libyaml-dev git
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cache gems
         uses: actions/cache@v4
