@@ -1,0 +1,8 @@
+name: "sweeparoundus CodeQL config"
+
+# CSP violation reports are POSTed by browsers without a CSRF token, so this
+# controller must call skip_forgery_protection. CodeQL's rb/csrf-protection-disabled
+# rule flags that as a false positive here, so we exclude the file from analysis.
+# The rule stays active for the rest of the app.
+paths-ignore:
+  - app/controllers/csp_reports_controller.rb
