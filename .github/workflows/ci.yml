@@ -46,7 +46,9 @@ jobs:
       SECRET_KEY_JWT: ci-secret-key-jwt
       SITE_NAME: We The Sweeple
       SITE_URL: http://example.com
-      DEFAULT_EMAIL: no.reply@example.com
+      # The alert/permit mailer specs assert the literal from address, so this
+      # must match the production sender rather than a generic placeholder.
+      DEFAULT_EMAIL: info@wethesweeple.com
       COFFEE_LINK_URL: https://example.com/coffee
       ADMIN_PATH: sau_admin
       # Must be non-blank so GoogleGeocoder issues the HTTP request that WebMock
