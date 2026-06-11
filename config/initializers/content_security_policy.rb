@@ -15,7 +15,9 @@ Rails.application.configure do
     policy.font_src    :self, :data,
                        "https://fonts.gstatic.com",
                        "http://fonts.gstatic.com"
-    policy.img_src     :self, :data,
+    # blob: is needed by the <gmp-place-autocomplete> Google Maps web component,
+    # which renders suggestion/icon images from blob: URLs.
+    policy.img_src     :self, :data, :blob,
                        "https://*.googleapis.com",
                        "https://*.gstatic.com",
                        "https://www.google-analytics.com",

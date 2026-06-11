@@ -48,4 +48,11 @@ Rails.application.routes.draw do
 
   # Root
   root to: "home#index"
+
+  # Error pages. `config.exceptions_app = routes` dispatches failed requests
+  # here using the status code as the path (e.g. a RoutingError for `/blah`
+  # becomes a GET `/404`). `via: :all` so the original HTTP method still matches.
+  match "/404", to: "errors#not_found", via: :all
+  match "/422", to: "errors#unprocessable_entity", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
 end

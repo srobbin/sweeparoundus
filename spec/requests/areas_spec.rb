@@ -131,6 +131,23 @@ RSpec.describe "Areas", type: :request do
       end
     end
 
+    context "when the slug does not match any area" do
+      it "renders a friendly 404 page with a search box for HTML requests" do
+        get "/areas/ward-2-r1w445r54ea35w"
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to include("We couldn't find that page.")
+        expect(response.body).to include('action="/search/"')
+      end
+
+      it "returns a bare 404 for non-HTML requests" do
+        get "/areas/ward-2-r1w445r54ea35w.ics"
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to be_blank
+      end
+    end
+
     context "after searching for an address" do
       # These coordinates fall inside the factory area (verified by
       # spec/requests/search_spec.rb). Coordinates that don't fall in

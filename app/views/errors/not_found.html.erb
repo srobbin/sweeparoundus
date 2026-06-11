@@ -1,0 +1,16 @@
+<% content_for :page_title, "Page not found" %>
+<div class="flex flex-1 flex-col items-center justify-center max-w-2xl mx-auto px-4 text-center">
+  <div class="my-8 w-full">
+    <%= link_to root_path do %><%= image_tag "logo.png", alt: "#{ENV["SITE_NAME"]} logo", class: "mb-2 mx-auto max-w-[280px] sm:max-w-md" %><% end %>
+    <div class="text-xl mt-2">We couldn't find that page.</div>
+    <p class="mt-3 text-gray-600">
+      Search your address to find your street sweeping schedule.
+    </p>
+    <div class="mt-6 text-left">
+      <%= render "search/form" %>
+    </div>
+    <p class="mt-6 text-sm text-gray-500">
+      Or head back to <%= link_to "the home page", root_path, class: "underline hover:text-black" %>.
+    </p>
+  </div>
+</div>

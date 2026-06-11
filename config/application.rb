@@ -48,5 +48,10 @@ module Sweeparoundus
 
     # Host
     config.active_job.default_url_options = { host: ENV["SITE_URL"] }
+
+    # Route exceptions through the app (see ErrorsController) so unrouted paths
+    # and other 404s render the on-brand 404 page instead of the bare static
+    # `public/404.html`. 422/500 are routed back to their existing static pages.
+    config.exceptions_app = routes
   end
 end
