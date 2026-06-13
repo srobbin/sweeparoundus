@@ -9,8 +9,8 @@
         </h1>
       </div>
 
-      <div class="flex flex-col gap-5 text-sm">
-        <p>Orange <em>should</em> be a hard color to miss.</p>
+      <div class="flex flex-col gap-5 text-sm text-gray-600 leading-relaxed">
+        <p class="text-base text-gray-900">Orange <em>should</em> be a hard color to miss.</p>
         <p>
           Just ask Nickelodeon, Home Depot, or the Sun.
           But when neon orange <strong>TH</strong> flyers are tied to every tree on your block, they have a way of blending in with nature.
@@ -19,10 +19,10 @@
         <p>
           <%= link_to 'However you feel', 'https://chicagoreader.com/news-politics/why-sweep-the-streets/', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %> about street sweeping, <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> is here to help you avoid getting ticketed.
           Just enter your street address, and we'll use the sanitation schedule from the City of Chicago's <%= link_to "open data portal", 'https://data.cityofchicago.org/browse?category=Sanitation', class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %> to let you know when your street is due for cleaning.
-          And, if you want reminders down the road, sign up for email notifications or download the schedule as an iCalendar (.ics) file. 
+          And, if you want reminders down the road, sign up for email notifications or download the schedule as an iCalendar (.ics) file.
         </p>
         <p>
-          <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> (formerly SweepAround.Us) was created in 2011 by Scott Robbin and is currently maintained by Carl Hauck and Kat Evans.
+          <%= "<b>".html_safe + ENV["SITE_NAME"] + "</b>".html_safe %> (formerly SweepAround.Us) was created in 2011 by Scott Robbin and is currently maintained by <%= link_to "Carl Hauck", "https://www.instagram.com/carlhauck/", class: "underline", target: "_blank", rel: "nofollow noopener noreferrer" %> and Kat Evans.
           None of them work for the City.
           All three have received their fair share of street sweeping tickets.
           (In other words, please direct your appeals elsewhere.)
@@ -31,12 +31,13 @@
           Lastly, if you find this site helpful and want to help with the cost of running it, <%= link_to 'send us a few bucks', coffee_link_url, class: 'underline', target: '_blank', rel: "nofollow noopener noreferrer" %>.
           (Full technical disclosure: Heroku + Postgres + Redis + dyno + domain name + Google Maps + SendGrid expenses all add up to an annual sum equal to 10+ street sweeping tickets).
         </p>
-        <p>
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col items-center gap-4 text-center">
+        <p class="text-sm text-gray-600">
           Have a question or suggestion?
           Drop us a line at <a href="mailto:info@wethesweeple.com" class="underline">info@wethesweeple.com</a>.
         </p>
-      </div>
-      <div class="flex justify-center mt-6 mb-6">
         <%= render "shared/buy_us_a_coffee_button" %>
       </div>
     </div>
