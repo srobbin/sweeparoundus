@@ -10,6 +10,7 @@ class PermitMailer < ApplicationMailer
     :work_type_description,
     :application_description,
     :static_map_url,
+    :static_map_segment,
     keyword_init: true,
   )
 
@@ -41,6 +42,12 @@ class PermitMailer < ApplicationMailer
   def build_match(attrs)
     permit = attrs[:permit]
 
+    static_map = PermitStaticMap.new(
+      alert: @alert,
+      line_from: attrs[:line_from],
+      line_to: attrs[:line_to],
+    )
+
     Sentry.add_breadcrumb(Sentry::Breadcrumb.new(
       category: "mailer",
       message: "build_match",
@@ -61,11 +68,8 @@ class PermitMailer < ApplicationMailer
       permit_dates: format_permit_dates(permit),
       work_type_description: permit.work_type_description,
       application_description: permit.application_description,
-      static_map_url: PermitStaticMap.new(
-        alert: @alert,
-        line_from: attrs[:line_from],
-        line_to: attrs[:line_to],
-      ).url,
+      static_map_url: static_map.url,
+      static_map_segment: static_map.segment?,
     )
   end
 

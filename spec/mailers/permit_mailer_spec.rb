@@ -88,6 +88,20 @@ RSpec.describe PermitMailer, type: :mailer do
       expect(html_body).to include("color%3Ablue%7Clabel%3AH%7C41.942%2C-87.6987")
     end
 
+    it "captions the map as a red line between A and B when a segment is drawn" do
+      expect(html_body).to include("the red line connects the two ends")
+      expect(html_body).not_to include("the red <strong>P</strong> marker")
+    end
+
+    context "when the permit geocodes to a single point" do
+      let(:line_to) { GeocodeAddress::Result.new(lat: line_from.lat, lng: line_from.lng) }
+
+      it "captions the map as a red P marker instead of a line" do
+        expect(html_body).to include("the red <strong>P</strong> marker shows the permit's posted area")
+        expect(html_body).not_to include("the red line connects the two ends")
+      end
+    end
+
     it "includes the manage-subscriptions link and no unsubscribe link" do
       expect(html_body).to include("Manage subscriptions")
       expect(html_body).to include(manage_subscriptions_url.to_s)

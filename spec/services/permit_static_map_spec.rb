@@ -113,4 +113,34 @@ RSpec.describe PermitStaticMap, type: :service do
       end
     end
   end
+
+  describe "#segment?" do
+    it "is true when the endpoints differ (a line is drawn)" do
+      expect(subject.segment?).to be(true)
+    end
+
+    context "when both endpoints are at the same point" do
+      let(:line_to) { GeocodeAddress::Result.new(lat: line_from.lat, lng: line_from.lng) }
+
+      it "is false (a single pin is drawn)" do
+        expect(subject.segment?).to be(false)
+      end
+    end
+
+    context "when an endpoint is missing" do
+      let(:line_from) { nil }
+
+      it "is false" do
+        expect(subject.segment?).to be(false)
+      end
+    end
+
+    context "when the alert has no coordinates" do
+      let(:alert) { AlertCoords.new(nil, nil) }
+
+      it "is false" do
+        expect(subject.segment?).to be(false)
+      end
+    end
+  end
 end

@@ -70,6 +70,10 @@
           style: "max-width: 100%; height: auto; border: 1px solid #ccc; display: block;" %>
   </p>
   <p style="font-size: 9pt; color: #6b7280; margin-top: 0.25em;">
-    The blue <strong>H</strong> marker is your address; the red line connects the two ends (<strong>A</strong> and <strong>B</strong>) of the permit's posted area.
+    <% if match.static_map_segment %>
+      The blue <strong>H</strong> marker is your address; the red line connects the two ends (<strong>A</strong> and <strong>B</strong>) of the permit's posted area.
+    <% else %>
+      The blue <strong>H</strong> marker is your address; the red <strong>P</strong> marker shows the permit's posted area.
+    <% end %>
   </p>
 <% end %>

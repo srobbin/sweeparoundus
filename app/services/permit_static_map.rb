@@ -28,9 +28,7 @@ class PermitStaticMap
   end
 
   def url
-    return nil if api_key.blank?
-    return nil if alert_lat.nil? || alert_lng.nil?
-    return nil if @line_from.nil? || @line_to.nil?
+    return nil unless renderable?
 
     parts = []
     parts << "size=#{SIZE}"
@@ -52,7 +50,23 @@ class PermitStaticMap
     "#{BASE_URL}?#{parts.join('&')}"
   end
 
+  # True when the map draws a red line with 'A'/'B' endpoints; false when it
+  # falls back to a single 'P' pin (or can't be rendered at all). Lets callers
+  # caption the image to match what's actually drawn.
+  def segment?
+    return false unless renderable?
+
+    coord(@line_from.lat) != coord(@line_to.lat) ||
+      coord(@line_from.lng) != coord(@line_to.lng)
+  end
+
   private
+
+  def renderable?
+    api_key.present? &&
+      !alert_lat.nil? && !alert_lng.nil? &&
+      !@line_from.nil? && !@line_to.nil?
+  end
 
   def alert_lat
     @alert.lat
@@ -60,11 +74,6 @@ class PermitStaticMap
 
   def alert_lng
     @alert.lng
-  end
-
-  def segment?
-    coord(@line_from.lat) != coord(@line_to.lat) ||
-      coord(@line_from.lng) != coord(@line_to.lng)
   end
 
   def marker_param(style, lat, lng)
