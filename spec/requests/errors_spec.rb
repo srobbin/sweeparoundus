@@ -31,6 +31,47 @@ RSpec.describe "Errors", type: :request do
       expect(response).to have_http_status(:not_found)
       expect(response.body).to be_blank
     end
+
+    # Scanners request `.js` URLs to probe for embeddable scripts. A bare
+    # `head :not_found` mirrors the requested format, stamping the empty body
+    # with `Content-Type: text/javascript`. Rails' cross-origin JS forgery
+    # check then logs a "Security warning: an embedded <script> tag..." warning
+    # (captured by Sentry) and raises InvalidCrossOriginRequest. Responding as
+    # text/plain keeps the 404 clean and silent.
+    it "returns a bare 404 for .js requests without tripping cross-origin JS protection" do
+      expect(Rails.logger).not_to receive(:warn)
+
+      get "/totally-bogus-path.js"
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.media_type).to eq("text/plain")
+      expect(response.body).to be_blank
+    end
+  end
+
+  # A routed action that raises RecordNotFound (e.g. an expired/unknown area
+  # slug) is handled by `ApplicationController#render_not_found` via `rescue_from`
+  # -- a separate code path from the unrouted `exceptions_app` dispatch above.
+  describe "a routed action that raises RecordNotFound" do
+    it "renders the friendly not-found page for HTML requests" do
+      get "/areas/does-not-exist"
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("We couldn't find that page.")
+    end
+
+    # Same cross-origin JS forgery concern as the unrouted path: a bare
+    # `head :not_found` would answer a `.js` probe as text/javascript, logging a
+    # "Security warning..." and raising InvalidCrossOriginRequest.
+    it "returns a bare 404 for .js requests without tripping cross-origin JS protection" do
+      expect(Rails.logger).not_to receive(:warn)
+
+      get "/areas/does-not-exist.js"
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.media_type).to eq("text/plain")
+      expect(response.body).to be_blank
+    end
   end
 
   # 422/500 keep their existing static `public/*.html` pages. A direct GET would

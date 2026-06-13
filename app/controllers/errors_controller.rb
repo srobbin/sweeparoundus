@@ -4,7 +4,11 @@ class ErrorsController < ApplicationController
   def not_found
     respond_to do |format|
       format.html { render "errors/not_found", status: :not_found }
-      format.any { head :not_found }
+      # text/plain, not the requested format: a `.js` probe answered as
+      # text/javascript trips Rails' cross-origin JS forgery check (logs a
+      # "Security warning..." + raises InvalidCrossOriginRequest). See #not_found
+      # comment in ApplicationController.
+      format.any { head :not_found, content_type: "text/plain" }
     end
   end
 
@@ -22,7 +26,7 @@ class ErrorsController < ApplicationController
   def render_static_page(name, status)
     respond_to do |format|
       format.html { render file: Rails.public_path.join("#{name}.html"), layout: false, status: status }
-      format.any { head status }
+      format.any { head status, content_type: "text/plain" }
     end
   end
 end
