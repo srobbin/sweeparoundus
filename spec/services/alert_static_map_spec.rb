@@ -118,6 +118,29 @@ RSpec.describe AlertStaticMap, type: :service do
         expect(subject.url).to start_with("https://maps\.googleapis\.com/maps/api/staticmap?")
       end
     end
+
+    context "with a MultiPolygon containing tiny artifacts" do
+      let(:polygon) do
+        wkt = <<~WKT.squish
+          MULTIPOLYGON (
+            ((-87.6857654 41.8572053, -87.6857656 41.8572053, -87.6857656 41.8572055, -87.6857654 41.8572053)),
+            ((-87.686 41.857, -87.666 41.857, -87.666 41.876, -87.686 41.876, -87.686 41.857)),
+            ((-87.700 41.860, -87.695 41.860, -87.695 41.865, -87.700 41.865, -87.700 41.860))
+          )
+        WKT
+
+        factory.parse_wkt(wkt)
+      end
+
+      it "emits a path for each significant component and skips tiny slivers" do
+        url = subject.url
+        decoded = URI.decode_www_form_component(url)
+        first_colors = AlertStaticMap::PALETTE[0]
+
+        expect(url.scan("path=").size).to eq(2)
+        expect(decoded.scan("fillcolor:#{first_colors[:fill]}").size).to eq(2)
+      end
+    end
   end
 
   describe "with multiple areas" do

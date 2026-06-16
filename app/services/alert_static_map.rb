@@ -23,6 +23,9 @@ class AlertStaticMap
 
   # Google Static Maps has a ~16 KB URL limit; cap polygon detail to stay safe.
   MAX_POLYGON_POINTS = 80
+  # Ignore MultiPolygon components smaller than 0.1% of the largest component;
+  # City zone data sometimes includes tiny slivers that skew Static Maps bounds.
+  MIN_COMPONENT_AREA_RATIO = 0.001
 
   def initialize(alert:, area: nil, areas: nil)
     @alert = alert
@@ -33,9 +36,10 @@ class AlertStaticMap
     return nil if api_key.blank?
     return nil if @areas.empty?
 
-    polygon_params = @areas.each_with_index.filter_map do |a, i|
-      coords = extract_polygon_coords(a)
-      polygon_path_param(coords, i) unless coords.empty?
+    polygon_params = @areas.each_with_index.flat_map do |a, i|
+      extract_polygon_coords(a).filter_map do |coords|
+        polygon_path_param(coords, i) unless coords.empty?
+      end
     end
     return nil if polygon_params.empty?
 
@@ -58,14 +62,28 @@ class AlertStaticMap
     shape = area&.shape
     return [] if shape.nil?
 
-    ring = case shape.geometry_type.type_name
-    when "Polygon"      then shape.exterior_ring
-    when "MultiPolygon" then shape.first&.exterior_ring
+    polygons = case shape.geometry_type.type_name
+    when "Polygon"      then [ shape ]
+    when "MultiPolygon" then significant_polygons(shape.each.to_a)
+    else []
     end
-    return [] unless ring
 
-    points = ring.points.map { |p| [ p.y, p.x ] } # [lat, lng]
-    downsample(points)
+    polygons.filter_map do |polygon|
+      ring = polygon.exterior_ring
+      next unless ring
+
+      points = ring.points.map { |p| [ p.y, p.x ] } # [lat, lng]
+      downsample(points)
+    end
+  end
+
+  def significant_polygons(polygons)
+    return [] if polygons.empty?
+
+    largest_area = polygons.map(&:area).max.to_f
+    return polygons if largest_area.zero?
+
+    polygons.select { |polygon| polygon.area >= largest_area * MIN_COMPONENT_AREA_RATIO }
   end
 
   def downsample(points)
