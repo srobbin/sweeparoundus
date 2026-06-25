@@ -59,7 +59,7 @@ gem "faraday-retry", "~> 2.3"
 gem "rack-attack", "~> 6.7"
 
 # Ruby stdlib extractions (removed in Ruby 4.0)
-gem "cgi", "~> 0.4"
+gem "cgi", "~> 0.5"
 gem "connection_pool", "~> 3.0"
 gem "observer", "~> 0.1"
 gem "ostruct", "~> 0.6"
