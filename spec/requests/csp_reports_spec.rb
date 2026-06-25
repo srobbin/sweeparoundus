@@ -61,6 +61,17 @@ RSpec.describe "CSP reports", type: :request do
       )
     end
 
+    it "suppresses the Google Maps JS API's internal eval() under script-src" do
+      expect(Rails.logger).not_to receive(:warn)
+
+      post_report(
+        "violated-directive" => "script-src",
+        "effective-directive" => "script-src",
+        "blocked-uri" => "eval",
+        "script-sample" => ""
+      )
+    end
+
     it "does not crash on malformed JSON" do
       post "/csp-violation-report",
            params: "not json",

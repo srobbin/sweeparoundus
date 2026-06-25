@@ -14,17 +14,18 @@ Sentry.init do |config|
   config.enable_logs = true
   config.enabled_patches << :logger
 
-  # The `:logger` patch ships every request-completion log to Sentry Logs,
-  # so our 404 handling sends a `warn` log for each not-found request. Those
-  # 404s are expected noise (mistyped URLs, scanners, prefetchers), so drop
-  # the Rails subscriber's 404 logs and pass everything else through.
+  # The `:logger` patch sends Rails request-completion logs to Sentry. Drop
+  # expected scanner/bot noise: 404s and JSON API 422s for missing/invalid params.
+  # Keep other logs, including user-facing 422 form validation outside `/api/`.
   config.before_send_log = lambda do |log|
-    status = (log.attributes[:status] || log.attributes["status"]).to_i
+    next log unless log.origin == "auto.log.rails.log_subscriber"
 
-    if log.origin == "auto.log.rails.log_subscriber" && status == 404
-      nil
-    else
-      log
-    end
+    status = (log.attributes[:status] || log.attributes["status"]).to_i
+    path = (log.attributes[:path] || log.attributes["path"]).to_s
+
+    next nil if status == 404
+    next nil if status == 422 && path.start_with?("/api/")
+
+    log
   end
 end

@@ -1,13 +1,10 @@
 # Content Security Policy.
 #
-# Currently in REPORT-ONLY mode: browsers will report violations to the
-# /csp-violation-report endpoint but will not block any resources. Once we've
-# observed real traffic for a while and confirmed nothing useful is being
-# flagged, switch `report_only` to false to start enforcing.
+# Enforced: browsers block violations and POST reports to
+# /csp-violation-report.
 #
-# strict-dynamic + nonces is what makes the Google Maps JS API work. Maps loads
-# additional scripts dynamically; under strict-dynamic, those inherit trust
-# from the nonce on the parent <script> tag.
+# strict-dynamic + nonces let Google Maps load child scripts that inherit trust
+# from the nonced parent <script> tag.
 
 Rails.application.configure do
   config.content_security_policy do |policy|
@@ -15,8 +12,7 @@ Rails.application.configure do
     policy.font_src    :self, :data,
                        "https://fonts.gstatic.com",
                        "http://fonts.gstatic.com"
-    # blob: is needed by the <gmp-place-autocomplete> Google Maps web component,
-    # which renders suggestion/icon images from blob: URLs.
+    # The Google Maps web component renders suggestion/icon images from blob: URLs.
     policy.img_src     :self, :data, :blob,
                        "https://*.googleapis.com",
                        "https://*.gstatic.com",
@@ -24,7 +20,9 @@ Rails.application.configure do
                        "https://*.googletagmanager.com",
                        "https://img.buymeacoffee.com"
     policy.object_src  :none
-    policy.script_src  :self, :strict_dynamic
+    # Fallback for browsers that ignore 'strict-dynamic': allow https: so
+    # Google's dynamically injected child scripts can still load.
+    policy.script_src  :self, :strict_dynamic, :https
     policy.style_src   :self, :unsafe_inline,
                        "https://fonts.googleapis.com"
     policy.connect_src :self,
@@ -44,11 +42,10 @@ Rails.application.configure do
   config.content_security_policy_report_only = false
 end
 
-# Active Admin uses Sprockets + Arbre which don't propagate CSP nonces onto
-# their <script> tags.  Admin pages are behind authentication so we can safely
-# drop strict-dynamic there and fall back to 'self' + 'unsafe-inline'.
-# This must also cover ActiveAdmin's Devise controllers (login, password
-# reset, etc.) since they inherit from DeviseController, not BaseController.
+# Active Admin's Sprockets + Arbre scripts don't get CSP nonces. Admin pages
+# are authenticated, so fall back to 'self' + 'unsafe-inline' there.
+# Devise login/password controllers need the same policy because they inherit
+# from DeviseController, not BaseController.
 Rails.application.config.after_initialize do
   relaxed_script_src = ->(policy) { policy.script_src :self, :unsafe_inline }
 
