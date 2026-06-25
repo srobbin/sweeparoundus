@@ -13,7 +13,7 @@ gem "redis", "~> 5.4"
 # Frontend / Assets
 gem "dartsass-rails", "~> 0.5.1"
 gem "importmap-rails", "~> 2.2"
-gem "rails_icons", "~> 1.8"
+gem "rails_icons", "~> 1.9"
 gem "sassc-embedded", "~> 1.80"
 gem "sprockets-rails", "~> 3.5"
 gem "stimulus-rails", "~> 1.3"
