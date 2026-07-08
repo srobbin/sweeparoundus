@@ -98,7 +98,11 @@ class AlertsController < ApplicationController
 
     report_missing_alert(email, address) unless @alert
   rescue JWT::DecodeError, JSON::ParserError
-    render_invalid_link
+    # An undecodable token on unsubscribe is the same benign noise as a blank one:
+    # real email links get mangled by mail-security scanners, and bots probe these
+    # URLs. Render 200 there (like the blank-token case) so it doesn't become a 400
+    # log warning. Other actions keep the 400 so genuinely broken links stay visible.
+    render_invalid_link(status: params[:action] == "unsubscribe" ? :ok : :bad_request)
   end
 
   # (subscriber_id, street_address) is globally unique (see Alert validations),
@@ -121,13 +125,24 @@ class AlertsController < ApplicationController
     # already-unsubscribed links, alerts removed by cleanup), so don't alert.
     return if params[:action] == "unsubscribe"
 
+    # A gone subscriber means the whole signup was cleaned up before the link
+    # was clicked (DestroyIneligibleAlerts purges unconfirmed alerts and their
+    # now-childless subscribers, and confirm/unsubscribe share one token), so
+    # this is expected noise — log at :info. A surviving subscriber whose alert
+    # can't be found is a genuine lookup mismatch worth a :warning.
+    subscriber_exists = Subscriber.exists?(email: email.to_s.strip.downcase)
+
     Sentry.set_context("find_alert", {
       area_id: @area.id,
       email: email,
       jwt_street_address: address,
-      action: params[:action]
+      action: params[:action],
+      subscriber_exists: subscriber_exists
     })
-    Sentry.capture_message("Valid JWT but alert not found", level: :warning)
+    Sentry.capture_message(
+      "Valid JWT but alert not found",
+      level: subscriber_exists ? :warning : :info
+    )
   end
 
   def render_invalid_link(status: :bad_request)

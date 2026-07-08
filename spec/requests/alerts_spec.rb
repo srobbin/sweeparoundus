@@ -256,10 +256,10 @@ RSpec.describe "Alerts", type: :request do
     end
 
     context "with an invalid token" do
-      it "renders the invalid link page" do
+      it "renders the invalid link page with a 200 (mangled/bot tokens are benign on unsubscribe; avoids 400 log noise)" do
         get unsubscribe_area_alerts_path(area), params: { t: "invalid.token.here" }
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include("This link is invalid or has expired")
       end
     end
@@ -276,10 +276,10 @@ RSpec.describe "Alerts", type: :request do
     context "with a manage token" do
       let(:token) { encode_manage_jwt(valid_email) }
 
-      it "renders the invalid link page" do
+      it "renders the invalid link page with a 200 (wrong-purpose tokens are benign on unsubscribe)" do
         get unsubscribe_area_alerts_path(area), params: { t: token }
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include("This link is invalid or has expired")
       end
     end
