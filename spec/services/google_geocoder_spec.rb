@@ -8,7 +8,7 @@ RSpec.describe GoogleGeocoder, type: :service do
   let(:memory_cache) { ActiveSupport::Cache::MemoryStore.new }
 
   # Thin subclass for testing the base class. Real subclass behavior is
-  # covered in the GeocodeAddress and ReverseGeocodeAddress specs.
+  # covered in the GeocodeAddress spec.
   let(:subclass) do
     Class.new(GoogleGeocoder) do
       def initialize(query:)

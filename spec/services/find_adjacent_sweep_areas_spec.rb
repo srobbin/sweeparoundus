@@ -21,10 +21,6 @@ RSpec.describe FindAdjacentSweepAreas, type: :service do
   let!(:area_a) { create(:area, ward: 33, number: 13, shortcode: "W33A13", slug: "ward-33-sweep-area-13", shape: shape_a) }
   let!(:area_b) { create(:area, ward: 33, number: 14, shortcode: "W33A14", slug: "ward-33-sweep-area-14", shape: shape_b) }
 
-  before do
-    allow_any_instance_of(ReverseGeocodeAddress).to receive(:call).and_return("123 N Fake St, Chicago, IL 60618")
-  end
-
   describe "#call" do
     context "when the point is near the shared edge (within 350 ft)" do
       # Point inside area_a, very close to the eastern boundary at -87.706
@@ -50,9 +46,8 @@ RSpec.describe FindAdjacentSweepAreas, type: :service do
         expect(FindAdjacentSweepAreas::COMPASS_POINTS).to include(results.first.direction)
       end
 
-      it "includes the reverse-geocoded address" do
-        results = subject.call
-        expect(results.first.nearest_address).to eq("123 N Fake St, Chicago, IL 60618")
+      it "does not attach a reverse-geocoded address to neighbors" do
+        expect(FindAdjacentSweepAreas::Neighbor.members).not_to include(:nearest_address)
       end
     end
 
@@ -131,23 +126,6 @@ RSpec.describe FindAdjacentSweepAreas, type: :service do
         result_ids = results.map { |n| n.area.object.id }
 
         expect(result_ids).not_to include(far_away.id)
-      end
-    end
-
-    context "when reverse geocoding fails" do
-      let(:lat) { 41.886 }
-      let(:lng) { -87.70605 }
-
-      subject { described_class.new(area: area_a, lat: lat, lng: lng) }
-
-      before do
-        allow_any_instance_of(ReverseGeocodeAddress).to receive(:call).and_return(nil)
-      end
-
-      it "still returns the neighbor without an address" do
-        results = subject.call
-        expect(results).not_to be_empty
-        expect(results.first.nearest_address).to be_nil
       end
     end
   end

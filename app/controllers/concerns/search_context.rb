@@ -28,7 +28,7 @@ module SearchContext
   end
 
   # Separated from `set_search_context` because it issues a PostGIS
-  # query and up to MAX_NEIGHBORS Google Geocoding requests.
+  # query to find nearby sweep-area boundaries.
   def load_neighbors
     @neighbors = []
     return unless search_session_present? && searched_in_this_area?

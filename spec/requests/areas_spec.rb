@@ -177,8 +177,7 @@ RSpec.describe "Areas", type: :request do
           [ FindAdjacentSweepAreas::Neighbor.new(
             area: neighbor_area.decorate,
             distance_feet: 42,
-            direction: "E",
-            nearest_address: "3300 N California Ave, Chicago, IL 60618"
+            direction: "E"
           ) ]
         end
 

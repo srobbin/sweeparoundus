@@ -2,8 +2,8 @@ require "net/http"
 
 # Abstract base for the Google Maps Geocoding API. Handles HTTP requests,
 # caching, retries with exponential back-off, and error reporting.
-# Subclasses (GeocodeAddress, ReverseGeocodeAddress) only need to define
-# the methods listed below.
+# Subclasses (e.g. GeocodeAddress) only need to define the methods
+# listed below.
 #
 # Subclass contract (all private):
 #   query_params        -> Hash of query-string params (key= is added automatically)

@@ -336,7 +336,7 @@ RSpec.describe "Alerts", type: :request do
       end
     end
 
-    context "with a token for a non-existent alert" do
+    context "with a token whose subscriber no longer exists" do
       let(:token) { encode_jwt("nobody@example.com", nil) }
 
       before do
@@ -351,7 +351,33 @@ RSpec.describe "Alerts", type: :request do
         expect(response.body).to include("could not find your subscription")
       end
 
-      it "reports to Sentry" do
+      it "reports to Sentry at :info (the signup was already cleaned up)" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(Sentry).to have_received(:capture_message).with(
+          "Valid JWT but alert not found",
+          level: :info
+        )
+      end
+    end
+
+    context "with a token for a surviving subscriber whose alert is missing" do
+      let!(:subscriber) { create(:subscriber, email: "orphan@example.com") }
+      let(:token) { encode_jwt(subscriber.email, "123 Nowhere Ave") }
+
+      before do
+        allow(Sentry).to receive(:set_context)
+        allow(Sentry).to receive(:capture_message)
+      end
+
+      it "renders the page without an error" do
+        get confirm_area_alerts_path(area), params: { t: token }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("could not find your subscription")
+      end
+
+      it "reports to Sentry at :warning (genuine lookup mismatch)" do
         get confirm_area_alerts_path(area), params: { t: token }
 
         expect(Sentry).to have_received(:capture_message).with(
