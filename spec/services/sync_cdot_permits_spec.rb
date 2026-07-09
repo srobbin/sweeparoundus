@@ -532,7 +532,7 @@ RSpec.describe SyncCdotPermits, type: :service do
     end
 
     context "segment geocoding enqueuing" do
-      it "enqueues a geocode job for new permits" do
+      it "enqueues a geocode batch for new permits with duplicate segment addresses" do
         rows = [ build_api_row("1000001"), build_api_row("1000002") ]
         stub_request(:get, api_url_pattern)
           .to_return(status: 200, body: rows.to_json,
@@ -540,7 +540,8 @@ RSpec.describe SyncCdotPermits, type: :service do
 
         subject.call
 
-        expect(GeocodePermitSegmentJob).to have_received(:perform_later).twice
+        ids = CdotPermit.where(unique_key: %w[1000001 1000002]).pluck(:id)
+        expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(match_array(ids)).once
       end
 
       it "enqueues a geocode job when a permit's address fields change" do
@@ -558,7 +559,7 @@ RSpec.describe SyncCdotPermits, type: :service do
         subject.call
 
         expect(GeocodePermitSegmentJob).to have_received(:perform_later)
-          .with(CdotPermit.find_by(unique_key: "1000001").id)
+          .with([ CdotPermit.find_by(unique_key: "1000001").id ])
       end
 
       it "does not enqueue geocoding for unchanged permits" do
@@ -611,7 +612,7 @@ RSpec.describe SyncCdotPermits, type: :service do
 
         subject.call
 
-        expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(permit.id)
+        expect(GeocodePermitSegmentJob).to have_received(:perform_later).with([ permit.id ])
       end
     end
 

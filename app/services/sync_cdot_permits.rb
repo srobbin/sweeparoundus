@@ -2,6 +2,8 @@ require "net/http"
 require "openssl"
 
 class SyncCdotPermits
+  include GeocodingBatchable
+
   BASE_URL = "https://data.cityofchicago.org/resource/pubx-yq2d.json"
   PAGE_SIZE = 1000
   OPEN_TIMEOUT = 10
@@ -366,11 +368,9 @@ class SyncCdotPermits
     nil
   end
 
-  GEOCODE_JOB_STAGGER = 0.3.seconds
-
   def enqueue_geocoding(permits)
-    permits.each_with_index do |permit, i|
-      GeocodePermitSegmentJob.set(wait: i * GEOCODE_JOB_STAGGER).perform_later(permit.id)
+    geocoding_batches(permits).each_with_index do |batch, i|
+      GeocodePermitSegmentJob.set(wait: i * GEOCODE_JOB_STAGGER).perform_later(batch.map(&:id))
     end
   end
 end

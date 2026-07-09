@@ -66,6 +66,13 @@ RSpec.describe GeocodeAddress, type: :service do
 
         expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
       end
+
+      it "collapses internal whitespace before caching" do
+        subject.call
+        described_class.new(address: "3300   N   California   Ave,   Chicago,   IL").call
+
+        expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).once
+      end
     end
 
     context "when the API returns OK but with no usable geometry" do

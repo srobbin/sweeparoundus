@@ -14,7 +14,7 @@ RSpec.describe BackfillPermitSegmentGeocodingJob, type: :job do
 
       described_class.perform_now
 
-      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(missing.id)
+      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with([ missing.id ])
     end
 
     it "skips permits that are already geocoded" do
@@ -27,7 +27,7 @@ RSpec.describe BackfillPermitSegmentGeocodingJob, type: :job do
       expect(GeocodePermitSegmentJob).not_to have_received(:perform_later)
     end
 
-    it "handles a mix of geocoded and un-geocoded permits" do
+    it "batches un-geocoded permits that share an address into one job, skipping geocoded ones" do
       missing1 = create(:cdot_permit, segment_from_lat: nil)
       missing2 = create(:cdot_permit, segment_from_lat: nil)
       create(:cdot_permit,
@@ -36,8 +36,18 @@ RSpec.describe BackfillPermitSegmentGeocodingJob, type: :job do
 
       described_class.perform_now
 
-      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(missing1.id)
-      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with(missing2.id)
+      expect(GeocodePermitSegmentJob).to have_received(:perform_later)
+        .with(match_array([ missing1.id, missing2.id ])).once
+    end
+
+    it "enqueues separate batches for permits with different addresses" do
+      california = create(:cdot_permit, segment_from_lat: nil, street_name: "CALIFORNIA")
+      kedzie = create(:cdot_permit, segment_from_lat: nil, street_name: "KEDZIE")
+
+      described_class.perform_now
+
+      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with([ california.id ])
+      expect(GeocodePermitSegmentJob).to have_received(:perform_later).with([ kedzie.id ])
       expect(GeocodePermitSegmentJob).to have_received(:perform_later).twice
     end
 

@@ -1,8 +1,12 @@
 class GeocodeAddress < GoogleGeocoder
   Result = Struct.new(:lat, :lng, keyword_init: true)
 
+  def self.normalize_address(address)
+    address.to_s.squish.downcase
+  end
+
   def initialize(address:)
-    @address = address.to_s.strip
+    @address = address.to_s.squish
   end
 
   private
@@ -16,7 +20,7 @@ class GeocodeAddress < GoogleGeocoder
   end
 
   def cache_key
-    "geocode_address:#{@address.downcase}"
+    "geocode_address:#{self.class.normalize_address(@address)}"
   end
 
   def log_identifier

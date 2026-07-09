@@ -1,18 +1,20 @@
 class BackfillPermitSegmentGeocodingJob < ApplicationJob
-  queue_as :default
+  include GeocodingBatchable
 
-  GEOCODE_JOB_STAGGER = 0.3.seconds
+  queue_as :default
 
   def perform
     permits = CdotPermit.where(segment_from_lat: nil)
     count = 0
 
-    permits.find_each do |permit|
-      GeocodePermitSegmentJob.set(wait: count * GEOCODE_JOB_STAGGER).perform_later(permit.id)
-      count += 1
+    permits.find_in_batches do |permit_batch|
+      geocoding_batches(permit_batch).each do |batch|
+        GeocodePermitSegmentJob.set(wait: count * GEOCODE_JOB_STAGGER).perform_later(batch.map(&:id))
+        count += 1
+      end
     end
 
-    Rails.logger.info("[BackfillPermitSegmentGeocodingJob] Enqueued #{count} permit(s) for geocoding")
+    Rails.logger.info("[BackfillPermitSegmentGeocodingJob] Enqueued #{count} geocoding batch(es)")
   rescue StandardError => e
     Rails.logger.error("[BackfillPermitSegmentGeocodingJob] #{e.class}: #{e.message}")
     Sentry.capture_exception(e, contexts: {
