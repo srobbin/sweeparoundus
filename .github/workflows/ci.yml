@@ -15,7 +15,7 @@ jobs:
   rspec:
     runs-on: ubuntu-latest
     container:
-      image: ruby:4.0.5-slim
+      image: ruby:4.0.7-slim
 
     services:
       db:
