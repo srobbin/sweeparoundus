@@ -8,8 +8,18 @@ class SubscriptionsController < ApplicationController
   end
 
   def send_link
+    unless TurnstileVerifier.new(
+      token: params[:"cf-turnstile-response"],
+      remote_ip: request.remote_ip,
+      expected_hostname: request.host
+    ).call
+      return redirect_to subscriptions_path, alert: "We couldn't complete the security check. Please try again."
+    end
+
     email = params[:email].to_s.strip.downcase
-    if email.match?(Subscriber::VALID_EMAIL_REGEX)
+    if email.match?(Subscriber::VALID_EMAIL_REGEX) &&
+        Subscriber.joins(:alerts).exists?(email: email) &&
+        ManageLinkRateLimiter.new(email).allowed?
       SubscriptionMailer.with(email: email).manage_link.deliver_later
     end
     redirect_to subscriptions_path, notice: "If you have any subscriptions, you'll receive an email with a link to manage them shortly."

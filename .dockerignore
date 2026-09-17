@@ -1,0 +1,4 @@
+.git
+.env
+.env.*
+!.env.example

@@ -5,9 +5,6 @@ class Rack::Attack
   SEND_LINK_RATE_LIMIT = 5
   SEND_LINK_RATE_PERIOD = 15.minutes
 
-  SEND_LINK_EMAIL_RATE_LIMIT = 4
-  SEND_LINK_EMAIL_RATE_PERIOD = 1.hour
-
   ICS_RATE_LIMIT = 10
   ICS_RATE_PERIOD = 1.hour
 
@@ -26,10 +23,6 @@ class Rack::Attack
 
   throttle("subscriptions/send_link/ip", limit: SEND_LINK_RATE_LIMIT, period: SEND_LINK_RATE_PERIOD) do |req|
     req.ip if req.path == "/subscriptions/send_link" && req.post?
-  end
-
-  throttle("subscriptions/send_link/email", limit: SEND_LINK_EMAIL_RATE_LIMIT, period: SEND_LINK_EMAIL_RATE_PERIOD) do |req|
-    req.params["email"].to_s.strip.downcase.presence if req.path == "/subscriptions/send_link" && req.post?
   end
 
   throttle("ics/ip", limit: ICS_RATE_LIMIT, period: ICS_RATE_PERIOD) do |req|

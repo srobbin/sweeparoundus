@@ -73,35 +73,4 @@ RSpec.describe "Rack::Attack", type: :request do
       expect(response).not_to have_http_status(429)
     end
   end
-
-  describe "send_link per-email rate limiting" do
-    around do |example|
-      Rack::Attack.throttle("subscriptions/send_link/email", limit: 3, period: 300) do |req|
-        req.params["email"].to_s.strip.downcase.presence if req.path == "/subscriptions/send_link" && req.post?
-      end
-      example.run
-      Rack::Attack.throttle("subscriptions/send_link/email", limit: Rack::Attack::SEND_LINK_EMAIL_RATE_LIMIT, period: Rack::Attack::SEND_LINK_EMAIL_RATE_PERIOD) do |req|
-        req.params["email"].to_s.strip.downcase.presence if req.path == "/subscriptions/send_link" && req.post?
-      end
-    end
-
-    it "allows requests within the limit for the same email" do
-      3.times { post "/subscriptions/send_link", params: { email: "test@example.com" } }
-
-      expect(response).not_to have_http_status(429)
-    end
-
-    it "throttles requests exceeding the limit for the same email" do
-      4.times { post "/subscriptions/send_link", params: { email: "test@example.com" } }
-
-      expect(response).to have_http_status(429)
-    end
-
-    it "tracks different emails separately" do
-      3.times { post "/subscriptions/send_link", params: { email: "test@example.com" } }
-      post "/subscriptions/send_link", params: { email: "other@example.com" }
-
-      expect(response).not_to have_http_status(429)
-    end
-  end
 end

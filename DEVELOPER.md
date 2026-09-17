@@ -94,6 +94,11 @@ docker compose run --rm --no-deps app bundle exec rubocop app/models/area.rb
 
 In development, emails are captured and viewable at [http://localhost:3000/letter_opener](http://localhost:3000/letter_opener).
 
+The manage-subscriptions email form uses Cloudflare Turnstile when
+`TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are configured. Development
+and test bypass verification when the keys are absent; production refuses to
+boot without both variables.
+
 ### Deploying
 
 Production runs on Heroku using the container stack defined in [heroku.yml](heroku.yml) (a `web` dyno and a `sidekiq` worker, both built from `Dockerfile`). "Deploy" throughout this guide means getting the merged `main` branch onto Heroku.

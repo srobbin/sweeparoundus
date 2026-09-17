@@ -10,16 +10,27 @@
     <h1 class="text-2xl font-bold mb-4">Manage Your Subscriptions</h1>
     <p class="mb-6 text-gray-600">Enter your email address and we'll send you a link to manage your street sweeping alert subscriptions.</p>
 
-    <%= form_with url: subscriptions_send_link_path, method: :post, class: "max-w-md mx-auto", data: { controller: "email-form" } do |f| %>
+    <%= form_with url: subscriptions_send_link_path,
+          method: :post,
+          class: "max-w-md mx-auto",
+          data: {
+            controller: "email-form",
+            email_form_security_check_required_value: TurnstileVerifier.configured?,
+            action: "turnstile:succeeded->email-form#securityCheckSucceeded turnstile:failed->email-form#securityCheckFailed"
+          } do |f| %>
       <%= f.label :email, class: "sr-only" %>
-      <div class="flex flex-col sm:flex-row sm:rounded-md sm:shadow-xs">
-        <div class="relative flex items-stretch grow focus-within:z-10">
-          <%= f.email_field :email, class: "focus:ring-sky-500 focus:border-sky-500 block w-full rounded-md sm:rounded-none sm:rounded-l-md border-gray-300 shadow-xs sm:shadow-none", placeholder: "you@example.com", required: true, data: { email_form_target: "input", action: "input->email-form#toggle" } %>
-        </div>
-        <button class="mt-2 sm:mt-0 sm:-ml-px relative inline-flex items-center justify-center gap-2 px-4 py-2 border border-transparent font-medium rounded-md sm:rounded-none sm:rounded-r-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-hidden focus:ring-1 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs sm:shadow-none" data-email-form-target="submit" disabled>
-          Send me a link
-        </button>
+      <div class="relative flex items-stretch">
+        <%= f.email_field :email, class: "focus:ring-sky-500 focus:border-sky-500 block w-full rounded-md border-gray-300 shadow-xs", placeholder: "you@example.com", required: true, data: { email_form_target: "input", action: "input->email-form#toggle" } %>
       </div>
+      <% if TurnstileVerifier.configured? %>
+        <div class="mt-4 flex justify-center"
+             data-controller="turnstile"
+             data-turnstile-site-key-value="<%= TurnstileVerifier.site_key %>"
+             data-turnstile-action-value="<%= TurnstileVerifier::ACTION %>"></div>
+      <% end %>
+      <button class="mt-4 w-full relative inline-flex items-center justify-center gap-2 px-4 py-2 border border-transparent font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-hidden focus:ring-1 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs" data-email-form-target="submit" disabled>
+        Send me a link
+      </button>
     <% end %>
   </div>
 </div>

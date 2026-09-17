@@ -14,10 +14,31 @@ RSpec.describe "Subscriptions", type: :request do
       expect(response.body).to include("Manage Your Subscriptions")
       expect(response.body).to include("Send me a link")
     end
+
+    it "renders Turnstile when it is configured" do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("TURNSTILE_SITE_KEY").and_return("site-key")
+      allow(ENV).to receive(:[]).with("TURNSTILE_SECRET_KEY").and_return("secret-key")
+
+      get subscriptions_path
+
+      expect(response.body).to include('data-controller="turnstile"')
+      expect(response.body).to include('data-turnstile-site-key-value="site-key"')
+      expect(response.body).to include("data-turnstile-action-value=\"#{TurnstileVerifier::ACTION}\"")
+      expect(response.body).to include('data-email-form-security-check-required-value="true"')
+      expect(response.body).to include("turnstile:succeeded-&gt;email-form#securityCheckSucceeded")
+      expect(response.body.index('data-controller="turnstile"')).to be < response.body.index("<button")
+    end
   end
 
   describe "POST /subscriptions/send_link" do
-    before { Rack::Attack.cache.store.clear }
+    before do
+      Rack::Attack.cache.store.clear
+      verifier = instance_double(TurnstileVerifier, call: true)
+      allow(TurnstileVerifier).to receive(:new).and_return(verifier)
+    end
+    let!(:subscriber) { create(:subscriber, email: email) }
+    let!(:subscription) { create(:alert, subscriber: subscriber, area: area) }
 
     context "with a valid email" do
       it "enqueues a manage link email" do
@@ -33,12 +54,53 @@ RSpec.describe "Subscriptions", type: :request do
         expect(mailer_dbl).to have_received(:deliver_later)
       end
 
+      it "does not enqueue an email for a subscriber without any alerts" do
+        create(:subscriber, email: "empty@example.com")
+        allow(SubscriptionMailer).to receive(:with).and_call_original
+
+        post subscriptions_send_link_path, params: { email: "empty@example.com" }
+
+        expect(SubscriptionMailer).not_to have_received(:with)
+      end
+
+      it "uses the same confirmation response for an email address without subscriptions" do
+        post subscriptions_send_link_path, params: { email: "unknown@example.com" }
+
+        expect(response).to redirect_to(subscriptions_path)
+        follow_redirect!
+        expect(response.body).to include("receive an email")
+      end
+
+      it "binds Turnstile verification to the submitted token and request hostname" do
+        verifier = instance_double(TurnstileVerifier, call: true)
+        allow(TurnstileVerifier).to receive(:new).and_return(verifier)
+
+        post subscriptions_send_link_path,
+          params: { email: email, "cf-turnstile-response": "challenge-token" }
+
+        expect(TurnstileVerifier).to have_received(:new).with(
+          token: "challenge-token",
+          remote_ip: "127.0.0.1",
+          expected_hostname: "www.example.com"
+        )
+      end
+
       it "redirects to subscriptions page with a notice" do
         post subscriptions_send_link_path, params: { email: email }
 
         expect(response).to redirect_to(subscriptions_path)
         follow_redirect!
         expect(response.body).to include("receive an email")
+      end
+
+      it "does not enqueue an email when the post-verification email limit is exhausted" do
+        limiter = instance_double(ManageLinkRateLimiter, allowed?: false)
+        allow(ManageLinkRateLimiter).to receive(:new).and_return(limiter)
+        allow(SubscriptionMailer).to receive(:with).and_call_original
+
+        post subscriptions_send_link_path, params: { email: email }
+
+        expect(SubscriptionMailer).not_to have_received(:with)
       end
     end
 
@@ -86,6 +148,31 @@ RSpec.describe "Subscriptions", type: :request do
         expect(response).to redirect_to(subscriptions_path)
         follow_redirect!
         expect(response.body).to include("receive an email")
+      end
+    end
+
+    context "when Turnstile verification fails" do
+      before do
+        verifier = instance_double(TurnstileVerifier, call: false)
+        allow(TurnstileVerifier).to receive(:new).and_return(verifier)
+      end
+
+      it "does not enqueue an email" do
+        allow(SubscriptionMailer).to receive(:with).and_call_original
+        allow(ManageLinkRateLimiter).to receive(:new)
+
+        post subscriptions_send_link_path, params: { email: email }
+
+        expect(SubscriptionMailer).not_to have_received(:with)
+        expect(ManageLinkRateLimiter).not_to have_received(:new)
+      end
+
+      it "asks the visitor to try verification again" do
+        post subscriptions_send_link_path, params: { email: email }
+
+        expect(response).to redirect_to(subscriptions_path)
+        follow_redirect!
+        expect(response.body).to include("complete the security check")
       end
     end
   end

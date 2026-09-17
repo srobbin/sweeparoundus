@@ -30,8 +30,13 @@ Rails.application.configure do
                        "https://*.google-analytics.com",
                        "https://*.analytics.google.com",
                        "https://*.googletagmanager.com",
-                       "https://www.google.com"
-    policy.frame_src   Rails.env.development? ? :self : :none
+                       "https://www.google.com",
+                       "https://challenges.cloudflare.com"
+    if Rails.env.development?
+      policy.frame_src :self, "https://challenges.cloudflare.com"
+    else
+      policy.frame_src "https://challenges.cloudflare.com"
+    end
     policy.base_uri    :self
     policy.form_action :self
     policy.report_uri  "/csp-violation-report"

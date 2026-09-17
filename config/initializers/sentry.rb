@@ -18,6 +18,13 @@ Sentry.init do |config|
   # expected scanner/bot noise: 404s and JSON API 422s for missing/invalid params.
   # Keep other logs, including user-facing 422 form validation outside `/api/`.
   config.before_send_log = lambda do |log|
+    # Rails' parameter filter redacts `t` from normal request logs. Drop any
+    # event that still contains a raw manage-token query parameter rather than
+    # risk sending a bearer token to Sentry through another logger integration.
+    raw_manage_token = /[?&]t=(?!\[FILTERED\])[^&\s"]+/
+    next nil if log.body.to_s.match?(raw_manage_token)
+    next nil if log.attributes.values.any? { |value| value.to_s.match?(raw_manage_token) }
+
     next log unless log.origin == "auto.log.rails.log_subscriber"
 
     status = (log.attributes[:status] || log.attributes["status"]).to_i
