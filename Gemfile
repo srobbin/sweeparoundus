@@ -41,7 +41,7 @@ gem "activeadmin", "~> 3.5"
 gem "scout_apm", "~> 6.2"
 gem "scout_apm_logging", "~> 2.1"
 gem "sentry-rails", "~> 6.6"
-gem "sentry-ruby", "~> 6.6"
+gem "sentry-ruby", "~> 6.7"
 gem "sentry-sidekiq", "~> 6.6"
 gem "stackprof", "~> 0.2"
 
