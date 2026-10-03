@@ -13,7 +13,7 @@ gem "redis", "~> 6.0"
 # Frontend / Assets
 gem "dartsass-rails", "~> 0.5.1"
 gem "importmap-rails", "~> 2.2"
-gem "rails_icons", "~> 1.9"
+gem "rails_icons", "~> 1.10"
 gem "sassc-embedded", "~> 1.80"
 gem "sprockets-rails", "~> 3.5"
 gem "stimulus-rails", "~> 1.3"
@@ -40,9 +40,9 @@ gem "activeadmin", "~> 3.5"
 # Monitoring / Performance
 gem "scout_apm", "~> 6.2"
 gem "scout_apm_logging", "~> 2.1"
-gem "sentry-rails", "~> 6.6"
-gem "sentry-ruby", "~> 6.7"
-gem "sentry-sidekiq", "~> 6.6"
+gem "sentry-rails", "~> 7.1"
+gem "sentry-ruby", "~> 7.1"
+gem "sentry-sidekiq", "~> 7.1"
 gem "stackprof", "~> 0.2"
 
 # Email / Notifications
