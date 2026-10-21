@@ -6,7 +6,7 @@ Developer setup, workflows, and operational runbooks for [We The Sweeple](http:/
 
 ### Initial setup
 
-If this is your first time running the application, you'll need to make sure you have [Docker](https://docs.docker.com/get-docker/) installed. Assuming you do, issue these commands from the terminal. Use `bin/setup` here — it's the **first-run** script that creates and seeds the database from scratch.
+Install and start [Docker Desktop](https://docs.docker.com/get-docker/), then run these commands from the repository directory. `bin/setup` prepares the database schema; the separate import step loads the sweep areas and schedules needed for address searches.
 
 ```sh
 # Make a copy of the environment variables file
@@ -20,9 +20,25 @@ docker compose build --no-cache
 # Run the setup script
 docker compose run app bin/setup
 
+# Import the included 2026 areas and schedules (replaces local sweep data)
+docker compose run --rm -e RAILS_ENV=development app bin/rails runner 'puts SeedYearlyData.new(write: true, year: "2026").call'
+
 # After the setup is completed, run the app
 docker compose up
 ```
+
+Expect a final `SUCCESS` message. The import **replaces development areas and
+sweeps**; do not run it as part of routine startup. Update the year when the
+corresponding GeoJSON and schedule CSV files are available in `db/data/`.
+
+Verify that both counts are greater than zero:
+
+```sh
+docker compose run --rm -e RAILS_ENV=development app bin/rails runner 'puts "Areas: #{Area.count}; Sweeps: #{Sweep.count}"'
+```
+
+If either count is zero, check the import output for errors. Without area data,
+address searches redirect to the home page.
 
 ### Running the app
 
@@ -98,6 +114,30 @@ The manage-subscriptions email form uses Cloudflare Turnstile when
 `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are configured. Development
 and test bypass verification when the keys are absent; production refuses to
 boot without both variables.
+
+### Abuse prevention
+
+Public alert signup and address search use rate limits, not CAPTCHA.
+
+| Operation | Limit |
+| --- | --- |
+| Public signup | 5 requests per IP per 15 minutes |
+| Confirmation email | 4 per email per hour, with a 60-second cooldown across areas |
+| Address search | 30 requests per IP per 5 minutes, before geocoding |
+
+Email limits ignore surrounding whitespace and letter case. Failed attempts can
+consume quota. Middleware returns HTTP 429 with `Retry-After` and `no-store`:
+HTML for browsers, JSON for API requests. Email-limit retry hints are conservative
+upper bounds: 60 seconds for the cooldown or one hour for the hourly limit.
+If the email-limit cache is unavailable, signup fails closed with a temporary
+unavailability message (HTTP 503 for Turbo/JSON), not a rate-limit error.
+
+The Redis integration specs run when `REDIS_URL` is set (including in CI).
+They use a unique cache namespace and never clear the shared Redis database.
+
+Separately, configure Google Cloud: restrict the backend Maps key to required
+APIs, set Geocoding API quotas, and enable billing budget alerts. Application
+rate limits do not replace these controls; budget alerts do not cap spending.
 
 ### Deploying
 

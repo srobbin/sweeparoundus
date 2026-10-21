@@ -16,6 +16,93 @@ RSpec.describe "Alerts", type: :request do
   end
 
   describe "POST /areas/:area_id/alerts" do
+    it "accepts signups without CAPTCHA even when Turnstile is configured" do
+      allow(TurnstileVerifier).to receive(:configured?).and_return(true)
+      expect(TurnstileVerifier).not_to receive(:new)
+      expect {
+        post area_alerts_path(area), params: { email: valid_email }
+      }.to change(Alert, :count).by(1)
+      expect(response).to redirect_to(area_path(area))
+    end
+
+    it "renders a signup form without a CAPTCHA or disabled submit button" do
+      allow(TurnstileVerifier).to receive(:configured?).and_return(true)
+      get area_path(area)
+
+      form = Nokogiri::HTML(response.body).at_css("form[action='#{area_alerts_path(area)}']")
+      expect(form).to be_present
+      expect(form.at_css('[data-controller="turnstile"]')).to be_nil
+      expect(form.at_css('button[type="submit"]')["disabled"]).to be_nil
+    end
+
+    it "suppresses repeated confirmations for the same normalized email" do
+      post area_alerts_path(area), params: { email: valid_email }
+      expect(AlertMailer).not_to receive(:with)
+      expect {
+        post area_alerts_path(area), params: { email: "  TEST@EXAMPLE.COM " }
+      }.not_to change(Alert, :count)
+      expect(flash[:alert]).to include("Too many confirmation requests")
+    end
+
+    it "preserves escaped email input and neighbor selections after an invalid signup" do
+      post area_alerts_path(area), params: {
+        email: 'test@example.com"><script>alert(1)</script>', neighbor_area_ids: [ area.id ]
+      },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(response.body).to include('value="test@example.com&quot;&gt;&lt;script&gt;')
+      expect(response.body).not_to include("<script>alert(1)</script>")
+      expect(response.body).to include('role="alert"')
+      expect(response.body).to include('name="neighbor_area_ids[]"', "value=\"#{area.id}\"")
+    end
+
+    it "rejects a second email request across different areas without writing records" do
+      other_area = create(:area, ward: 29, number: 1, shortcode: "W29A1", slug: "ward-29-sweep-area-1")
+      post area_alerts_path(area), params: { email: valid_email }
+
+      expect(AlertMailer).not_to receive(:with)
+      expect {
+        post area_alerts_path(other_area), params: { email: valid_email },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      }.not_to change(Alert, :count)
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.headers["Retry-After"]).to eq("60")
+      expect(response.body).to include('value="test@example.com"')
+    end
+
+    it "returns a structured error for rate-limited JSON requests" do
+      post area_alerts_path(area), params: { email: valid_email }
+      post area_alerts_path(area, format: :json), params: { email: valid_email }
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.parsed_body["error"]).to include("Too many confirmation requests")
+      expect(response.headers["Retry-After"]).to eq("60")
+    end
+
+    [ "text/vnd.turbo-stream.html", "application/json", "text/html" ].each do |accept|
+      it "reports cache unavailability safely for #{accept}" do
+        # Leave middleware's cache operational; fail the email reservation only.
+        allow(Rack::Attack.cache.store).to receive(:increment).and_call_original
+        allow(Rack::Attack.cache.store).to receive(:increment)
+          .with(start_with("confirmation-email/"), 1, expires_in: anything).and_return(nil)
+        expect(AlertMailer).not_to receive(:with)
+
+        expect {
+          post area_alerts_path(area), params: { email: valid_email }, headers: { "Accept" => accept }
+        }.not_to change(Subscriber, :count)
+        expect(response.headers["Retry-After"]).to eq("60")
+        if accept == "text/html"
+          expect(response).to have_http_status(:see_other)
+          expect(flash[:alert]).to include("temporarily unavailable")
+        else
+          expect(response).to have_http_status(:service_unavailable)
+          expect(response.body).to include("temporarily unavailable")
+          expect(response.body).not_to include("Too many confirmation requests")
+        end
+      end
+    end
+
     context "with a valid email" do
       it "creates an alert for the area" do
         expect {

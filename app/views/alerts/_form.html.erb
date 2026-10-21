@@ -1,5 +1,4 @@
 <%= form_with url: area_alerts_path(@area) do |f| %>
-  <%= f.label :email, class: "sr-only" %>
   <% if @viewing_adjacent_area %>
     <%= hidden_field_tag :from_neighbor, 1 %>
     <div class="mt-4 flex gap-2 items-start bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
@@ -10,20 +9,22 @@
     </div>
   <% end %>
   <% if !@alert || !@alert.persisted? %>
+    <%= f.label :email, class: "sr-only" %>
+    <% Array(params[:neighbor_area_ids]).compact_blank.uniq.each do |id| %>
+      <%= hidden_field_tag "neighbor_area_ids[]", id, data: { neighbor_hidden: id } %>
+    <% end %>
     <div class="mt-4 flex flex-col">
       <% if @searched_address.present? %>
         <div class="flex gap-2 items-center">
-          <%= f.check_box :is_save_street_address, checked: session[:is_save_street_address_checked], class: "h-4 w-4 rounded border-gray-400 text-sky-500 focus:ring-sky-500" %>
+          <%= f.check_box :is_save_street_address, checked: params[:action] == "create" ? params[:is_save_street_address] == "1" : session[:is_save_street_address_checked], class: "h-4 w-4 rounded border-gray-400 text-sky-500 focus:ring-sky-500" %>
           <%= f.label :is_save_street_address, "Save my street address so I won't need to re-subscribe next year", class: "text-xs text-gray-400" %>
         </div>
       <% end %>
       <div class="flex mt-3">
-        <div class="relative flex items-stretch grow focus-within:z-10">
-          <%= f.text_field :email, class: "focus:ring-sky-500 focus:border-sky-500 block w-full rounded-none rounded-l-md border-gray-300", placeholder: "you@example.com" %>
+        <div class="relative flex items-stretch grow min-w-0 focus-within:z-10">
+          <%= f.email_field :email, value: params[:email].to_s, class: "focus:ring-sky-500 focus:border-sky-500 block w-full min-w-0 rounded-none rounded-l-md border-gray-300", placeholder: "you@example.com", autocomplete: "email", required: true %>
         </div>
-        <button class="-ml-px relative inline-flex items-center gap-2 px-4 py-2 border border-transparent font-medium rounded-r-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-hidden focus:ring-1 focus:ring-sky-500">
-          Subscribe
-        </button>
+        <%= f.button "Subscribe", type: "submit", class: "-ml-px relative inline-flex shrink-0 items-center gap-2 px-4 py-2 border border-transparent font-medium rounded-r-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-hidden focus:ring-1 focus:ring-sky-500" %>
       </div>
     </div>
   <% end %>

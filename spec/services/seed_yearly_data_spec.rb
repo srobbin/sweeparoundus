@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe SeedYearlyData, type: :model do
+  include ActiveSupport::Testing::TimeHelpers
   describe '#call' do
     let!(:sweep) { create(:sweep) }
     let(:year) { Time.current.year.to_s }
@@ -108,15 +109,22 @@ RSpec.describe SeedYearlyData, type: :model do
           it 'merges month-boundary pairs into a single Sweep' do
             subject
             area = Area.find_by(ward: 1, number: 4)
-            current_year = Date.current.year
-
-            sep_30 = Date.new(current_year, 9, 30)
-            oct_01 = Date.new(current_year, 10, 1)
+            sep_30 = Date.new(year.to_i, 9, 30)
+            oct_01 = Date.new(year.to_i, 10, 1)
 
             merged_sweep = area.sweeps.find_by(date_1: sep_30, date_2: oct_01)
             expect(merged_sweep).to be_present
             expect(area.sweeps.where(date_1: sep_30, date_2: nil)).to be_empty
             expect(area.sweeps.where(date_1: oct_01, date_2: nil)).to be_empty
+          end
+
+          it 'imports dates for the requested year rather than the current year' do
+            travel_to Time.zone.local(2027, 6, 1) do
+              expect(subject).to include('SUCCESS')
+              dates = Sweep.pluck(:date_1, :date_2, :date_3, :date_4).flatten.compact
+              expect(dates).not_to be_empty
+              expect(dates.map(&:year).uniq).to eq([ 2026 ])
+            end
           end
         end
 
