@@ -116,7 +116,7 @@ class SeedYearlyData
         day = day.strip
         next if day.blank?
 
-        map[area] << Date.new(Date.current.year, month.to_i, day.to_i)
+        map[area] << Date.new(Integer(year), month.to_i, day.to_i)
       end
     end
 

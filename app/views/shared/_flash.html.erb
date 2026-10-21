@@ -1,5 +1,5 @@
 <% flash.each do |key, value| %>
-  <%= content_tag :div, class: "rounded-md p-4 mb-6 #{%w(alert error).include?(key) ? "bg-red-100" :  "bg-sky-100"}" do %>
+  <%= content_tag :div, role: %w(alert error).include?(key) ? "alert" : "status", class: "rounded-md p-4 mb-6 #{%w(alert error).include?(key) ? "bg-red-100" :  "bg-sky-100"}" do %>
     <div class="flex">
       <div class="shrink-0">
         <% if %w(alert error).include?(key) %>

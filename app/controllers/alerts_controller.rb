@@ -12,6 +12,18 @@ class AlertsController < ApplicationController
 
   def create
     email = params[:email].to_s.strip.downcase
+    if email.match?(Subscriber::VALID_EMAIL_REGEX)
+      limiter = ConfirmationEmailRateLimiter.new(email)
+      unless limiter.allowed?
+        if limiter.unavailable?
+          return reject_signup("Subscriptions are temporarily unavailable. Please try again shortly.",
+            status: :service_unavailable, retry_after: limiter.retry_after)
+        end
+        return reject_signup("Too many confirmation requests. Please try again later.",
+          status: :too_many_requests, retry_after: limiter.retry_after)
+      end
+    end
+
     subscriber = find_or_create_subscriber(email)
 
     unless subscriber
@@ -73,6 +85,20 @@ class AlertsController < ApplicationController
   end
 
   private
+
+  def reject_signup(message, status:, retry_after: nil)
+    # Keep the form available for retries, preserving submitted values in Turbo.
+    @alert = @area.alerts.new
+    response.set_header("Retry-After", retry_after.to_s) if retry_after
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:alert] = message
+        render :create, status: status
+      end
+      format.html { redirect_to @area, alert: message, status: :see_other }
+      format.json { render json: { error: message }, status: status }
+    end
+  end
 
   def find_area
     @area = Area.find(params[:area_id])
