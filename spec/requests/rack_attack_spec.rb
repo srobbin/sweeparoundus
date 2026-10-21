@@ -62,11 +62,29 @@ RSpec.describe "Rack::Attack", type: :request do
     end
 
     it "throttles requests exceeding the limit" do
-      4.times { post "/subscriptions/send_link", params: { email: "test@example.com" } }
+      4.times do
+        post "/subscriptions/send_link", params: { email: "test@example.com" },
+          headers: { "Accept" => "application/json" }
+      end
 
       expect(response).to have_http_status(429)
+      expect(response.media_type).to eq("application/json")
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Rate limit exceeded. Try again later.")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+    end
+
+    it "serves an uncached error page when a browser exceeds the limit" do
+      4.times do
+        post "/subscriptions/send_link", params: { email: "test@example.com" },
+          headers: { "Accept" => "text/html" }
+      end
+
+      expect(response).to have_http_status(429)
+      expect(response.media_type).to eq("text/html")
+      expect(response.body).to include("Too many requests")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(response.headers["Retry-After"]).to be_present
     end
 
     it "does not throttle GET requests to subscriptions" do

@@ -59,10 +59,10 @@ class Rack::Attack
     [
       429,
       {
-        "Content-Type" => html ? "text/html; charset=utf-8" : "application/json",
-        "Retry-After" => retry_after.to_s,
-        "Cache-Control" => "no-store",
-        "Vary" => "Accept"
+        "content-type" => html ? "text/html; charset=utf-8" : "application/json",
+        "retry-after" => retry_after.to_s,
+        "cache-control" => "no-store",
+        "vary" => "Accept"
       },
       [ html ? RATE_LIMIT_PAGE : { error: "Rate limit exceeded. Try again later." }.to_json ]
     ]
