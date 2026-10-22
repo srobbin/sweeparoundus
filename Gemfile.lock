@@ -463,7 +463,7 @@ GEM
     sawyer (0.9.3)
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
-    scout_apm (6.2.1)
+    scout_apm (6.3.1)
       parser
     scout_apm_logging (2.1.0)
       google-protobuf (>= 3.18)
@@ -584,7 +584,7 @@ DEPENDENCIES
   rspec-rails (~> 8.0)
   rubocop-rails-omakase
   sassc-embedded (~> 1.80)
-  scout_apm (~> 6.2)
+  scout_apm (~> 6.3)
   scout_apm_logging (~> 2.1)
   sendgrid-ruby (~> 6.7)
   sentry-rails (~> 6.6)
