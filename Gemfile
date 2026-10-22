@@ -22,7 +22,7 @@ gem "turbo-rails", "~> 2.0"
 
 # Authentication / Authorization
 gem "devise", "~> 5.0"
-gem "jwt", "~> 3.2"
+gem "jwt", "~> 3.3"
 gem "pundit", "~> 2.5"
 
 # Background Jobs
