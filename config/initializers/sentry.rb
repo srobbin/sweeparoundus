@@ -11,10 +11,11 @@ Sentry.init do |config|
     "ActiveRecord::RecordNotFound"
   ]
 
-  config.enable_logs = true
+  # Sentry 7 enables logs globally; Rails auto-collection is opt-in in 7.1.
+  config.rails.structured_logging.enabled = true
   config.enabled_patches << :logger
 
-  # The `:logger` patch sends Rails request-completion logs to Sentry. Drop
+  # Rails structured logging sends request-completion logs to Sentry. Drop
   # expected scanner/bot noise: 404s and JSON API 422s for missing/invalid params.
   # Keep other logs, including user-facing 422 form validation outside `/api/`.
   config.before_send_log = lambda do |log|
