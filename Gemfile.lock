@@ -312,8 +312,8 @@ GEM
       racc
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-x86_64-linux)
-    pg_query (6.2.2)
-      google-protobuf (>= 3.25.3)
+    pg_query (6.2.5)
+      google-protobuf (>= 4.34.0)
     pp (0.6.4)
       prettyprint
     prettyprint (0.2.1)
