@@ -2,7 +2,7 @@
 # BASE #
 ########
 
-FROM ruby:4.0.8-slim as base
+FROM ruby:4.0.9-slim as base
 
 # Install dependencies
 RUN apt-get update -qq \
