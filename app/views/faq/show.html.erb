@@ -127,6 +127,19 @@
 
         <details class="group border border-gray-200 rounded-lg">
           <summary class="flex items-center justify-between cursor-pointer list-none px-4 py-3 text-base font-semibold text-gray-900 rounded-lg hover:bg-gray-50 group-open:bg-sky-50 group-open:rounded-b-none">
+            How do I tell which side of the street will be swept on which day?
+            <%= icon "caret-down", class: "w-5 h-5 shrink-0 transition-transform group-open:rotate-180", aria: { hidden: true } %>
+          </summary>
+          <div class="px-4 pt-4 pb-4 flex flex-col gap-2 border-t border-gray-100 text-gray-600 leading-relaxed">
+            <p>
+              The City's sweep schedule data only gives us the dates in each two-day window, <em>not</em> which side maps to which date.
+              Unfortunately, that means you need to check the posted signs for the day of the week that each side will be swept.
+            </p>
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg">
+          <summary class="flex items-center justify-between cursor-pointer list-none px-4 py-3 text-base font-semibold text-gray-900 rounded-lg hover:bg-gray-50 group-open:bg-sky-50 group-open:rounded-b-none">
             Can I depend on <%= ENV["SITE_NAME"] %>?
             <%= icon "caret-down", class: "w-5 h-5 shrink-0 transition-transform group-open:rotate-180", aria: { hidden: true } %>
           </summary>
