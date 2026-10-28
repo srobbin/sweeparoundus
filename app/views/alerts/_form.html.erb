@@ -16,7 +16,7 @@
     <div class="mt-4 flex flex-col">
       <% if @searched_address.present? %>
         <div class="flex gap-2 items-center">
-          <%= f.check_box :is_save_street_address, checked: params[:action] == "create" ? params[:is_save_street_address] == "1" : session[:is_save_street_address_checked], class: "h-4 w-4 rounded border-gray-400 text-sky-500 focus:ring-sky-500" %>
+          <%= f.check_box :is_save_street_address, checked: params[:action] == "create" ? params[:is_save_street_address] == "1" : session[:is_save_street_address_checked], class: "h-4 w-4 rounded border-gray-400 text-sky-600 focus:ring-sky-500" %>
           <%= f.label :is_save_street_address, "Save my street address so I won't need to re-subscribe next year", class: "text-xs text-gray-400" %>
         </div>
       <% end %>
