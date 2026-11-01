@@ -17,7 +17,7 @@ gem "rails_icons", "~> 1.10"
 gem "sassc-embedded", "~> 1.80"
 gem "sprockets-rails", "~> 3.5"
 gem "stimulus-rails", "~> 1.3"
-gem "tailwindcss-rails", "~> 4.6"
+gem "tailwindcss-rails", "~> 4.7"
 gem "turbo-rails", "~> 2.0"
 
 # Authentication / Authorization
