@@ -613,7 +613,7 @@ DEPENDENCIES
   sendgrid-ruby (~> 6.7)
   sentry-rails (~> 7.2)
   sentry-ruby (~> 7.1)
-  sentry-sidekiq (~> 7.1)
+  sentry-sidekiq (~> 7.2)
   sidekiq (~> 8.1)
   sidekiq-cron (~> 2.0)
   sprockets-rails (~> 3.5)
