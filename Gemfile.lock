@@ -483,7 +483,7 @@ GEM
     sawyer (0.9.3)
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
-    scout_apm (6.3.1)
+    scout_apm (6.3.2)
       parser
     scout_apm_logging (2.2.0)
       google-protobuf (>= 3.18)
