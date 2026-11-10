@@ -73,7 +73,7 @@ group :development, :test do
   gem "faker", "~> 3.8"
   gem "pg_query", "~> 6.2"
   gem "prosopite", "~> 2.5"
-  gem "rspec-rails", "~> 8.0"
+  gem "rspec-rails", "~> 8.1"
 end
 
 group :development do
