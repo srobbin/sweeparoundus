@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_05_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -108,6 +108,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_000001) do
     t.index ["ward"], name: "index_cdot_permits_on_ward"
   end
 
+  create_table "one_off_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "alert_id", null: false
+    t.string "campaign", null: false
+    t.datetime "queued_at", null: false
+    t.index ["alert_id"], name: "index_one_off_notifications_on_alert_id"
+    t.index ["campaign", "alert_id"], name: "index_one_off_notifications_on_campaign_and_alert_id", unique: true
+  end
+
   create_table "subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -128,5 +136,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_000001) do
 
   add_foreign_key "alerts", "areas"
   add_foreign_key "alerts", "subscribers"
+  add_foreign_key "one_off_notifications", "alerts", on_delete: :cascade
   add_foreign_key "sweeps", "areas"
 end

@@ -10,12 +10,46 @@ RSpec.describe "Home", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    context "in December (sweeping done for year)" do
-      it "shows the off-season message" do
+    context "during the 2026 extended season (Nov 19-Dec 17)" do
+      it "shows the extended sweeping message" do
         travel_to Date.new(2026, 12, 15) do
           get root_path
 
+          expect(response.body).to include("SWEEPING EXTENDED THROUGH DEC 17")
+          expect(response.body).to include("will not be updated")
+        end
+      end
+    end
+
+    context "after the extended season (sweeping done for year)" do
+      it "shows the off-season message" do
+        travel_to Date.new(2026, 12, 18) do
+          get root_path
+
           expect(response.body).to include("SWEEP YOU NEXT YEAR")
+        end
+      end
+    end
+
+    {
+      Date.new(2026, 11, 18) => false,
+      Date.new(2026, 11, 19) => true,
+      Date.new(2026, 12, 17) => true,
+      Date.new(2026, 12, 18) => false,
+      Date.new(2027, 12, 1) => false
+    }.each do |date, extended|
+      it "shows the extension only within its date range on #{date}" do
+        travel_to date do
+          get root_path
+
+          if extended
+            expect(response.body).to include("SWEEPING EXTENDED THROUGH DEC 17")
+            expect(response.body).to include("will not be updated")
+          else
+            expect(response.body).not_to include("SWEEPING EXTENDED THROUGH DEC 17")
+            expect(response.body).not_to include("Extended season through Dec. 17:")
+            expect(response.body).to include("SWEEP YOU NEXT YEAR") if date.month == 12
+          end
         end
       end
     end

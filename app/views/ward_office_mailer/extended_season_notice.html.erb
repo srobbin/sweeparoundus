@@ -1,0 +1,29 @@
+<p>Dear Alderperson <%= @name %>,</p>
+
+<p>
+  The City has <%= link_to "extended street sweeping through Dec. 17", "https://chicago.suntimes.com/news/2026/11/19/chicago-extends-street-sweeping-to-week-before-christmas-as-leaves-linger-on-city-trees" %>—about
+  a month past its usual Thanksgiving cutoff—to catch lingering leaves
+  (<%= link_to "Sun-Times, Nov. 19", "https://chicago.suntimes.com/news/2026/11/19/chicago-extends-street-sweeping-to-week-before-christmas-as-leaves-linger-on-city-trees" %>).
+  Extra sweeps will be scheduled ad hoc based on weather and crew capacity.
+</p>
+
+<p>
+  When we reached out to the City's Open Data team, they informed us that the Department of Streets and Sanitation will <strong>NOT</strong> be updating the
+  <%= link_to "2026 schedule dataset", "https://data.cityofchicago.org/Sanitation/Street-Sweeping-Schedule-2026/u5ai-3efk/about_data" %>
+  that <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %> relies upon. Unfortunately, this means that schedules and email alerts on our site will miss those extra sweeps.
+</p>
+
+<p>
+  We have emailed subscribers in Ward <%= @ward %> to watch for temporary orange signs through Dec. 17. We also included your office's contact information
+  so residents with feedback about late-season sweeping and the lack of a reliable schedule can reach you directly.
+</p>
+
+<p>
+  We wanted your office to have a heads-up in case constituents reach out. Thank you for helping to keep Chicago's streets clean!
+</p>
+
+<p>
+  Please note that <%= ENV["SITE_NAME"] %> is not affiliated with the City of Chicago.
+</p>
+
+<%= render "shared/email_footer", signoff: "Best regards,", coffee_link: false %>

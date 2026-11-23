@@ -20,4 +20,15 @@ class WardOfficeMailer < ApplicationMailer
       subject: "#{Time.current.year} Chicago street sweeping data delayed",
     )
   end
+
+  def extended_season_notice
+    @name = params[:name]
+    @email = params[:email]
+    @ward = params[:ward]
+
+    mail(
+      to: @email,
+      subject: "Chicago street sweeping extended thru Dec 17 (with no reliable schedule)",
+    )
+  end
 end
