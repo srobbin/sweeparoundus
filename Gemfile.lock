@@ -148,6 +148,7 @@ GEM
       net-http (~> 0.5)
     faraday-retry (2.4.0)
       faraday (~> 2.0)
+    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
@@ -163,6 +164,9 @@ GEM
       raabro (~> 1.4)
     globalid (1.4.0)
       activesupport (>= 6.1)
+    google-protobuf (4.36.2)
+      bigdecimal
+      rake (~> 13.3)
     google-protobuf (4.36.2-aarch64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
@@ -250,6 +254,7 @@ GEM
       net-smtp
     marcel (1.2.1)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (6.1.0)
       drb (~> 2.0)
       prism (>= 1.5, < 3)
@@ -267,6 +272,9 @@ GEM
     net-smtp (0.5.2)
       net-protocol
     nio4r (2.7.5)
+    nokogiri (1.19.7)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.7-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.7-arm64-darwin)
@@ -323,9 +331,10 @@ GEM
     orm_adapter (0.5.0)
     ostruct (0.6.3)
     parallel (2.1.0)
-    parser (3.3.13.0)
+    parser (3.3.14.0)
       ast (~> 2.4.1)
       racc
+    pg (1.7.0)
     pg (1.7.0-aarch64-linux)
     pg (1.7.0-arm64-darwin)
     pg (1.7.0-x86_64-linux)
@@ -472,6 +481,9 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     ruby_http_client (3.6.0)
+    sass-embedded (1.106.1)
+      google-protobuf (~> 4.31)
+      rake (~> 13.3)
     sass-embedded (1.106.1-aarch64-linux-gnu)
       google-protobuf (~> 4.31)
     sass-embedded (1.106.1-arm64-darwin)
@@ -483,7 +495,7 @@ GEM
     sawyer (0.9.3)
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
-    scout_apm (6.3.2)
+    scout_apm (6.4.0)
       parser
     scout_apm_logging (2.2.0)
       google-protobuf (>= 3.18)
@@ -534,6 +546,7 @@ GEM
     tailwindcss-rails (4.7.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.3.3)
     tailwindcss-ruby (4.3.3-aarch64-linux-gnu)
     tailwindcss-ruby (4.3.3-arm64-darwin)
     tailwindcss-ruby (4.3.3-x86_64-linux-gnu)
@@ -608,7 +621,7 @@ DEPENDENCIES
   rspec-rails (~> 8.1)
   rubocop-rails-omakase
   sassc-embedded (~> 1.80)
-  scout_apm (~> 6.3)
+  scout_apm (~> 6.4)
   scout_apm_logging (~> 2.2)
   sendgrid-ruby (~> 6.7)
   sentry-rails (~> 7.2)
