@@ -130,4 +130,52 @@ RSpec.describe WardOfficeMailer, type: :mailer do
       expect(text_body).to include("is not affiliated with the City of Chicago")
     end
   end
+
+  describe '#extended_season_notice email' do
+    let(:mail) do
+      described_class
+        .with(name: "La Spata", email: "Ward01@cityofchicago.org", ward: "1")
+        .extended_season_notice
+        .deliver_now
+    end
+
+    let(:html_body) do
+      mail.body.parts.find { |p| p.content_type.match 'text/html' }.body.raw_source
+    end
+
+    let(:text_body) do
+      mail.body.parts.find { |p| p.content_type.match 'text/plain' }.body.raw_source
+    end
+
+    it 'has the right attributes' do
+      expect(mail.from).to eq([ ENV["DEFAULT_EMAIL"] ])
+      expect(mail.to).to eq([ "Ward01@cityofchicago.org" ])
+      expect(mail.subject).to eq("Chicago street sweeping extended thru Dec 17 (with no reliable schedule)")
+    end
+
+    it 'includes the alderperson name and ward in the HTML body' do
+      expect(html_body).to include("Dear Alderperson La Spata")
+      expect(html_body).to include("Ward 1")
+    end
+
+    it 'includes the extension announcement in the HTML body' do
+      expect(html_body).to include("extended street sweeping through Dec. 17")
+      expect(html_body).to include("Sun-Times, Nov. 19")
+      expect(html_body).to include("will <strong>NOT</strong> be updating")
+      expect(html_body).to include("Unfortunately, this means that schedules and email alerts")
+      expect(html_body).to include("lack of a reliable schedule")
+    end
+
+    it 'includes the unaffiliated disclaimer in the HTML body' do
+      expect(html_body).to include("is not affiliated with the City of Chicago")
+    end
+
+    it 'includes the correct content in the text body' do
+      expect(text_body).to include("Dear Alderperson La Spata")
+      expect(text_body).to include("Ward 1")
+      expect(text_body).to include("extended street sweeping through Dec. 17")
+      expect(text_body).to include("will NOT be updating")
+      expect(text_body).to include("is not affiliated with the City of Chicago")
+    end
+  end
 end

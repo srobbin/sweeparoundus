@@ -14,6 +14,86 @@ RSpec.describe AlertMailer, type: :mailer do
     mail.body.parts.find { |p| p.content_type.match 'text/plain' }.body.raw_source
   end
 
+  describe '#extended_season_notice email' do
+    let(:alert) { create :alert, :confirmed, :with_address, area: area }
+    let(:mail) do
+      described_class.with(alert: alert, ward_office: nil).extended_season_notice
+    end
+
+    it 'renders the generic contact link without retrying an explicitly skipped lookup' do
+      expect(WardOfficeLookup).not_to receive(:for_ward)
+
+      expect(html_body).to include("https://www.chicago.gov/city/en/about/wards.html")
+      expect(text_body).to include("https://www.chicago.gov/city/en/about/wards.html")
+    end
+
+    context 'without a street address' do
+      let(:alert) { create :alert, :confirmed, area: area }
+
+      it 'identifies the subscribed area in both formats' do
+        expect(html_body).to include("for #{area.name}.")
+        expect(text_body).to include("for #{area.name}.")
+      end
+    end
+
+    context 'with personalized contact information' do
+      let(:office) do
+        {
+          ward: "1",
+          alderperson: "Daniel La Spata",
+          phone: "(872) 206-2685",
+          email: "Ward01@cityofchicago.org",
+          website: "https://www.the1stward.com/"
+        }
+      end
+      let(:mail) do
+        described_class.with(alert: alert, ward_office: office).extended_season_notice
+      end
+
+      it 'renders the supplied contact details in both formats without looking them up again' do
+        expect(WardOfficeLookup).not_to receive(:for_ward)
+
+        [ html_body, text_body ].each do |body|
+          expect(body).to include("Ward 1")
+          expect(body).to include("Daniel La Spata")
+          expect(body).to include(office[:phone], office[:email], office[:website])
+        end
+        expect(html_body).to include("mailto:#{office[:email]}")
+      end
+
+      context 'when optional contact fields are missing' do
+        let(:office) { super().merge(phone: nil, email: nil, website: nil) }
+
+        it 'omits empty contact fields from both formats' do
+          [ html_body, text_body ].each do |body|
+            expect(body).to include("Daniel La Spata")
+            expect(body).not_to include("Phone:", "Email:", "Website:")
+          end
+        end
+      end
+    end
+
+    context 'when no lookup result was supplied' do
+      let(:mail) { described_class.with(alert: alert).extended_season_notice }
+
+      it 'looks up the subscribed ward and renders its contact information' do
+        expect(WardOfficeLookup).to receive(:for_ward).with(area.ward).once.and_return(
+          { ward: area.ward.to_s, alderperson: "Test Alderperson" }
+        )
+
+        expect(html_body).to include("Test Alderperson")
+        expect(text_body).to include("Test Alderperson")
+      end
+
+      it 'renders the generic link when the CSV cannot be read' do
+        allow(WardOfficeLookup).to receive(:for_ward).and_raise(Errno::ENOENT)
+
+        expect(html_body).to include("https://www.chicago.gov/city/en/about/wards.html")
+        expect(text_body).to include("https://www.chicago.gov/city/en/about/wards.html")
+      end
+    end
+  end
+
   describe '#annual_schedule_live email' do
     let!(:alert) { create :alert, :with_address, area: area }
     let(:mail) do

@@ -1,0 +1,47 @@
+<% content_for :preheader do %>Chicago sweeping is extended through Dec 17.<% end %>
+
+<p>Hello,</p>
+
+<p>
+  You're receiving this email because you subscribed to Chicago street sweeping alerts through <%= link_to ENV["SITE_NAME"], ENV["SITE_URL"] %> for <%= @street_address.presence || @area.name %>.
+</p>
+
+<p>
+  The City has <%= link_to "extended street sweeping through Dec. 17", "https://chicago.suntimes.com/news/2026/11/19/chicago-extends-street-sweeping-to-week-before-christmas-as-leaves-linger-on-city-trees" %>—about a month past its usual Thanksgiving cutoff—to catch lingering leaves
+  (<%= link_to "Sun-Times, Nov. 19", "https://chicago.suntimes.com/news/2026/11/19/chicago-extends-street-sweeping-to-week-before-christmas-as-leaves-linger-on-city-trees" %>).
+  Extra sweeps will be scheduled ad hoc based on weather and crew capacity.
+</p>
+
+<p>
+  When we reached out to the City's Open Data team, they informed us that the Department of Streets and Sanitation will <strong>NOT</strong> be updating the
+  <%= link_to "2026 schedule dataset", "https://data.cityofchicago.org/Sanitation/Street-Sweeping-Schedule-2026/u5ai-3efk/about_data" %>
+  that powers <%= ENV["SITE_NAME"] %>. Unfortunately, this means that schedules and email alerts here will miss those extra sweeps.
+</p>
+
+<p>
+  Through Dec. 17, please watch for temporary orange signs on your block.
+</p>
+
+<% if @ward_office %>
+  <p>
+    Have feedback about late-season sweeping and the lack of a reliable schedule? Consider letting your alderperson know:
+  </p>
+
+  <ul>
+    <li>Ward <%= @ward_office[:ward] %> — Alderperson <%= @ward_office[:alderperson] %></li>
+    <% if @ward_office[:phone] %><li>Phone: <%= @ward_office[:phone] %></li><% end %>
+    <% if @ward_office[:email] %><li>Email: <%= mail_to @ward_office[:email] %></li><% end %>
+    <% if @ward_office[:website] %><li>Website: <%= link_to @ward_office[:website], @ward_office[:website] %></li><% end %>
+  </ul>
+<% else %>
+  <p>
+    Have feedback about late-season sweeping and the lack of a reliable schedule? Consider contacting
+    <%= link_to "your alderperson", "https://www.chicago.gov/city/en/about/wards.html" %>
+    and asking for a permanently extended schedule.
+  </p>
+<% end %>
+
+<%= render "shared/email_footer",
+      disclaimer: true,
+      manage_url: @manage_url,
+      unsubscribe_url: @unsubscribe_url %>

@@ -1,14 +1,15 @@
 class AlertMailer < ApplicationMailer
   before_action :set_alert_and_area
   before_action :set_email
-  before_action :set_street_address, only: [ :reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed ]
+  before_action :set_street_address, only: [ :reminder, :confirm, :annual_schedule_live, :sweeping_data_delayed, :extended_season_notice ]
   before_action :set_formatted_address_area, only: [ :confirm ]
   before_action :set_multi_flag, only: [ :confirm ]
   before_action :set_sweep_dates, only: [ :reminder ]
   before_action :set_annual_first_sweep, only: [ :annual_schedule_live ]
-  before_action :set_mailer_urls, only: [ :confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed ]
-  before_action :set_manage_url, only: [ :reminder, :annual_schedule_live, :sweeping_data_delayed ]
+  before_action :set_mailer_urls, only: [ :confirm, :reminder, :annual_schedule_live, :sweeping_data_delayed, :extended_season_notice ]
+  before_action :set_manage_url, only: [ :reminder, :annual_schedule_live, :sweeping_data_delayed, :extended_season_notice ]
   before_action :set_static_map_url, only: [ :reminder, :confirm ]
+  before_action :set_ward_office, only: [ :extended_season_notice ]
 
   def reminder
     mail(
@@ -32,6 +33,13 @@ class AlertMailer < ApplicationMailer
     mail(
       to: @email,
       subject: "#{Time.current.year} Chicago street sweeping alerts are delayed",
+    )
+  end
+
+  def extended_season_notice
+    mail(
+      to: @email,
+      subject: "Sweeping extended thru Dec 17 (without alerts)",
     )
   end
 
@@ -96,6 +104,13 @@ class AlertMailer < ApplicationMailer
 
   def set_manage_url
     @manage_url = manage_subscriptions_url(t: encode_manage_jwt(@email, expires_in: 60.days))
+  end
+
+  def set_ward_office
+    @ward_office = params.key?(:ward_office) ? params[:ward_office] : WardOfficeLookup.for_ward(@area.ward)
+  rescue SystemCallError, CSV::MalformedCSVError => e
+    Rails.logger.warn("[AlertMailer] Ward office lookup failed: #{e.class}: #{e.message}")
+    @ward_office = nil
   end
 
   def set_multi_flag
