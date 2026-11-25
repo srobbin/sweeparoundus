@@ -46,7 +46,7 @@ gem "sentry-sidekiq", "~> 7.2"
 gem "stackprof", "~> 0.2"
 
 # Email / Notifications
-gem "icalendar", "~> 2.13"
+gem "icalendar", "~> 2.14"
 gem "sendgrid-ruby", "~> 6.7"
 
 # GitHub API (CheckSweepingDataUpdatesJob opens data-update PRs).

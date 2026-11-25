@@ -184,7 +184,7 @@ GEM
     hashdiff (1.2.1)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.13.0)
+    icalendar (2.14.0)
       base64
       ice_cube (~> 0.16)
       logger
@@ -605,7 +605,7 @@ DEPENDENCIES
   faraday-retry (~> 2.3)
   foreman (~> 0.90.0)
   friendly_id (~> 5.7)
-  icalendar (~> 2.13)
+  icalendar (~> 2.14)
   importmap-rails (~> 2.2)
   jwt (~> 3.3)
   letter_opener_web (~> 3.0)
