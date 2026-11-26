@@ -418,9 +418,9 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    redis (6.0.0)
-      redis-client (= 0.30.1)
-    redis-client (0.30.1)
+    redis (6.1.0)
+      redis-client (= 0.31.0)
+    redis-client (0.31.0)
       connection_pool
     regexp_parser (2.12.0)
     reline (0.7.0)
@@ -621,7 +621,7 @@ DEPENDENCIES
   rack-attack (~> 6.7)
   rails (~> 8.1)
   rails_icons (~> 1.10)
-  redis (~> 6.0)
+  redis (~> 6.1)
   rgeo-geojson (~> 2.2)
   rspec-rails (~> 8.1)
   rubocop-rails-omakase

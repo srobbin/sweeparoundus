@@ -8,7 +8,7 @@ gem "rails", "~> 8.1"
 gem "bootsnap", "~> 1.26", require: false
 gem "pg", "~> 1.7"
 gem "puma", "~> 8.1"
-gem "redis", "~> 6.0"
+gem "redis", "~> 6.1"
 
 # Frontend / Assets
 gem "dartsass-rails", "~> 0.5.1"
